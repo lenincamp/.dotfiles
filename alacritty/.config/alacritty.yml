@@ -1,0 +1,225 @@
+env:
+  # TERM env customization.
+  #
+  # If this property is not set, alacritty will set it to xterm-256color.
+  #
+  # Note that some xterm terminfo databases don't declare support for italics.
+  # You can verify this by checking for the presence of `smso` and `sitm` in
+  # `infocmp xterm-256color`.
+  TERM: xterm-256color
+# Window Customization
+window:
+  opacity: .9
+  dimensions:
+    columns: 140
+    lines: 38
+  padding:
+    x: 3
+    y: 3
+  decorations: none #buttonless Still won't show in a window manger, but will in a desktop environment
+  startup_mode: Windowed
+
+scrolling:
+  history: 10000
+  multiplier: 3
+window.dynamic_title: true
+
+# Font Customization
+font:
+  normal:
+    family: Hack Nerd Font Mono
+    style: Regular
+  bold:
+    family: Hack Nerd Font Mono
+    style: Bold
+  italic:
+    family: Hack Nerd Font Mono
+    style: Italic
+  size: 16
+  offset:
+    x: 0
+    y: 0
+  glyph_offset:
+    x: 0
+    y: 0
+  # Scale the font size based on the monitor's DPI. This will lead to bigger text on HiDPI
+  # screens and make reading text a little easier.
+  scale_with_dpi: true
+  use_thin_strokes: true
+  debug:
+    persistent_logging: false
+# Use custom cursor colors. If true, display the cursor in the cursor.foreground
+# and cursor.background colors, otherwise invert the colors of the cursor.
+draw_bold_text_with_bright_colors: true
+schemes:
+  solarized_dark: &solarized_dark # Default colors
+    primary:
+      background: "#001b21" # base03 00151a
+      foreground: "#839496" # base0
+
+    # Cursor colors
+    cursor:
+      text: "#002b36" # base03
+      cursor: "#839496" # base0
+
+    # Normal colors
+    normal:
+      black: "#073642" # base02
+      red: "#dc322f" # red
+      green: "#859900" # green
+      yellow: "#b58900" # yellow
+      blue: "#268bd2" # blue
+      magenta: "#d33682" # magenta
+      cyan: "#2aa198" # cyan
+      white: "#eee8d5" # base2
+
+    # Bright colors
+    bright:
+      black: "#002b36" # base03
+      red: "#cb4b16" # orange
+      green: "#586e75" # base01
+      yellow: "#657b83" # base00
+      blue: "#839496" # base0
+      magenta: "#6c71c4" # violet
+      cyan: "#93a1a1" # base1
+      white: "#fdf6e3" # base3
+
+  monokai: &monokai # Default colors
+    primary:
+      background: "#272822"
+      foreground: "#F8F8F2"
+
+    # Normal colors
+    normal:
+      black: "#272822"
+      red: "#F92672"
+      green: "#A6E22E"
+      yellow: "#F4BF75"
+      blue: "#66D9EF"
+      magenta: "#AE81FF"
+      cyan: "#A1EFE4"
+      white: "#F8F8F2"
+
+    # Bright colors
+    bright:
+      black: "#75715E"
+      red: "#F92672"
+      green: "#A6E22E"
+      yellow: "#F4BF75"
+      blue: "#66D9EF"
+      magenta: "#AE81FF"
+      cyan: "#A1EFE4"
+      white: "#F9F8F5"
+  gruvbox_dark: &gruvbox_dark
+    primary:
+      # hard contrast background - '#1d2021'  282828
+      background: &gruvbox_dark_bg "#1d2021"
+      # soft contrast background - '#32302f'
+      foreground: "#ebdbb2"
+      bright_foreground: "#fbf1c7"
+      dim_foreground: "#a89984"
+    cursor:
+      text: CellBackground
+      cursor: CellForeground
+    vi_mode_cursor:
+      text: CellBackground
+      cursor: CellForeground
+    # search:
+    #   matches:
+    #     foreground: '#000000'
+    #     background: '#ffffff'
+    #   focused_match:
+    #    foreground: CellBackground
+    #    background: CellForeground
+    #   bar:
+    #     background: ''
+    #     foreground: ''
+    # line_indicator:
+    #   foreground: None
+    #   background: None
+    selection:
+      text: CellBackground
+      background: CellForeground
+    bright:
+      black: "#928374"
+      red: "#fb4934"
+      green: "#b8bb26"
+      yellow: "#fabd2f"
+      blue: "#83a598"
+      magenta: "#d3869b"
+      cyan: "#8ec07c"
+      white: "#ebdbb2"
+    normal:
+      black: *gruvbox_dark_bg
+      red: "#cc241d"
+      green: "#98971a"
+      yellow: "#d79921"
+      blue: "#458588"
+      magenta: "#b16286"
+      cyan: "#689d6a"
+      white: "#a89984"
+    dim:
+      black: "#32302f"
+      red: "#9d0006"
+      green: "#79740e"
+      yellow: "#b57614"
+      blue: "#076678"
+      magenta: "#8f3f71"
+      cyan: "#427b58"
+      white: "#928374"
+    # indexed_colors: []
+
+colors: *solarized_dark
+
+cursor:
+  style:
+    shape: Block
+    blinking: on
+    blink-interval: 750
+    unfocused_hollow: true
+# Live config reload (changes require restart)
+live_config_reload: true
+
+# Shell
+#
+# You can set shell.program to the path of your favorite shell, e.g. /bin/fish.
+# Entries in shell.args are passed unmodified as arguments to the shell.
+# shell:
+# program: /bin/zsh
+# args:
+#   - --login
+shell:
+  program: /usr/local/bin/tmux
+  args:
+    - new-session
+    - -A
+    - -D
+    - -s
+    - main
+#key bindings for tmux
+key_bindings:
+  - { key: N, mods: Command, action: SpawnNewInstance }
+  - { key: V, mods: Command, action: Paste }
+  - { key: C, mods: Command, action: Copy }
+  - { key: Q, mods: Command, action: Quit }
+  - { key: D, mods: Command, chars: "\x06\x76" }
+  - { key: D, mods: Command|Shift, chars: "\x06\x73" }
+  - { key: W, mods: Command, chars: "\x06\x78" }
+  - { key: H, mods: Command|Shift, chars: "\x06\x68" }
+  - { key: J, mods: Command|Shift, chars: "\x06\x6a" }
+  - { key: K, mods: Command|Shift, chars: "\x06\x6b" }
+  - { key: L, mods: Command|Shift, chars: "\x06\x6c" }
+  - { key: T, mods: Command, chars: "\x06\x63" }
+  - { key: Key1, mods: Command, chars: "\x06\x31" }
+  - { key: Key2, mods: Command, chars: "\x06\x32" }
+  - { key: Key3, mods: Command, chars: "\x06\x33" }
+  - { key: Key4, mods: Command, chars: "\x06\x34" }
+  - { key: Key5, mods: Command, chars: "\x06\x35" }
+  - { key: Key6, mods: Command, chars: "\x06\x36" }
+  - { key: Key7, mods: Command, chars: "\x06\x37" }
+  - { key: Key8, mods: Command, chars: "\x06\x38" }
+  - { key: Key9, mods: Command, chars: "\x06\x39" }
+  - { key: Left, mods: Command, chars: "\x06\x48" }
+  - { key: Down, mods: Command, chars: "\x06\x4a" }
+  - { key: Up, mods: Command, chars: "\x06\x4b" }
+  - { key: Right, mods: Command, chars: "\x06\x4c" }

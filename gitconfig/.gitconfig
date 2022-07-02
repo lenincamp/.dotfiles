@@ -1,0 +1,41 @@
+[core]
+  pager = delta
+[interactive]
+  diffFilter = delta --color-only
+[delta]
+  navigate = true  # use n and N to move between diff sections
+  features = side-by-side line-numbers decorations
+  #line-numbers-left-format = ""
+  #line-numbers-right-format = "│ "
+[delta "interactive"]
+  keep-plus-minus-markers = false
+
+[pager]
+	branch = false
+	diff = delta
+	log = delta
+	reflog = delta
+	show = delta
+[init]
+  defaultBranch = main
+[include]
+	path = ~/.local/.gitconfig
+
+[user]
+	name = lcampoverde
+	email = lenincamp18@gmail.com
+[merge]
+	tool = nvimdiff
+  conflictstyle = diff3
+[mergetool]
+  keepBackup = false
+  prompt = true
+#[mergetool "nvimdiff"]
+#  cmd = "nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'"
+[diff]
+	tool = nvimdiff
+  colorMoved = default
+[difftool]
+  prompt = false
+#[difftool "nvimdiff"]
+#    cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
