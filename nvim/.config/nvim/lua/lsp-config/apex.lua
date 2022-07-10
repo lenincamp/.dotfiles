@@ -6,9 +6,9 @@ if not configs.apex then
 	configs.apex = {
 		default_config = {
 			cmd = {
-				"/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home/bin/java",
+				"/usr/lib/jvm/default-runtime/bin/java",
 				"-cp",
-				"/Users/lcampoverde/.local/share/vim-lsp-settings/servers/apex-jorje-lsp/apex-jorje-lsp.jar",
+				"/home/lenin/.config/lsp-apex/apex-jorje-lsp.jar",
 				"-Ddebug.internal.errors=true",
 				"-Ddebug.semantic.errors=false",
 				"-Ddebug.completion.statistics=false",

@@ -32,8 +32,8 @@ bindkey "ç" fzf-cd-widget
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="robbyrussell"
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=23'
+# ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=23'
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
 
 # Set list of themes to pick from when loading at random
@@ -98,15 +98,13 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=23'
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
         git
-        zsh-vi-mode
         z
         fzf
-        docker
-        salesforce-cli-zsh-completion
-        zsh-interactive-cd
         fzf-tab
+        sfdx
+        docker
         zsh-syntax-highlighting
-        zsh-autosuggestions
+        zsh-vi-mode
 )
 # Open tmux on startup, requires tmux plugin
 # ZSH_TMUX_AUTOSTART=true
@@ -220,4 +218,5 @@ export LOCATE_PATH="$HOME/locatedb"
 export CC='gcc-11'
 export LANG=en_US.UTF-8
 export PATH=$PATH:~/.cargo/bin
+export BAT_THEME="Solarized (dark)"
 # export CLICOLOR=1

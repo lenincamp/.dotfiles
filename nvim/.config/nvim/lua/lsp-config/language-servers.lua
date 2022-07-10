@@ -4,6 +4,7 @@ local key_maps_on_attach = function(bufnr)
 	local function buf_set_keymap(...)
 		vim.api.nvim_buf_set_keymap(bufnr, ...)
 	end
+
 	local function buf_set_option(...)
 		vim.api.nvim_buf_set_option(bufnr, ...)
 	end
@@ -57,8 +58,13 @@ local servers = {
 	"tsserver",
 	"emmet_ls",
 	"sumneko_lua",
-	"ltex",
+	-- "ltex",
 	"eslint",
+	"cssls",
+	"cssmodules_ls",
+	"html",
+	"jsonls",
+	"tailwindcss",
 }
 
 ---@diagnostic disable-next-line: undefined-global
