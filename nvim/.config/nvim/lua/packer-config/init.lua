@@ -101,6 +101,7 @@ return require("packer").startup(function()
 	use("windwp/nvim-ts-autotag")
 	use("p00f/nvim-ts-rainbow")
 	use("nvim-lua/popup.nvim")
+	use("epilande/vim-react-snippets")
 
 	-- use("prabirshrestha/vim-lsp")
 	-- use('mattn/vim-lsp-settings')

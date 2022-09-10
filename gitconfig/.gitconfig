@@ -30,12 +30,12 @@
 [mergetool]
   keepBackup = false
   prompt = true
-#[mergetool "nvimdiff"]
-#  cmd = "nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'"
-[diff]
-	tool = nvimdiff
-  colorMoved = default
-[difftool]
-  prompt = false
+[mergetool "nvimdiff"]
+  cmd = "nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd W' -c 'wincmd J'"
+#[diff]
+#	tool = nvimdiff
+#  colorMoved = default
+#[difftool]
+#  prompt = false
 #[difftool "nvimdiff"]
-#    cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
+#  cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
