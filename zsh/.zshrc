@@ -1,14 +1,6 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-# fi
-
-
-export NVM_DIR="$HOME/.nvm"
-  [ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+ export NVM_DIR="$HOME/.nvm"
+   [ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+   [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 
 
@@ -22,18 +14,16 @@ export ZSH="/Users/lcampoverde/.oh-my-zsh"
 autoload -U colors && colors
 autoload compinit && compinit
 
-# vi mode
-# bindkey -v
-# export KEYTIMEOUT=1
-bindkey "ç" fzf-cd-widget
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
-# ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=23'
+# ZSH_THEME="robbyrussell"
+# ZSH_THEME="archcraft-dwm"
+ZSH_THEME="macovsky-ruby"
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+#ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=23'
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
 
 # Set list of themes to pick from when loading at random
@@ -98,17 +88,15 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
         git
+        zsh-vi-mode
         z
         fzf
-        fzf-tab
-        sfdx
         docker
+        salesforce-cli-zsh-completion
+        fzf-tab
         zsh-syntax-highlighting
-        zsh-vi-mode
+        zsh-autosuggestions
 )
-# Open tmux on startup, requires tmux plugin
-# ZSH_TMUX_AUTOSTART=true
-
 
 # User configuration
 
@@ -161,38 +149,15 @@ alias fgcot='gco $(g tag | fzf)'
 alias fgco='gco $(gb | fzf)'
 alias fgcor='gco --track $(gbr | fzf)'
 
-
-
-#alias gcf="gco $(gb | fzf)"
-#alias gcrf="git checkout $(git branch -r | fzf)"
-#git checkout --track $()
-#. $(brew --prefix)/etc/profile.d/z.sh
-
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 
-source /Users/lcampoverde/.oh-my-zsh/custom/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 source $ZSH/oh-my-zsh.sh
-# source ~/powerlevel10k/powerlevel10k.zsh-theme
-
-# The plugin will auto execute this zvm_config function
-zvm_config() {
-  # Retrieve default cursor styles
-  local ncur=$(zvm_cursor_style $ZVM_NORMAL_MODE_CURSOR)
-  local icur=$(zvm_cursor_style $ZVM_INSERT_MODE_CURSOR)
-
-  # Append your custom color for your cursor
-  ZVM_INSERT_MODE_CURSOR=$icur'\e\e]12;red\a'
-  ZVM_NORMAL_MODE_CURSOR=$ncur'\e\e]12;#008800\a'
-  ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
-}
 
 function zvm_after_init() {
   [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 }
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-#[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
@@ -204,19 +169,7 @@ source $(dirname $(arch -x86_64 gem which colorls))/tab_complete.sh
 alias ll='colorls -lA --sd'
 alias ls="colorls --gs --sd"
 
-# https://egeek.me/2020/04/18/enabling-locate-on-osx/
-if which glocate > /dev/null; then
-  alias locate="glocate -d $HOME/locatedb"
-
-  # Using cache_list requires `LOCATE_PATH` environment var to exist in session.
-  # trouble shoot: `echo $LOCATE_PATH` needs to return db path.
-  [[ -f "$HOME/locatedb" ]] && export LOCATE_PATH="$HOME/locatedb"
-fi
-
-alias loaddb="gupdatedb --localpaths=$HOME --prunepaths=/Volumes --output=$HOME/locatedb"
-export LOCATE_PATH="$HOME/locatedb"
 export CC='gcc-11'
 export LANG=en_US.UTF-8
 export PATH=$PATH:~/.cargo/bin
-export BAT_THEME="Solarized (dark)"
-# export CLICOLOR=1
+eval "$(starship init zsh)"
