@@ -1,29 +1,18 @@
-require("packer-config")
-require("options")
-require("keymap-config")
-require("autopairs-config")
-require("lualine-config")
--- require("barbar-config")
--- require("colors-config.nightfox")
--- require("colors-config.tokyo-night")
--- require("nvim-tree-config")
-require("toggleterm-config")
-require("comment-nvim-config")
-require("neorg-config")
-require("colorizer-config")
-require("indent-blankline-config")
--- require("shade-config")
-require("truezen-config")
---require("mdeval-config")
---> tree-sitter and tree-sitter plugins
-require("treesitter-config")
---> lsp modules
-require("lsp-config.language-servers")
-require("lsp-config.apex")
-require("lsp-config.lspsaga")
-require("lsp-config.completion")
-require("lsp-config.null-ls")
+require('base')
+require('highlights')
+require('maps')
+require('plugins')
+require('macos')--temporary setting macos as linux
 
--- telescope and telescope plugins
-require("telescope-config")
-require("gitsigns-config")
+local has = function(x)
+  return vim.fn.has(x) == 1
+end
+local is_mac = has "macunix"
+local is_win = has "win32"
+
+--if is_mac then
+--  require('macos')
+--end
+--if is_win then
+--  require('windows')
+--end
