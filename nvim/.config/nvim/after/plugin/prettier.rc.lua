@@ -13,5 +13,6 @@ prettier.setup {
     "scss",
     "less",
     "apex",
+    "html"
   }
 }

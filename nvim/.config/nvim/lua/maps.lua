@@ -58,7 +58,7 @@ keymap.set("n", "<Leader><Leader>", "<c-^>")
 -- Copy the relative path of the current file to the clipboard
 keymap.set("n", "<Leader>cf", ":silent !echo -n % | pbcopy<Enter>")
 --"""Config save
-keymap.set("n", "<Leader>w", ":w<CR>")
+keymap.set("n", "<Leader>w", ":w<CR>", { noremap = true, silent = true })
 keymap.set("n", "Q", ":q<CR>")
 keymap.set("n", "Qa", ":qa<CR>")
 keymap.set("n", "QQ", ":q!<CR>")

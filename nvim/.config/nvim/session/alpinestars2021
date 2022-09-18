@@ -1,0 +1,211 @@
+let SessionLoad = 1
+let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1
+let v:this_session=expand("<sfile>:p")
+silent only
+silent tabonly
+cd ~/Documents/Projects/remote/alpinestars-2021
+if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
+  let s:wipebuf = bufnr('%')
+endif
+let s:shortmess_save = &shortmess
+if &shortmess =~ 'A'
+  set shortmess=aoOA
+else
+  set shortmess=aoO
+endif
+badd +321 force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.js
+badd +220 force-app/order-manage/classes/ProductColorSizeController.cls
+badd +1 productColorSize
+badd +1 byDates
+badd +1 force-app/order-manage/classes/dto/ProductColorSizeDto.cls
+badd +86 force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.html
+badd +19 force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.css
+badd +10 force-app/order-manage/lwc/messageBody/messageBody.html
+argglobal
+%argdel
+$argadd force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.js
+tabnew +setlocal\ bufhidden=wipe
+tabrewind
+edit force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.css
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd _ | wincmd |
+split
+1wincmd k
+wincmd w
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe '1resize ' . ((&lines * 29 + 31) / 62)
+exe 'vert 1resize ' . ((&columns * 104 + 117) / 235)
+exe '2resize ' . ((&lines * 29 + 31) / 62)
+exe 'vert 2resize ' . ((&columns * 104 + 117) / 235)
+exe 'vert 3resize ' . ((&columns * 130 + 117) / 235)
+argglobal
+balt force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.html
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 19 - ((18 * winheight(0) + 14) / 29)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 19
+normal! 012|
+wincmd w
+argglobal
+if bufexists(fnamemodify("force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.html", ":p")) | buffer force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.html | else | edit force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.html | endif
+if &buftype ==# 'terminal'
+  silent file force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.html
+endif
+balt force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.css
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 94 - ((10 * winheight(0) + 14) / 29)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 94
+normal! 027|
+wincmd w
+argglobal
+if bufexists(fnamemodify("force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.js", ":p")) | buffer force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.js | else | edit force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.js | endif
+if &buftype ==# 'terminal'
+  silent file force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.js
+endif
+balt force-app/order-manage/lwc/productColorSizeByDates/productColorSizeByDates.html
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 311 - ((45 * winheight(0) + 29) / 59)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 311
+normal! 012|
+wincmd w
+3wincmd w
+exe '1resize ' . ((&lines * 29 + 31) / 62)
+exe 'vert 1resize ' . ((&columns * 104 + 117) / 235)
+exe '2resize ' . ((&lines * 29 + 31) / 62)
+exe 'vert 2resize ' . ((&columns * 104 + 117) / 235)
+exe 'vert 3resize ' . ((&columns * 130 + 117) / 235)
+tabnext
+edit force-app/order-manage/classes/dto/ProductColorSizeDto.cls
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe '1resize ' . ((&lines * 58 + 31) / 62)
+exe 'vert 1resize ' . ((&columns * 100 + 117) / 235)
+exe '2resize ' . ((&lines * 58 + 31) / 62)
+exe 'vert 2resize ' . ((&columns * 99 + 117) / 235)
+argglobal
+balt force-app/order-manage/classes/ProductColorSizeController.cls
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 41 - ((40 * winheight(0) + 29) / 58)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 41
+normal! 025|
+wincmd w
+argglobal
+if bufexists(fnamemodify("force-app/order-manage/classes/ProductColorSizeController.cls", ":p")) | buffer force-app/order-manage/classes/ProductColorSizeController.cls | else | edit force-app/order-manage/classes/ProductColorSizeController.cls | endif
+if &buftype ==# 'terminal'
+  silent file force-app/order-manage/classes/ProductColorSizeController.cls
+endif
+balt force-app/order-manage/classes/dto/ProductColorSizeDto.cls
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 220 - ((48 * winheight(0) + 29) / 58)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 220
+normal! 053|
+wincmd w
+exe '1resize ' . ((&lines * 58 + 31) / 62)
+exe 'vert 1resize ' . ((&columns * 100 + 117) / 235)
+exe '2resize ' . ((&lines * 58 + 31) / 62)
+exe 'vert 2resize ' . ((&columns * 99 + 117) / 235)
+tabnext 1
+if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
+  silent exe 'bwipe ' . s:wipebuf
+endif
+unlet! s:wipebuf
+set winheight=1 winwidth=20
+let &shortmess = s:shortmess_save
+let &winminheight = s:save_winminheight
+let &winminwidth = s:save_winminwidth
+let s:sx = expand("<sfile>:p:r")."x.vim"
+if filereadable(s:sx)
+  exe "source " . fnameescape(s:sx)
+endif
+let &g:so = s:so_save | let &g:siso = s:siso_save
+set hlsearch
+doautoall SessionLoadPost
+unlet SessionLoad
+" vim: set ft=vim :

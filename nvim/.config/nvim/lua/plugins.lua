@@ -65,4 +65,5 @@ packer.startup(function(use)
   })
 
   use "ggandor/lightspeed.nvim" --> motion plugin with incremental input processing, allowing for unparalleled speed with near-zero cognitive effort
+  use "p00f/nvim-ts-rainbow"
 end)
