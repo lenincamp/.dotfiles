@@ -18,8 +18,9 @@ local on_attach = function(client, bufnr)
 
   -- See `:help vim.lsp.*` for documentation on any of the below functions
   buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  --buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', '<C-]>', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
   buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('i', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   --buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
 end
 
@@ -93,7 +94,7 @@ nvim_lsp.sumneko_lua.setup {
 nvim_lsp.tailwindcss.setup {}
 
 nvim_lsp.apex_ls.setup {
-  apex_jar_path = '/home/lenin/.lsp/apex-jorje-lsp.jar',
+  apex_jar_path = '/Users/lcampoverde/.config/.lsp/apex-jorje-lsp.jar',
   apex_enable_semantic_errors = true, -- Whether to allow Apex Language Server to surface semantic errors
   apex_enable_completion_statistics = false, -- Whether to allow Apex Language Server to collect telemetry on code completion usage
   filetypes = { "apex", "cls", "trigger" },

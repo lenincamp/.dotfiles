@@ -30,5 +30,7 @@ Install fzf, fzf-tab, zsh-syntax-highlighting from [git](https://github.com/ohmy
 ### Install manual lsp
 
 ```sh
-npm install -g typescript-language-server eslint_d prettier emmet_ls
+npm install -g typescript-language-server eslint_d  emmet-ls tailwindcss-language-server
+brew install tree-sitter
+brew install prettierd
 ```
