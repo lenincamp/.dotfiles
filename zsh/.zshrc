@@ -135,7 +135,7 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 alias v='vim'
 alias nv='nvim'
 alias gitalias='alias | grep git | fzf'
-alias colorls='arch -x86_64 colorls'
+# alias colorls='arch -x86_64 colorls'
 
 
 alias sdp="sfdx force:source:deploy -p $1"
@@ -159,9 +159,23 @@ prompt_context() {
   fi
 }
 
-source $(dirname $(arch -x86_64 gem which colorls))/tab_complete.sh
-alias ll='colorls -lA --sd'
-alias ls="colorls --gs --sd"
+# source $(dirname $(arch -x86_64 gem which colorls))/tab_complete.sh
+#alias ll='colorls -lA --sd'
+#alias ls="colorls --gs --sd"
+
+# general use
+alias ls='exa --icons'                                                          # ls
+alias l='exa -lbF --git --icons'                                                # list, size, type, git
+alias ll='exa -lbGF --git --icons'                                             # long list
+alias llm='exa -lbGd --git --sort=modified --icons'                            # long list, modified date sort
+alias la='exa -lbhHigUmuSa --time-style=long-iso --git --color-scale --icons'  # all list
+alias lx='exa -lbhHigUmuSa@ --time-style=long-iso --git --color-scale --icons' # all + extended list
+
+# specialty views
+alias lS='exa -1 --icons'                                                              # one column, just names
+alias lt='exa --tree --level=2 --icons'                                         # tree
+alias llt='exa -l --git --icons --tree '                                         # tree
+alias lld='exa -lbhHFGmuSa --group-directories-first --icons'
 
 export CC='gcc-11'
 export LANG=en_US.UTF-8

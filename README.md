@@ -33,4 +33,5 @@ Install fzf, fzf-tab, zsh-syntax-highlighting from [git](https://github.com/ohmy
 npm install -g typescript-language-server eslint_d  emmet-ls tailwindcss-language-server
 brew install tree-sitter
 brew install prettierd
+brew install exa
 ```
