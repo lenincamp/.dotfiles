@@ -66,7 +66,8 @@ nvim_lsp.tsserver.setup {
   on_attach = on_attach,
   filetypes = { "typescript", "typescriptreact", "typescript.tsx", "javascript" },
   cmd = { "typescript-language-server", "--stdio" },
-  capabilities = capabilities
+  capabilities = capabilities,
+  root_dir = function() return vim.loop.cwd() end -- run lsp for javascript in any directory
 }
 
 nvim_lsp.sourcekit.setup {
@@ -95,7 +96,7 @@ nvim_lsp.tailwindcss.setup {}
 
 nvim_lsp.apex_ls.setup {
   apex_jar_path = '/Users/lcampoverde/.config/.lsp/apex-jorje-lsp.jar',
-  apex_enable_semantic_errors = true, -- Whether to allow Apex Language Server to surface semantic errors
+  apex_enable_semantic_errors = false, -- Whether to allow Apex Language Server to surface semantic errors
   apex_enable_completion_statistics = false, -- Whether to allow Apex Language Server to collect telemetry on code completion usage
   filetypes = { "apex", "cls", "trigger" },
 }
