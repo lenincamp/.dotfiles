@@ -29,8 +29,8 @@ keymap.set('n', 'te', ':tabedit')
 --keymap.set("n", "<C-n>", ":tabnew<CR>")
 keymap.set("n", "tc", ":tabclose<CR>")
 -- Split window
-keymap.set('n', 'ss', ':split<Return><C-w>w')
-keymap.set('n', 'sv', ':vsplit<Return><C-w>w')
+keymap.set('n', 'ss', ':split<Return>')
+keymap.set('n', 'sv', ':vsplit<Return>')
 -- Move window
 keymap.set('n', '<Space>', '<C-w>w')
 keymap.set('', 'sh', '<C-w>h')

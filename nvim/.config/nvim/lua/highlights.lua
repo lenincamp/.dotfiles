@@ -4,31 +4,43 @@ vim.opt.winblend = 0
 vim.opt.wildoptions = 'pum'
 vim.opt.pumblend = 5
 vim.opt.background = 'dark'
+
+
+local augroup = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
+vim.api.nvim_create_autocmd('TextYankPost', {
+  pattern = '*',
+  group = augroup,
+  desc = 'Show highlight when copy text',
+  callback = function()
+    vim.highlight.on_yank { higroup = "IncSearch", timeout = 400, on_visual = true }
+  end
+})
+
 -- Highlight on yank
-vim.cmd([[
-  augroup YankHighlight
-    autocmd!
-    autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=400, on_visual=true}
-  augroup end
-  augroup AuBufWritePre
-    autocmd!
-    autocmd BufWritePre * let current_pos = getpos(".")
-    autocmd BufWritePre * silent! undojoin | %s/\s\+$//e
-    autocmd BufWritePre * silent! undojoin | %s/\n\+\%$//e
-    autocmd BufWritePre * call setpos(".", current_pos)
-    autocmd BufWritePre,FileWritePre * silent! call mkdir(expand('<afile>:p:h'), 'p')
-  augroup end
-  set noswapfile
-  set nobackup
-  set nowritebackup
-]])
+-- vim.cmd([[
+--   " augroup YankHighlight
+--   "   autocmd!
+--   "   autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=400, on_visual=true}
+--   " augroup end
+--   " augroup AuBufWritePre
+--   "   autocmd!
+--   "   autocmd BufWritePre * let current_pos = getpos(".")
+--   "   autocmd BufWritePre * silent! undojoin | %s/\s\+$//e
+--   "   autocmd BufWritePre * silent! undojoin | %s/\n\+\%$//e
+--   "   autocmd BufWritePre * call setpos(".", current_pos)
+--   "   autocmd BufWritePre,FileWritePre * silent! call mkdir(expand('<afile>:p:h'), 'p')
+--   " augroup end
+--   " set noswapfile
+--   " set nobackup
+--   " set nowritebackup
+-- ]])
 
 
 vim.cmd([[
-autocmd BufNewFile,BufRead *.apxc,*.apxt,*.cls,*.trigger,*.tgr set filetype=apex
-autocmd BufNewFile,BufRead *.vfp,*.vfc,*.page,*.component set filetype=visualforce
-autocmd BufNewFile,BufRead *.log set filetype=apexlog
-autocmd BufNewFile,BufRead *.approvalProcess,*.globalValueSet,*.layout,*.obj,*.objectTranslation,*.permissionSet,*.tab,*.translation set filetype=xml
+  autocmd BufNewFile,BufRead *.apxc,*.apxt,*.cls,*.trigger,*.tgr set filetype=apex
+  autocmd BufNewFile,BufRead *.vfp,*.vfc,*.page,*.component set filetype=visualforce
+  autocmd BufNewFile,BufRead *.log set filetype=apexlog
+  autocmd BufNewFile,BufRead *.approvalProcess,*.globalValueSet,*.layout,*.obj,*.objectTranslation,*.permissionSet,*.tab,*.translation set filetype=xml
 ]])
 
 vim.cmd([[

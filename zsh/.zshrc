@@ -17,7 +17,7 @@ autoload compinit && compinit
 # ZSH_THEME="archcraft-dwm"
 ZSH_THEME="macovsky-ruby"
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-#ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=23'
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#073642'
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
 
 # Set list of themes to pick from when loading at random
@@ -143,7 +143,9 @@ alias fgcot='gco $(g tag | fzf)'
 alias fgco='gco $(gb | fzf)'
 alias fgcor='gco --track $(gbr | fzf)'
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
+  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+fi
 
 
 source $ZSH/oh-my-zsh.sh
@@ -180,5 +182,6 @@ alias lld='exa -lbhHFGmuSa --group-directories-first --icons'
 export CC='gcc-11'
 export LANG=en_US.UTF-8
 export PATH=$PATH:~/.cargo/bin
+export BAT_THEME="Solarized (dark)"
 eval "$(starship init zsh)"
 eval "$(fnm env --use-on-cd)"

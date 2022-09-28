@@ -1,5 +1,3 @@
-vim.cmd("autocmd!")
-
 vim.scriptencoding = 'utf-8'
 vim.opt.encoding = 'utf-8'
 vim.opt.fileencoding = 'utf-8'
@@ -12,6 +10,8 @@ vim.opt.smartindent = true
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
 vim.opt.backup = false
+vim.opt.backup.nowritebackup = true
+vim.opt.swapfile = false
 vim.opt.showcmd = true
 vim.opt.cmdheight = 1
 vim.opt.laststatus = 2
@@ -33,6 +33,8 @@ vim.opt.relativenumber = true
 vim.opt.mouse = "a"
 vim.opt.mousefocus = true
 vim.opt.smartcase = true
+vim.opt.splitbelow = true
+vim.opt.splitright = true
 
 -- Undercurl
 vim.cmd([[let &t_Cs = "\e[4:3m"]])
