@@ -183,5 +183,12 @@ export CC='gcc-11'
 export LANG=en_US.UTF-8
 export PATH=$PATH:~/.cargo/bin
 export BAT_THEME="Solarized (dark)"
+
+#Java settings
+# export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home
+#export PATH=%JAVA_HOME/bin:$PATH
+
 eval "$(starship init zsh)"
 eval "$(fnm env --use-on-cd)"
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
