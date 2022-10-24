@@ -101,7 +101,7 @@ vim.keymap.set('n', ';gc', function()
 end)
 
 -- git_commits (log) git log
-vim.keymap.set('n', 'gc', function()
+vim.keymap.set('n', '<leader>gc', function()
   builtin.git_commits { prompt_title = '  ', initial_mode = "normal",
     layout_strategy = 'vertical', layout_config = { preview_height = 30 } }
 end)

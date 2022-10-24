@@ -35,6 +35,7 @@ vim.opt.mousefocus = true
 vim.opt.smartcase = true
 vim.opt.splitbelow = true
 vim.opt.splitright = true
+vim.opt.paste = true
 
 -- Undercurl
 vim.cmd([[let &t_Cs = "\e[4:3m"]])

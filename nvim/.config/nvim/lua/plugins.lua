@@ -49,7 +49,7 @@ packer.startup(function(use)
   use 'akinsho/nvim-bufferline.lua'
   -- use 'github/copilot.vim'
 
-  use 'lewis6991/gitsigns.nvim'
+  use( 'lewis6991/gitsigns.nvim' )
   use("numToStr/Comment.nvim")
   use("JoosepAlviste/nvim-ts-context-commentstring")
 
