@@ -32,7 +32,7 @@ keymap.set("n", "tc", ":tabclose<CR>")
 keymap.set('n', 'ss', ':split<Return>')
 keymap.set('n', 'sv', ':vsplit<Return>')
 -- Move window
-keymap.set('n', '<Space>', '<C-w>w')
+--[[ keymap.set('n', '<Space>', '<C-w>w') ]]
 keymap.set('', 'sh', '<C-w>h')
 keymap.set('', 'sk', '<C-w>k')
 keymap.set('', 'sj', '<C-w>j')
@@ -73,6 +73,8 @@ keymap.set("n", "<F10>", ":!sfdx force:source:deploy -p '%:p'<CR>")
 keymap.set("n", "<F11>", ":!sfdx force:apex:test:run --tests %:t:r.<cword> -r human<CR>")
 keymap.set("n", "<F12>", ":!sfdx force:apex:test:run --classnames %:t:r --codecoverage -r human<CR>")
 
+keymap.set({ 'n', 'x' }, "s", "<Plug>Lightspeed_s")
+keymap.set({ 'n', 'x' }, "S", "<Plug>Lightspeed_S")
 
 function _G.set_terminal_keymaps()
   local opts = { noremap = true }

@@ -17,7 +17,7 @@ autoload compinit && compinit
 # ZSH_THEME="archcraft-dwm"
 ZSH_THEME="macovsky-ruby"
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#073642'
+# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#073642'
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
 
 # Set list of themes to pick from when loading at random

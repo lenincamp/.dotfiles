@@ -10,7 +10,7 @@ bufferline.setup({
     show_close_icon = false,
     color_icons = true
   },
-  highlights = {
+  --[[ highlights = {
     separator = {
       fg = '#073642',
       bg = '#002b36',
@@ -29,7 +29,7 @@ bufferline.setup({
     fill = {
       bg = '#073642'
     }
-  },
+  }, ]]
 })
 
 vim.keymap.set('n', '<Tab>', '<Cmd>BufferLineCycleNext<CR>', {})
