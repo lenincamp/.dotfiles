@@ -41,6 +41,10 @@ vim.opt.paste = true
 vim.cmd([[let &t_Cs = "\e[4:3m"]])
 vim.cmd([[let &t_Ce = "\e[4:0m"]])
 
+--Disable editor config on gitcommit
+vim.cmd([[au FileType gitcommit let b:EditorConfig_disable = 1]])
+
+
 -- Turn off paste mode when leaving insert
 vim.api.nvim_create_autocmd("InsertLeave", {
   pattern = '*',
@@ -51,3 +55,4 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 vim.opt.formatoptions:append { 'r' }
 
 vim.opt.syntax = "on"
+vim.o.completeopt = "menuone,noinsert,noselect"

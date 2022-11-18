@@ -244,14 +244,14 @@
             ]
           },
           {
-            "description": "Change fn+left_shift to caps_lock if alone.",
+            "description": "Change left_shift + caps_lock to caps_lock if alone.",
             "manipulators": [
               {
                 "from": {
-                  "key_code": "right_shift",
+                  "key_code": "left_control",
                   "modifiers": {
                     "mandatory": [
-                      "fn"
+                      "left_shift"
                     ],
                     "optional": [
                       "any"
