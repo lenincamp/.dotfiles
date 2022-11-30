@@ -1,13 +1,10 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
+export PATH=/usr/local/bin:$PATH
+export PATH=/home/linuxbrew/.linuxbrew/bin:$PATH
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/lcampoverde/.oh-my-zsh"
-
-#enable colors and change prompt:
-autoload -U colors && colors
-autoload compinit && compinit
-
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -135,7 +132,6 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 alias v='vim'
 alias nv='nvim'
 alias gitalias='alias | grep git | fzf'
-# alias colorls='arch -x86_64 colorls'
 
 
 alias sdp="sfdx force:source:deploy -p $1"
@@ -143,16 +139,8 @@ alias fgcot='gco $(g tag | fzf)'
 alias fgco='gco $(gb | fzf)'
 alias fgcor='gco --track $(gbr | fzf)'
 
-if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-fi
-
-
 source $ZSH/oh-my-zsh.sh
 
-function zvm_after_init() {
-  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-}
 
 
 prompt_context() {
@@ -184,11 +172,20 @@ export LANG=en_US.UTF-8
 export PATH=$PATH:~/.cargo/bin
 export BAT_THEME="Solarized (dark)"
 
-#Java settings
-# export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home
-#export PATH=%JAVA_HOME/bin:$PATH
 
+#Starship prompt shell
 eval "$(starship init zsh)"
-eval "$(fnm env --use-on-cd)"
-export PATH="$HOME/.jenv/bin:$PATH"
-eval "$(jenv init -)"
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# fnm
+export PATH=/home/lcampoverde/.fnm:$PATH
+eval "`fnm env`"
+
+
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+#z
+eval "$(zoxide init zsh)"

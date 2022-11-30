@@ -76,6 +76,15 @@ keymap.set("n", "<F12>", ":!sfdx force:apex:test:run --classnames %:t:r --codeco
 keymap.set({ 'n', 'x' }, "s", "<Plug>Lightspeed_s")
 keymap.set({ 'n', 'x' }, "S", "<Plug>Lightspeed_S")
 
+--"Put search results in the middle of screen
+keymap.set("n", "n", "nzz")
+keymap.set("n", "N", "Nzz")
+
+
+--"Some search and replace shorcouts
+keymap.set("n", "<leader><leader>r", ":%s//g<Left><Left>")
+keymap.set("x", "<leader><leader>r", ":s//g<Left><Left>")
+
 function _G.set_terminal_keymaps()
   local opts = { noremap = true }
   vim.api.nvim_buf_set_keymap(0, "t", "<esc>", [[<C-\><C-n>]], opts)

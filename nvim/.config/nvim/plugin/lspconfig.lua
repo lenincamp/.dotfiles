@@ -94,7 +94,7 @@ nvim_lsp.sumneko_lua.setup {
 nvim_lsp.tailwindcss.setup {}
 
 nvim_lsp.apex_ls.setup {
-  apex_jar_path = '/Users/lcampoverde/.config/.lsp/apex-jorje-lsp.jar',
+  apex_jar_path = '/home/lcampoverde/.config/.lsp/apex-jorje-lsp.jar',
   apex_enable_semantic_errors = false, -- Whether to allow Apex Language Server to surface semantic errors
   apex_enable_completion_statistics = false, -- Whether to allow Apex Language Server to collect telemetry on code completion usage
   filetypes = { "apex", "cls", "trigger" },
