@@ -132,6 +132,7 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 alias v='vim'
 alias nv='nvim'
 alias gitalias='alias | grep git | fzf'
+alias dockeralias='alias | grep docker | fzf'
 
 
 alias sdp="sfdx force:source:deploy -p $1"
@@ -141,7 +142,42 @@ alias fgcor='gco --track $(gbr | fzf)'
 
 source $ZSH/oh-my-zsh.sh
 
+### funcions
+#fuzzy docker start 
+function fdstart() {
+	CONTAINER=`docker ps -a | rg -v CONTAINER | awk '-F ' ' {print $NF}' | fzf`
+	if [ ! -z $CONTAINER ]
+	then
+		docker start $CONTAINER 
+	fi
+}
 
+#fuzzy docker stop
+function fdstop() {
+	CONTAINER=`docker ps | rg -v CONTAINER | awk '-F ' ' {print $NF}' | fzf`
+	if [ ! -z $CONTAINER ]
+	then
+		docker stop $CONTAINER 
+	fi
+}
+
+#fuzzy docker exec
+function fdex() {
+	CONTAINER=`docker ps | rg -v CONTAINER | awk '-F ' ' {print $NF}' | fzf`
+	if [ ! -z $CONTAINER ]
+	then
+		docker exec -it $CONTAINER bash
+	fi
+}
+
+#fuzzy docker log
+function fdlog() {
+	CONTAINER=`docker ps | rg -v CONTAINER | awk '-F ' ' {print $NF}' | fzf`
+	if [ ! -z $CONTAINER ]
+	then
+		docker logs -f $CONTAINER
+	fi
+}
 
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then

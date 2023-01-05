@@ -8,4 +8,4 @@ onedark.setup {
     transparent = false, -- lualine center bar transparency
   },
 }
-onedark.load()
+--[[ onedark.load() ]]

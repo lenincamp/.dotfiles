@@ -56,3 +56,7 @@ vim.opt.formatoptions:append { 'r' }
 
 vim.opt.syntax = "on"
 vim.o.completeopt = "menuone,noinsert,noselect"
+
+vim.g.foldmethod = "expr"
+vim.g.foldexpr = "nvim_treesitter#foldexpr()"
+vim.cmd([[autocmd BufReadPost,FileReadPost * normal zR]])

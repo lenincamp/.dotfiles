@@ -73,6 +73,30 @@ keymap.set("n", "<F10>", ":!sfdx force:source:deploy -p '%:p'<CR>")
 keymap.set("n", "<F11>", ":!sfdx force:apex:test:run --tests %:t:r.<cword> -r human<CR>")
 keymap.set("n", "<F12>", ":!sfdx force:apex:test:run --classnames %:t:r --codecoverage -r human<CR>")
 
+vim.cmd([[
+:nnoremap ++ :!git add "%"<CR>
+:nnoremap ]t <C-w>s<C-w>j10<C-w>-:term sfdx force:apex:test:run -y -r human -c -w 5 -n "%:t:r" --verbose<CR>
+":nnoremap ]t :set mp="sfdx force:apex:test:run -y -r human -c -w 5 -n \"%:t:r\" --verbose" \|exe 'make' \| copen<CR>
+:nnoremap <silent> ]tt ?\c@IsTest<CR>j0f(hyiw<C-w>s<C-w>j10<C-w>-:term sfdx force:apex:test:run -y -r human -c -w 5 --verbose -t "%:t:r".<C-r>"<CR>
+:nnoremap ]a <C-w>s<C-w>j10<C-w>-:term sfdx force:source:beta:push<CR>
+:nnoremap ]af <C-w>s<C-w>j10<C-w>-:term sfdx force:source:beta:push -f<CR>
+:nnoremap ]u <C-w>s<C-w>j10<C-w>-:term sfdx force:source:beta:pull<CR>
+:nnoremap ]uf <C-w>s<C-w>j10<C-w>-:term sfdx force:source:beta:pull -f<CR>
+:nnoremap ]d <C-w>s<C-w>j10<C-w>-:term sfdx force:source:deploy -p "%" -l NoTestRun -w 5 -u 
+:nnoremap ]dd <C-w>s<C-w>j10<C-w>-:term sfdx force:source:deploy -p "%" -l NoTestRun -w 5<CR>
+:nnoremap ]e :tabnew \| read !sfdx force:apex:execute -f "#" -u 
+:nnoremap ]ee :tabnew \| read !sfdx force:apex:execute -f "#"<CR>
+
+"apex logs
+:nnoremap ]l :tabnew /tmp/apexlogs.log<CR><C-w>s<C-w>j:term sfdx force:apex:log:tail --color -u <bar> tee /tmp/apexlogs.log<C-left><C-left><C-left>
+:nnoremap ]ll :tabnew /tmp/apexlogs.log<CR><C-w>s<C-w>j:term sfdx force:apex:log:tail --color <bar> tee /tmp/apexlogs.log<CR>
+]])
+
+
+
+
+
+
 keymap.set({ 'n', 'x' }, "s", "<Plug>Lightspeed_s")
 keymap.set({ 'n', 'x' }, "S", "<Plug>Lightspeed_S")
 
