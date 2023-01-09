@@ -163,7 +163,7 @@ function fdstop() {
 
 #fuzzy docker exec
 function fdex() {
-	CONTAINER=`docker ps | rg -v CONTAINER | awk '-F ' ' {print $NF}' | fzf`
+	CONTAINER=`dclsa | rg -v CONTAINER | awk '-F ' ' {print $NF}' | fzf`
 	if [ ! -z $CONTAINER ]
 	then
 		docker exec -it $CONTAINER bash
@@ -219,6 +219,12 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # fnm
 export PATH=/home/lcampoverde/.fnm:$PATH
 eval "`fnm env`"
+
+
+## Developer tools
+export ANDROID_HOME=/home/lcampoverde/android-settings/sdk
+export ANDROID_SDK_ROOT=/home/lcampoverde/android-settings/sdk
+export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
 
 
 # fzf
