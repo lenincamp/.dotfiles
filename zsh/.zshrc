@@ -220,10 +220,14 @@ export SDKMAN_DIR="$HOME/.sdkman"
 export PATH=/home/lcampoverde/.fnm:$PATH
 eval "`fnm env`"
 
+## Android Developer tools
+export DEV_TOOLS="/home/$USER/DevTools"
 
-## Developer tools
-export ANDROID_HOME=/home/lcampoverde/android-settings/sdk
-export ANDROID_SDK_ROOT=/home/lcampoverde/android-settings/sdk
+export ANDROID_HOME="$DEV_TOOLS/android-sdk"
+export ANDROID_SDK_ROOT="$DEV_TOOLS/android-sdk"
+# export ANDROID_SDK_ROOT="$DEV_TOOLS/Android/sdk"
+#export PATH="$JAVA_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+
 export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
 
 
