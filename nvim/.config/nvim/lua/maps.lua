@@ -70,6 +70,7 @@ keymap.set("n", "<S-Down>", ":m+<CR>")
 --Salesforce maps
 keymap.set("n", "<F9>", ":!sfdx force:source:retrieve -p %:p<CR>")
 keymap.set("n", "<F10>", ":!sfdx force:source:deploy -p '%:p'<CR>")
+keymap.set("n", "]dd", ":!sfdx force:source:deploy -p '%:p'<CR>")
 keymap.set("n", "<F11>", ":!sfdx force:apex:test:run --tests %:t:r.<cword> -r human<CR>")
 keymap.set("n", "<F12>", ":!sfdx force:apex:test:run --classnames %:t:r --codecoverage -r human<CR>")
 
