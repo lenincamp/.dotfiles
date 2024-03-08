@@ -1,5 +1,6 @@
 [core]
   pager = delta
+	autocrlf = input
 [interactive]
   diffFilter = delta --color-only
 [delta]
@@ -39,3 +40,5 @@
 #  prompt = false
 #[difftool "nvimdiff"]
 #  cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
+[http]
+	sslVerify = true

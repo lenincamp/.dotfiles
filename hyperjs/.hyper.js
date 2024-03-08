@@ -12,9 +12,10 @@ module.exports = {
     // or `'canary'` for less polished but more frequent updates
     updateChannel: "stable",
     // default font size in pixels for all tabs
-    fontSize: 15.7,
+    fontSize: 18,
     // font family with optional fallbacks
-    fontFamily: '"Hack Nerd Font Mono"',
+    /* fontFamily: '"Hack Nerd Font"', */
+    fontFamily: '"Consolas NF"',
     // default font weight: 'normal' or 'bold'
     fontWeight: "normal",
     // font weight for bold characters: 'normal' or 'bold'

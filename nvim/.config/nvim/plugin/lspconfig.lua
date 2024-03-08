@@ -22,6 +22,7 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', 'gi', vim.lsp.buf.implementation, opts)
   buf_set_keymap('i', '<C-k>', vim.lsp.buf.signature_help, opts)
   buf_set_keymap('n', '<leader>rn', vim.lsp.buf.rename, opts)
+  buf_set_keymap('n', '<leader>e', vim.diagnostic.open_float, opts)
   --buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
 end
 

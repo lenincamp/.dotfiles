@@ -59,10 +59,6 @@ keymap.set("n", "<Leader><Leader>", "<c-^>")
 keymap.set("n", "<Leader>cf", ":silent !echo -n % | pbcopy<Enter>")
 --"""Config save
 keymap.set("n", "<Leader>w", ":w<CR>", { noremap = true, silent = true })
-keymap.set("n", "Q", ":q<CR>")
-keymap.set("n", "Qa", ":qa<CR>")
-keymap.set("n", "QQ", ":q!<CR>")
-keymap.set("n", "QA", ":qa!<CR>")
 --" Mover lineas
 keymap.set("n", "<S-Up>", ":m-2<CR>")
 keymap.set("n", "<S-Down>", ":m+<CR>")

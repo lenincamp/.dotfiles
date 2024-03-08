@@ -9,19 +9,23 @@ vim.cmd [[packadd packer.nvim]]
 packer.startup(function(use)
   use 'wbthomason/packer.nvim'
   --> colorschemes
-  use("EdenEast/nightfox.nvim")
-  use("sainnhe/gruvbox-material")
-  use("NLKNguyen/papercolor-theme")
-  use("folke/tokyonight.nvim")
   use {
     'svrana/neosolarized.nvim',
     requires = { 'tjdevries/colorbuddy.nvim' }
   }
   use 'navarasu/onedark.nvim'
-  use 'tanvirtin/monokai.nvim'
-  use 'artanikin/vim-synthwave84'
-
-
+  use({
+    'rose-pine/neovim',
+    as = 'rose-pine',
+    config = function()
+      require("rose-pine").setup()
+      --[[ vim.cmd('colorscheme rose-pine') ]]
+    end
+  })
+  use { "ellisonleao/gruvbox.nvim" }
+  use { "Yazeed1s/minimal.nvim" }
+  use { "kvrohit/mellow.nvim" }
+  --
   use 'nvim-lualine/lualine.nvim' -- Statusline
   use 'nvim-lua/plenary.nvim' -- Common utilities
   use 'onsails/lspkind-nvim' -- vscode-like pictograms
@@ -75,5 +79,6 @@ packer.startup(function(use)
   use "p00f/nvim-ts-rainbow"
   use "rafamadriz/friendly-snippets" --> snippets similar to vscode
   use "editorconfig/editorconfig-vim"
+  use "andreshazard/vim-logreview"
 
 end)

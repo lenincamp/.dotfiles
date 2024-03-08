@@ -14,7 +14,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # ZSH_THEME="archcraft-dwm"
 ZSH_THEME="macovsky-ruby"
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#073642'
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#586e75'
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
 
 # Set list of themes to pick from when loading at random
@@ -203,7 +203,18 @@ alias lt='exa --tree --level=2 --icons'                                         
 alias llt='exa -l --git --icons --tree '                                         # tree
 alias lld='exa -lbhHFGmuSa --group-directories-first --icons'
 
-export CC='gcc-11'
+#technisys aliases
+alias tce='~/apache-tomcat-9.0.68/shared/changeenvironment.sh $1'
+
+function tol() {
+  name=$1
+  name=${name:u}
+  if [[ name -eq BSF ]] then name=BERSA fi
+  logPath=~/apache-tomcat-9.0.68/shared/shared_"$name"/logs/omnichannel.log
+  code $logPath
+}
+
+export CC='gcc-12'
 export LANG=en_US.UTF-8
 export PATH=$PATH:~/.cargo/bin
 export BAT_THEME="Solarized (dark)"
@@ -223,8 +234,10 @@ eval "`fnm env`"
 ## Android Developer tools
 export DEV_TOOLS="/home/$USER/DevTools"
 
-export ANDROID_HOME="$DEV_TOOLS/android-sdk"
-export ANDROID_SDK_ROOT="$DEV_TOOLS/android-sdk"
+# export ANDROID_HOME="$DEV_TOOLS/android-sdk"
+# export ANDROID_SDK_ROOT="$DEV_TOOLS/android-sdk"
+export ANDROID_HOME="$DEV_TOOLS/Android"
+export ANDROID_SDK_ROOT="$DEV_TOOLS/Android"
 # export ANDROID_SDK_ROOT="$DEV_TOOLS/Android/sdk"
 #export PATH="$JAVA_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 
@@ -235,3 +248,8 @@ export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 #z
 eval "$(zoxide init zsh)"
+
+# export PATH="/home/linuxbrew/.linuxbrew/opt/glibc/bin:$PATH"
+# export PATH="/home/linuxbrew/.linuxbrew/opt/glibc/sbin:$PATH"
+# export LDFLAGS="-L/home/linuxbrew/.linuxbrew/opt/glibc/lib"
+# export CPPFLAGS="-I/home/linuxbrew/.linuxbrew/opt/glibc/include"
