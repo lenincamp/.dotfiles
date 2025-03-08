@@ -1,0 +1,43 @@
+window-decoration = false
+window-inherit-working-directory = true
+window-theme = dark
+window-save-state = always
+# window-width = 1920
+# window-height = 1080
+mouse-hide-while-typing=true
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
+clipboard-paste-protection = false
+copy-on-select = true
+
+font-size = 16
+font-family = Maple Mono NF
+theme = catppuccin-mocha
+shell-integration-features = no-cursor,sudo,no-title
+cursor-style = block
+adjust-cell-height = 35%
+# background = #000000
+# background-opacity = 0.85
+background-opacity = 1
+background-blur-radius = 100
+# copy-on-select = clipboard
+
+# Keybindings
+keybind = alt+s>r=reload_config
+keybind = alt+s>x=close_surface
+keybind = alt+s>n=new_window
+
+# Tabs
+keybind = alt+s>c=new_tab
+keybind = alt+s>shift+l=next_tab
+keybind = alt+s>shift+h=previous_tab
+keybind = alt+s>comma=move_tab:-1
+keybind = alt+s>period=move_tab:1
+
+# Quick Tab Switch
+keybind = alt+s>1=goto_tab:1
+keybind = alt+s>2=goto_tab:2
+keybind = alt+s>3=goto_tab:3
+# Splits
+keybind = alt+s>ctrl+v=new_split:right
+keybind = alt+s>ctrl+h=new_split:down
+keybind = alt+s>z=toggle_split_zoom
