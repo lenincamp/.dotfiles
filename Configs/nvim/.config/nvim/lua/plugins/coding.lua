@@ -1,5 +1,12 @@
 return {
   {
+    "stevearc/conform.nvim",
+    opts = function(_, opts)
+      opts.formatters_by_ft["xml"] = { "lemminx" }
+      return opts
+    end,
+  },
+  {
     "nvim-treesitter/nvim-treesitter",
     opts = {
       ensure_installed = {
@@ -40,6 +47,7 @@ return {
     "williamboman/mason.nvim",
     opts = {
       ensure_installed = {
+        "lemminx",
         "bash-language-server",
         "docker-compose-language-service",
         "dockerfile-language-server",
@@ -102,7 +110,9 @@ return {
         -- All settings are optional
         settings = {
           -- The default for sonarlint is {}, this is just an example
-          sonarlint = {},
+          sonarlint = {
+            test = "test",
+          },
         },
       },
       filetypes = {
