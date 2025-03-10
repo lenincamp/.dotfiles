@@ -43,6 +43,7 @@ require("lazy").setup({
         "TmuxNavigateUp",
         "TmuxNavigateRight",
         "TmuxNavigatePrevious",
+        "TmuxNavigatorProcessList",
       },
       keys = {
         { "<c-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
