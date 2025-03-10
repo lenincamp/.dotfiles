@@ -115,6 +115,11 @@ source $ZSH/oh-my-zsh.sh
 export EDITOR="nvim"
 export VISUAL=$EDITOR
 
+#bat theme - https://github.com/catppuccin/bat
+export BAT_THEME="Catppuccin Mocha"
+alias cat='bat --paging=never'
+alias fk=thefuck
+
 # fzf
 export FZF_DEFAULT_COMMAND='fd --type f --color=never --hidden'
 export FZF_DEFAULT_OPTS='--layout=reverse --no-height --color=bg+:#343d46,gutter:-1,pointer:#ff3c3c,info:#0dbc79,hl:#0dbc79,hl+:#23d18b'
@@ -130,8 +135,8 @@ export FZF_ALT_C_COMMAND='fd --type d . --color=never --hidden'
 export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -50'"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
-export ANDROID_HOME=~/Documents/projects/petersen/DevTools/Android/sdk # Ruta descrita en “Android SDK Location” en el paso anterior
-export ANDROID_SDK_ROOT=~/Documents/projects/petersen/DevTools/Android/sdk # Ruta descrita en “Android SDK Location” en el paso anterior
+export ANDROID_HOME=$HOME/workspace/DevTools/Android/sdk # Ruta descrita en “Android SDK Location” en el paso anterior
+export ANDROID_SDK_ROOT=$HOME/workspace/DevTools/Android/sdk # Ruta descrita en “Android SDK Location” en el paso anterior
 # export JAVA_HOME=/Users/lcampoverde/Library/Java/JavaVirtualMachines/azul-17.0.10/Contents/Home
 # export CORDOVA_JAVA_HOME=/Users/lcampoverde/Library/Java/JavaVirtualMachines/azul-17.0.10/Contents/Home
 export JAVA_HOME=/opt/homebrew/Cellar/openjdk/23.0.2/libexec/openjdk.jdk/Contents/Home
