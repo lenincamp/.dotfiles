@@ -1,6 +1,6 @@
 ## Previous steps
 
-### Install town
+### Install tuckr
 
 1. Install [https://github.com/RaphGL/tuckr](tuckr)
 
@@ -13,5 +13,9 @@ Install fzf, fzf-tab, zsh-syntax-highlighting from [git](https://github.com/ohmy
 
 ### Install tools
 ```sh
-brew install exa z tmux aerospace ghostty jdtls lazygit
+brew install exa z tmux aerospace ghostty jdtls lazygit speedtest-cli tldr thefuck ranger ncdu btop jadx clean-me daisydisk kanata
+brew install --cask font-maple-mono font-maple-mono-nf
+# https://github.com/mchehab/zbar - read qr-code from google authenticator
+#zbarimg --raw ~/SCR-20250215-pfdn.png
+brew install zbar
 ```
