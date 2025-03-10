@@ -160,6 +160,7 @@ alias fgco='gco $(gb | fzf)'
 alias fgcor='gco --track $(gbr | fzf)'
 
 # general use
+export EZA_CONFIG_DIR=$HOME/.config/eza
 alias ls='eza --icons'                                                          # ls
 alias l='eza -lbF --git --icons'                                                # list, size, type, git
 alias ll='eza -lbGF --git --icons'                                             # long list
