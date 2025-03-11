@@ -26,22 +26,24 @@
 # """
 
 format = """\
-[](#1e1d2c)\
-[ ](fg:#cdd6f4 bg:#1e1d2c)\
+[](#292c3c)\
+[ ](fg:#c6d0f5 bg:#292c3c)\
+$username\
+[](bg:#fab387 fg:#292c3c)\
 $directory\
-[](fg:#cdd6f4 bg:#fab387)\
+[](fg:#fab387 bg:#a6e3a1)\
 $git_branch\
 $git_status\
-[](fg:#fab387 bg:#cba6f7)\
+[](fg:#a6e3a1 bg:#99d1db)\
 $java\
 $nodejs\
-[](fg:#cba6f7 bg:#a6e3a1)\
+[](fg:#99d1db bg:#89B4FA)\
 $docker_context\
-[](fg:#a6e3a1 bg:#89b4fa)\
-[ ](fg:#89B4FA)\
+[](fg:#89B4FA bg:#cba6f7)\
+$time\
+[ ](fg:#cba6f7)\
 $fill\
 $cmd_duration\
-$time\
 $battery
 $character
 """
@@ -71,12 +73,12 @@ error_symbol = '[➜](bold red)'
 # You can also replace your username with a neat symbol like  to save some space
 [username]
 show_always = true
-style_user = "fg:#11111b bg:#89B4FA"
+style_user = "fg:#c6d0f5 bg:#292c3c"
 style_root = "fg:#11111b bg:#f38ba8"
 format = '[$user ]($style)'
 
 [directory]
-style = "fg:#11111b bg:#cdd6f4"
+style = "fg:#11111b bg:#fab387"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -101,8 +103,8 @@ format = '[[ $symbol ($version) ](fg:#11111b bg:#cba6f7)]($style)'
 
 [docker_context]
 symbol = " "
-style = "fg:#11111b bg:#a6e3a1"
-format = '[[ $symbol $context ](fg:#11111b bg:#a6e3a1)]($style) $path'
+style = "fg:#11111b bg:#89B4FA"
+format = '[[ $symbol $context ](fg:#11111b bg:#89B4FA)]($style) $path'
 
 [elixir]
 symbol = " "
@@ -116,16 +118,16 @@ format = '[[ $symbol ($version) ](fg:#11111b bg:#cba6f7)]($style)'
 
 [git_branch]
 symbol = ""
-style = "fg:#11111b bg:#fab387"
-format = '[[ $symbol $branch ](fg:#11111b bg:#fab387)]($style)'
+style = "fg:#11111b bg:#a6e3a1"
+format = '[[ $symbol $branch ](fg:#11111b bg:#a6e3a1)]($style)'
 
 [git_status]
-style = "fg:#11111b bg:#fab387"
-format = '[[($all_status$ahead_behind )](fg:#11111b bg:#fab387)]($style)'
+style = "fg:#11111b bg:#a6e3a1"
+format = '[[($all_status$ahead_behind )](fg:#11111b bg:#a6e3a1)]($style)'
 
 [golang]
 symbol = " "
-style = "fg:#11111b bg:##cba6f7"
+style = "fg:#11111b bg:#cba6f7"
 #format = '[[ $symbol ($version) ](fg:#11111b bg:#cba6f7)]($style)'
 format = '[[ $symbol](fg:#11111b bg:#cba6f7)]($style)'
 [haskell]
@@ -134,35 +136,35 @@ style = "fg:#11111b bg:#cba6f7"
 format = '[[ $symbol ($version) ](fg:#11111b bg:#cba6f7)]($style)'
 
 [java]
-symbol = ""
-style = "fg:#11111b bg:#cba6f7"
-format = '[[ $symbol ($version)](fg:#11111b bg:#cba6f7)]($style)'
+symbol = " "
+style = "fg:#11111b bg:#99d1db"
+format = '[[ $symbol($version)](fg:#11111b bg:#99d1db)]($style)'
 
 [julia]
 symbol = " "
-style = "fg:#11111b bg:#cba6f7"
-format = '[[ $symbol ($version) ](fg:#11111b bg:#cba6f7)]($style)'
+style = "fg:#11111b bg:#99d1db"
+format = '[[ $symbol ($version) ](fg:#11111b bg:#99d1db)]($style)'
 
 [nodejs]
 symbol = ""
-style = "fg:#11111b bg:#cba6f7"
-format = '[[ $symbol ($version) ](fg:#11111b bg:#cba6f7)]($style)'
+style = "fg:#11111b bg:#99d1db"
+format = '[[ $symbol ($version) ](fg:#11111b bg:#99d1db)]($style)'
 
 [nim]
 symbol = " "
-style = "fg:#11111b bg:#cba6f7"
-format = '[[ $symbol ($version) ](fg:#11111b bg:#cba6f7)]($style)'
+style = "fg:#11111b bg:#99d1db"
+format = '[[ $symbol ($version) ](fg:#11111b bg:#99d1db)]($style)'
 
 [rust]
 symbol = ""
-style = "fg:#11111b bg:#cba6f7"
-format = '[[ $symbol ($version) ](fg:#11111b bg:#cba6f7)]($style)'
+style = "fg:#11111b bg:#99d1db"
+format = '[[ $symbol ($version) ](fg:#11111b bg:#99d1db)]($style)'
 
 [time]
 disabled = false
-time_format = "%R" # Hour:Minute Format
-# style = "fg:#11111b bg:#89b4fa"
-format = '[[  $time ]()]($style)'
+time_format = "%R"                                      # Hour:Minute Format
+style = "fg:#11111b bg:#cba6f7"
+format = '[[  $time ](fg:#11111b bg:#cba6f7)]($style)'
 
 # Output the current git config email address
 [custom.git_config_email]
