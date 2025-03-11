@@ -150,6 +150,7 @@ eval "$(fnm env --use-on-cd)"
 eval "$(starship init zsh)"
 eval "$(pyenv init -)"
 eval "$(jenv init -)"
+eval "$(zoxide init zsh)"
 
 ########################### PATH variables ################################
 # Preferred editor for local and remote sessions
