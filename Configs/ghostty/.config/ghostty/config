@@ -1,3 +1,4 @@
+shell-integration = zsh
 window-decoration = false
 window-inherit-working-directory = true
 window-theme = dark
