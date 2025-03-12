@@ -16,18 +16,28 @@ return {
       },
     },
   },
-
-  -- -- statusline
-  -- {
-  --   "nvim-lualine/lualine.nvim",
-  --   event = "VeryLazy",
-  --   opts = {
-  --     options = {
-  --       -- globalstatus = false,
-  --       theme = "solarized_dark",
-  --     },
-  --   },
-  -- },
+  {
+    "nvim-lualine/lualine.nvim",
+    config = function()
+      local colors = require("catppuccin.palettes").get_palette("mocha")
+      local theme = {
+        normal = { a = { fg = colors.peach }, b = { fg = colors.blue }, c = { fg = colors.teal } },
+        insert = { a = { fg = colors.blue } },
+        visual = { a = { fg = colors.text } },
+        replace = { a = { fg = colors.yellow } },
+        command = { a = { fg = colors.red } },
+        inactive = { a = { fg = colors.green }, b = { fg = colors.blue }, c = { fg = colors.green } },
+      }
+      require("lualine").setup({
+        options = {
+          icons_enabled = true,
+          theme = theme,
+          component_separators = { left = "", right = "" },
+          section_separators = { left = "", right = "" },
+        },
+      })
+    end,
+  },
 
   -- filename
   {
@@ -42,8 +52,8 @@ return {
       require("incline").setup({
         highlight = {
           groups = {
-            InclineNormal = { guibg = "#fab387", guifg = "#11111b" },
-            InclineNormalNC = { guifg = "#11111b", guibg = "#fab387" },
+            InclineNormal = { guibg = "#89B4FA", guifg = "#11111b" },
+            InclineNormalNC = { guifg = "#11111b", guibg = "#89B4FA" },
           },
         },
         window = { margin = { vertical = 0, horizontal = 1 } },
