@@ -81,7 +81,7 @@ function fdlog() {
 function tol() {
   name=$1
   name=${name:u}
-  logPath=~/Documents/projects/petersen/apache-tomcat-9.0.68/shared/shared_"$name"/omnichannel.log
+  logPath=$WORK_PROJECT/apache-tomcat-9.0.68/shared/shared_"$name"/omnichannel.log
   zed $logPath
 }
 
@@ -93,7 +93,7 @@ function buildApp(){
   jenv shell 17.0.10
   pyenv shell 2.7.18
   fnm use v14.21.3
-  cd ~/Documents/projects/petersen/ar-petersen-cdp/mobile
+  cd $WORK_PROJECT/ar-petersen-cdp/mobile
   if [ $# -eq 0 ] || [ -z "$1" -a -z "$2" ]; then
       python release.py lcampoverde --debug --no-ios --verbose
       exit 1
@@ -166,11 +166,11 @@ eval "$(zoxide init zsh)"
 export LANG=en_US.UTF-8
 export PATH="$HOME/.jenv/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/Documents/projects/petersen/instantclient/:$PATH"
+export PATH="$WORK_PROJECT/instantclient/:$PATH"
 #petersen
-export WORK_PROJECT="$HOME/Documents/projects/petersen"
-alias cenv='$WORK_PROJECT/apache-tomcat-9.0.68/shared/changeenvironment.sh'
-alias openApk='open $WORK_PROJECT/ar-petersen-cdp/mobile/platforms/android/app/build/outputs/apk/debug/'
+export WORK_PROJECT="$HOME/workspace/projects/petersen"
+alias cenv="$WORK_PROJECT/apache-tomcat-9.0.68/shared/changeenvironment.sh"
+alias openApk="open $WORK_PROJECT/ar-petersen-cdp/mobile/platforms/android/app/build/outputs/apk/debug/"
 #EZA
 export EZA_CONFIG_DIR=$HOME/.config/eza
 export EDITOR="nvim"
