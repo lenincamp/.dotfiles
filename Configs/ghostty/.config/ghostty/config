@@ -10,12 +10,12 @@ keybind = global:ctrl+grave_accent=toggle_quick_terminal
 clipboard-paste-protection = false
 copy-on-select = true
 
-font-size = 16
+font-size = 15.45
 font-family = Maple Mono NF
 theme = catppuccin-mocha
 shell-integration-features = no-cursor,sudo,no-title
 cursor-style = block
-#adjust-cell-height = 35%
+adjust-cell-height = 35%
 background = #000000
 background-opacity = 0.85
 #background-opacity = 1
