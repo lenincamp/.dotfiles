@@ -40,6 +40,14 @@ alias lt='eza --tree --level=2 --icons'                                         
 alias llt='eza -l --git --icons --tree '                                         # tree
 alias lld='eza -lbhHFGmuSa --group-directories-first --icons'
 
+# alias lazygit/lazydocker
+alias lg=lazygit
+alias ld=lazydocker
+
+# petersen alias 
+alias cenv="$WORK_PROJECT/apache-tomcat-9.0.68/shared/changeenvironment.sh"
+alias openApk="open $WORK_PROJECT/ar-petersen-cdp/mobile/platforms/android/app/build/outputs/apk/debug/"
+
 ################################# Funcions ###################################
 #fuzzy docker start
 function fdstart() {
@@ -166,11 +174,9 @@ eval "$(zoxide init zsh)"
 export LANG=en_US.UTF-8
 export PATH="$HOME/.jenv/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$WORK_PROJECT/instantclient/:$PATH"
 #petersen
 export WORK_PROJECT="$HOME/workspace/projects/petersen"
-alias cenv="$WORK_PROJECT/apache-tomcat-9.0.68/shared/changeenvironment.sh"
-alias openApk="open $WORK_PROJECT/ar-petersen-cdp/mobile/platforms/android/app/build/outputs/apk/debug/"
+export PATH="$WORK_PROJECT/instantclient/:$PATH"
 #EZA
 export EZA_CONFIG_DIR=$HOME/.config/eza
 export EDITOR="nvim"
