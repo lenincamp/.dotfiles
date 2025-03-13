@@ -41,3 +41,18 @@ vim.api.nvim_create_autocmd({ "BufWritePost" }, {
     local _, _ = pcall(vim.lsp.codelens.refresh)
   end,
 })
+
+local function apply_folds()
+  vim.cmd("normal! zM")
+  vim.cmd("normal! 3zr")
+  local import_line = vim.fn.search("^import", "n")
+  if import_line > 0 then
+    vim.api.nvim_win_set_cursor(0, { import_line, 0 })
+    vim.cmd("normal! zc")
+  end
+end
+
+vim.api.nvim_create_autocmd({ "BufEnter" }, {
+  pattern = { "*.java", "*.js", "*.jsx", "*.ts", "*.tsx" },
+  callback = apply_folds,
+})

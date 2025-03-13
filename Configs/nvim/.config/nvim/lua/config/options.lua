@@ -10,6 +10,7 @@ vim.cmd([[let g:loaded_python3_provider=0]])
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 vim.o.termguicolors = true
+vim.opt.cursorline = false
 
 -- Undercurl
 vim.cmd([[let &t_Cs = "\e[4:3m"]])
