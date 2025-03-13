@@ -1,39 +1,34 @@
 return {
-  {
-    "danarth/sonarlint.nvim",
-    lazy = true,
-    ft = { "java" },
-    opts = {
+  url = "https://gitlab.com/schrieveslaach/sonarlint.nvim",
+  lazy = true,
+  ft = { "java" },
+  config = function()
+    require("sonarlint").setup({
       server = {
         cmd = {
-          "sonarlint-language-server",
-          -- Ensure that sonarlint-language-server uses stdio channel
+          "java",
+          "-jar",
+          vim.fn.expand("$MASON/packages/sonarlint-language-server/extension/server/sonarlint-ls.jar"),
           "-stdio",
           "-analyzers",
-          -- paths to the analyzers you need, using those for python and java in this example
           -- vim.fn.expand("$MASON/share/sonarlint-analyzers/sonarpython.jar"),
-          -- vim.fn.expand("$MASON/share/sonarlint-analyzers/sonarcfamily.jar"),
-          "/Users/lcampoverde/.local/share/nvim/mason/packages/sonarlint-language-server/extension/analyzers/sonarjava.jar",
-          -- vim.fn.expand(
-          --   os.getenv("HOME")
-          --     .. "/.local/share/nvim/mason/packages/sonarlint-language-server/extension/analyzers/sonarjavasymbolicexecution.jar"
-          -- ),
-        },
-        -- All settings are optional
-        settings = {
-          -- The default for sonarlint is {}, this is just an example
-          sonarlint = {
-            test = "test",
-          },
+          vim.fn.expand(
+            "$HOME/.local/share/nvim/mason/packages/sonarlint-language-server/extension/analyzers/sonarjava.jar"
+          ),
+          -- vim.fn.expand("$MASON/share/sonarlint-analyzers/sonarhtml.jar"),
+          -- vim.fn.expand("$MASON/share/sonarlint-analyzers/sonarxml.jar"),
+          -- vim.fn.expand("$MASON/share/sonarlint-analyzers/sonarjs.jar"),
         },
       },
       filetypes = {
         -- Tested and working
         -- "python",
-        -- "cpp",
         -- Requires nvim-jdtls, otherwise an error message will be printed
         "java",
+        -- "html",
+        -- "xml",
+        -- "js",
       },
-    },
-  },
+    })
+  end,
 }

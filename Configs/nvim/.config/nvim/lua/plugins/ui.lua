@@ -1,5 +1,6 @@
+local colors = require("catppuccin.palettes").get_palette("mocha")
+
 return {
-  -- buffer line
   {
     "akinsho/bufferline.nvim",
     event = "VeryLazy",
@@ -19,7 +20,6 @@ return {
   {
     "nvim-lualine/lualine.nvim",
     config = function()
-      local colors = require("catppuccin.palettes").get_palette("mocha")
       local theme = {
         normal = { a = { fg = colors.peach }, b = { fg = colors.blue }, c = { fg = colors.teal } },
         insert = { a = { fg = colors.blue } },
@@ -38,22 +38,16 @@ return {
       })
     end,
   },
-
-  -- filename
   {
     "b0o/incline.nvim",
-    -- dependencies = { "craftzdog/solarized-osaka.nvim" },
     event = "BufReadPre",
     priority = 1200,
     config = function()
-      -- local colors = require("solarized-osaka.colors").setup()
-      -- local helpers = require("incline.helpers")
-      -- local devicons = require("nvim-web-devicons")
       require("incline").setup({
         highlight = {
           groups = {
-            InclineNormal = { guibg = "#89B4FA", guifg = "#11111b" },
-            InclineNormalNC = { guifg = "#11111b", guibg = "#89B4FA" },
+            InclineNormal = { guifg = colors.peach },
+            InclineNormalNC = { guifg = colors.peach },
           },
         },
         window = { margin = { vertical = 0, horizontal = 1 } },
@@ -67,22 +61,9 @@ return {
           end
 
           local icon, color = require("nvim-web-devicons").get_icon_color(filename)
-          return { { icon, guifg = "#11111b" }, { " " }, { filename } }
+          return { { icon, guifg = colors.peach }, { " " }, { filename } }
         end,
       })
     end,
   },
-
-  -- {
-  --   "folke/zen-mode.nvim",
-  --   cmd = "ZenMode",
-  --   opts = {
-  --     plugins = {
-  --       gitsigns = true,
-  --       tmux = true,
-  --       kitty = { enabled = false, font = "+2" },
-  --     },
-  --   },
-  --   keys = { { "<leader>z", "<cmd>ZenMode<cr>", desc = "Zen Mode" } },
-  -- },
 }

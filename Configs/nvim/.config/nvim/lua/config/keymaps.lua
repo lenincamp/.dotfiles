@@ -6,17 +6,21 @@ local keymap = vim.keymap
 -- local opts = { noremap = true, silent = true }
 -- Delete a word backwards
 keymap.set("n", "dw", "vb_d")
+keymap.set("v", "p", '"_dP')
 
 --Jump
 keymap.set("n", "L", "$")
 keymap.set("n", "H", "^")
-keymap.set("n", "[b", "<Cmd>bp<CR>", { desc = "Prev buffer" })
-keymap.set("n", "]b", "<Cmd>bn<CR>", { desc = "Next buffer" })
+keymap.set("n", "<C-i>", "<C-I>", { noremap = true, desc = "Jump forward" })
+keymap.set("v", "J", "<cmd>m '>+1<CR>gv=gv")
+keymap.set("v", "K", "<cmd>m '<-2<CR>gv=gv")
+keymap.set("n", "<TAB>", "<cmd>bn<CR>")
+keymap.set("n", "<S-TAB>", "<cmd>bp<CR>")
 
 local goto_preview = require("goto-preview")
 keymap.set("n", "gpd", function()
   goto_preview.goto_preview_definition({})
-end, { desc = "[G]oto [P]review [D]efinition" })
+end, { desc = "[G]o to [P]review [D]efinition" })
 keymap.set("n", "gpt", function()
   goto_preview.goto_preview_type_definition({})
 end, { desc = "[G]o to [P]review [T]ype Definition" })
@@ -32,6 +36,19 @@ end, { desc = "Close all win" })
 keymap.set("n", "gpr", function()
   goto_preview.goto_preview_references()
 end, { desc = "[G]o to [P]review [R]references" })
+keymap.set(
+  { "n" },
+  "<leader>rr",
+  [[:%s/\V<C-r><C-w>/<C-r><C-w>/gI<Left><Left><Left>]],
+  { desc = "Replace all ocurrencies" }
+)
+
+keymap.set(
+  { "v" },
+  "<leader>rr",
+  [["vy:%s/\V<C-r>=escape(@v, '/\')<CR>/<C-r>v/gI<Left><Left><Left>]],
+  { desc = "Replace all ocurrencies" }
+)
 
 local function copy_relative_path_and_show_notify()
   local cwd = vim.fn.getcwd()

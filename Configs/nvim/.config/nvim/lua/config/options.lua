@@ -3,6 +3,8 @@
 -- Add any additional options here
 vim.o.pumblend = 0
 vim.o.winblend = 0
+vim.cmd([[let g:loaded_python3_provider=0]])
+
 -- vim.cmd.colorscheme("catppuccin")
 -- vim.cmd.colorscheme "catppuccin-mocha"
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
