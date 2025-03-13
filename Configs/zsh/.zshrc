@@ -138,6 +138,7 @@ bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 bindkey '^[w' kill-region
 bindkey "^O" fzf-cd-widget
+unset LAST_LOGIN
 #######################################################################################
 
 # History
