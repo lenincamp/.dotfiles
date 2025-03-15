@@ -17,7 +17,8 @@ after-login-command = []
 # Run Sketchybar together with AeroSpace
 # sketchbar has a built-in detection of already running process,
 # so it won't be run twice on AeroSpace restart
-after-startup-command = ['exec-and-forget sketchybar']
+# after-startup-command = ['exec-and-forget sketchybar']
+after-startup-command = []
 
 # Notify Sketchybar about workspace change
 exec-on-workspace-change = [
@@ -27,7 +28,7 @@ exec-on-workspace-change = [
 ]
 
 # Start AeroSpace at login
-start-at-login = true
+start-at-login = false
 
 # Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
 enable-normalization-flatten-containers = false
@@ -65,12 +66,12 @@ on-focus-changed = "move-mouse window-lazy-center"
 #                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
-inner.horizontal = 5
-inner.vertical = 5
-outer.left = 5
-outer.bottom = 5
-outer.top = 5
-outer.right = 5
+outer.top = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 42 }, 5]
+outer.bottom = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 12 }, 5]
+outer.left = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 12 }, 5]
+outer.right = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 12 }, 5]
+inner.horizontal = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 12 }, 5]
+inner.vertical = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 12 }, 5]
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -152,6 +153,7 @@ alt-shift-d = 'move-node-to-workspace D' #for DataGrip
 alt-shift-i = 'move-node-to-workspace I' #for intellij
 alt-shift-m = 'move-node-to-workspace M' #for music
 alt-shift-t = 'move-node-to-workspace T' #for terminal
+# alt-shift-t = ['move-node-to-workspace T', 'workspace T'] #for terminal
 alt-shift-w = 'move-node-to-workspace W' #for webstorm
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
@@ -196,6 +198,10 @@ run = "move-node-to-workspace D"
 
 [[on-window-detected]]
 if.app-id = 'company.thebrowser.Browser'
+run = "move-node-to-workspace B"
+
+[[on-window-detected]]
+if.app-id = 'com.brave.Browser'
 run = "move-node-to-workspace B"
 
 [[on-window-detected]]

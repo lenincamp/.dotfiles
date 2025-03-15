@@ -13,7 +13,7 @@
 Install fzf, fzf-tab, zsh-syntax-highlighting from [git](https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins)
 
 ### Install tools
-* **exa:** colorls
+* **eza:** colorls
 * **z:** save index in cd
 * **tmux:** terminal multiplexer
 * **aerospace:** macos tiling window manager
@@ -53,7 +53,9 @@ Install fzf, fzf-tab, zsh-syntax-highlighting from [git](https://github.com/ohmy
 ```sh
 ##unix tools
 brew install --cask font-maple-mono font-maple-mono-nf
-brew install exa z tmux ghostty jdtls lazygit lazydocker speedtest-cli tldr thefuck ncdu btop jadx ttyper zbar neofetch axel ffmpeg kanata
+brew install eza z tmux ghostty jdtls lazygit lazydocker speedtest-cli tldr thefuck ncdu btop jadx zbar neofetch axel ffmpeg kanata
+
+cargo install ttyper
 ## locate => index db to find files in system
 
 ## yazi & dependencies
