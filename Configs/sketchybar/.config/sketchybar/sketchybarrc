@@ -13,7 +13,7 @@ FONT_FACE="Maple Mono NF"
 # If you are looking for other colors, see the color picker:
 # https://felixkratz.github.io/SketchyBar/config/tricks#color-picker
 
-sketchybar --bar position=top height=32 color=0xff11111b padding=0 blur_radius=20 sticky=off border_width=0 notch_width=0
+sketchybar --bar position=top height=32 color=0xff11111b blur_radius=20 sticky=off border_width=0 notch_width=0
 # sketchybar --bar position=top height=27 color=0xff11111b padding=0 blur_radius=20 sticky=off margin=5 corner_radius=15  y_offset=5  border_width=0 
 
 
@@ -92,7 +92,6 @@ sketchybar --add item wifi right \
                     background.padding_right=10 \
                     label.padding_right=0 \
                     icon.padding_right=0 \
-                    icon.font="$FONT_FACE:Regular:17.0" \
                     icon.color=0xffa6e3a1\
                     update_freq=10 
 
