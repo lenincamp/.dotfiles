@@ -1,10 +1,10 @@
 shell-integration = zsh
 window-decoration = false
 window-inherit-working-directory = true
-window-theme = dark
+#window-theme = dark
 window-save-state = always
-# window-width = 1920
-# window-height = 1080
+window-width = 1920
+window-height = 1080
 mouse-hide-while-typing=true
 keybind = global:ctrl+grave_accent=toggle_quick_terminal
 clipboard-paste-protection = false
@@ -16,8 +16,8 @@ theme = catppuccin-mocha
 shell-integration-features = no-cursor,sudo,no-title
 cursor-style = block
 adjust-cell-height = 35%
-background = #000000
-background-opacity = 0.85
+background = #11111b 
+background-opacity = 0.9
 #background-opacity = 1
 background-blur-radius = 100
 # copy-on-select = clipboard
