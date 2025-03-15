@@ -3,6 +3,7 @@
 ### Install tuckr
 
 1. Install [https://github.com/RaphGL/tuckr](tuckr)
+2. run dotfiles
 
 ### Prettier cat and git diff
 1. install bat at [install](https://github.com/sharkdp/bat#installation)
@@ -36,6 +37,7 @@ Install fzf, fzf-tab, zsh-syntax-highlighting from [git](https://github.com/ohmy
 * **yazi**: terminal file manager
 * **mdfind**:alternative to locate (from spotlight / in system) 
 * **locate**: index db of system files
+* **sketchybar**: integrate with aerospace
 
 
 > #### example of use zbar
