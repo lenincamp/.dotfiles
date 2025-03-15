@@ -1,5 +1,6 @@
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="lambda"
+source $ZSH_CUSTOM/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
 plugins=(
         git
         zsh-vi-mode
