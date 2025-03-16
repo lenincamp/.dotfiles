@@ -13,7 +13,8 @@ FONT_FACE="Maple Mono NF"
 # If you are looking for other colors, see the color picker:
 # https://felixkratz.github.io/SketchyBar/config/tricks#color-picker
 
-sketchybar --bar position=top height=32 color=0xff11111b blur_radius=20 sticky=off border_width=0 notch_width=0
+sketchybar --bar position=top height=30 color=0xff11111b blur_radius=20 sticky=on shadow=off padding_right=10 padding_left=10 margin=12 notch_width=0
+# sketchybar --bar position=top height=27 color=0xff11111b blur_radius=20 sticky=on shadow=off padding_right=10 padding_left=10 y_offset=5 margin=12 notch_width=0 corner_radius=4
 # sketchybar --bar position=top height=27 color=0xff11111b padding=0 blur_radius=20 sticky=off margin=5 corner_radius=15  y_offset=5  border_width=0 
 
 
@@ -24,8 +25,8 @@ sketchybar --bar position=top height=32 color=0xff11111b blur_radius=20 sticky=o
 
 default=(
   padding_left=5
-  padding_right=5
-  icon.font="$FONT_FACE:Regular:20.0"
+  padding_right=5 
+  icon.font="$FONT_FACE:Regular:18.0"
   label.font="$FONT_FACE:Medium:14.0"
   icon.color=0xfffab387
   label.color=0xffcdd6f4
@@ -37,7 +38,7 @@ default=(
 sketchybar --default "${default[@]}"
 
 sketchybar --add item logo left \
-           --set logo update_freq=10 icon="" icon.padding_right=10 label.drawing=off icon.color=0xff9399b2
+           --set logo update_freq=10 icon="󰀶 " icon.padding_right=10 label.drawing=off icon.color=0xff89b4fa   icon.font="$FONT_FACE:Regular:20.0"
 
 
 ##### Adding Right Items #####
@@ -65,13 +66,14 @@ sketchybar --add item clock right \
 
 sketchybar --add event aerospace_workspace_change
 
+# for sid in $(aerospace list-workspaces --monitor all --empty no); do
 for sid in $(aerospace list-workspaces --all); do
     sketchybar --add item space.$sid left \
         --subscribe space.$sid aerospace_workspace_change \
         --set space.$sid \
         background.color=0xfffab387 \
         background.corner_radius=5 \
-        background.height=20 \
+        background.height=18 \
         background.drawing=off \
         label="$sid" \
         click_script="aerospace workspace $sid" \

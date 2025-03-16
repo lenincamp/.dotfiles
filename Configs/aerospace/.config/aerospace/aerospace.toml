@@ -131,30 +131,22 @@ alt-3 = 'workspace 3'
 # alt-9 = 'workspace 9'
 alt-b = 'workspace B' #for browser
 alt-c = 'workspace C' #for Email
-alt-d = 'workspace D' #for DataGrip
+alt-d = 'workspace D' #for DataBase
 alt-i = 'workspace I' #for intellij idea
 alt-m = 'workspace M' #for music - spotify
 alt-t = 'workspace T' #for terminal
-alt-w = 'workspace W' #for webstorm
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
 alt-shift-1 = 'move-node-to-workspace 1'
 alt-shift-2 = 'move-node-to-workspace 2'
 alt-shift-3 = 'move-node-to-workspace 3'
-# alt-shift-4 = 'move-node-to-workspace 4'
-# alt-shift-5 = 'move-node-to-workspace 5'
-# alt-shift-6 = 'move-node-to-workspace 6'
-# alt-shift-7 = 'move-node-to-workspace 7'
-# alt-shift-8 = 'move-node-to-workspace 8'
-# alt-shift-9 = 'move-node-to-workspace 9'
 alt-shift-b = 'move-node-to-workspace B' #for browser
 alt-shift-c = 'move-node-to-workspace C' #for email
-alt-shift-d = 'move-node-to-workspace D' #for DataGrip
+alt-shift-d = 'move-node-to-workspace D' #for DataBase
 alt-shift-i = 'move-node-to-workspace I' #for intellij
 alt-shift-m = 'move-node-to-workspace M' #for music
 alt-shift-t = 'move-node-to-workspace T' #for terminal
 # alt-shift-t = ['move-node-to-workspace T', 'workspace T'] #for terminal
-alt-shift-w = 'move-node-to-workspace W' #for webstorm
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
 alt-tab = 'workspace-back-and-forth'
@@ -189,11 +181,11 @@ if.app-id = 'com.jetbrains.intellij'
 run = "move-node-to-workspace I"
 
 [[on-window-detected]]
-if.app-id = 'com.jetbrains.WebStorm'
-run = "move-node-to-workspace W"
+if.app-id = 'com.jetbrains.datagrip'
+run = "move-node-to-workspace D"
 
 [[on-window-detected]]
-if.app-id = 'com.jetbrains.datagrip'
+if.app-id = 'org.jkiss.dbeaver.core.product'
 run = "move-node-to-workspace D"
 
 [[on-window-detected]]

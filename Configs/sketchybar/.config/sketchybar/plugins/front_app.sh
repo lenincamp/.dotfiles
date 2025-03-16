@@ -5,7 +5,7 @@
 # focused application in the $INFO variable:
 # https://felixkratz.github.io/SketchyBar/config/events#events-and-scripting
 case "$INFO" in
-"Firefox" | "Safari" | "Arc" | "Chrome")
+"Firefox" | "Safari" | "Arc" | "Chrome" | "Brave Browser")
   ICON=󰖟
   ;;
 "Slack")
