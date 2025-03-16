@@ -66,12 +66,16 @@ on-focus-changed = "move-mouse window-lazy-center"
 #                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
-outer.top = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 42 }, 5]
-outer.bottom = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 12 }, 5]
-outer.left = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 12 }, 5]
-outer.right = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 12 }, 5]
-inner.horizontal = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 12 }, 5]
-inner.vertical = [{ monitor."built-in" = 5 }, { monitor."LS24D300G" = 12 }, 5]
+outer.top = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 42 }, 10]
+outer.bottom = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
+outer.left = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
+outer.right = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
+inner.horizontal = [
+  { monitor."built-in" = 10 },
+  { monitor."LS24D300G" = 12 },
+  10,
+]
+inner.vertical = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes

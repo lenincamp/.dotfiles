@@ -12,8 +12,12 @@ FONT_FACE="Maple Mono NF"
 # https://felixkratz.github.io/SketchyBar/config/bar
 # If you are looking for other colors, see the color picker:
 # https://felixkratz.github.io/SketchyBar/config/tricks#color-picker
-
-sketchybar --bar position=top height=30 color=0xff11111b blur_radius=20 sticky=on shadow=off padding_right=10 padding_left=10 margin=12 notch_width=0
+MONITOR_NAME=$(aerospace list-monitors --format "%{monitor-name}")
+if [[ "$MONITOR_NAME" == "Built-in Retina Display" ]]; then
+  sketchybar --bar position=top height=32 color=0xff11111b blur_radius=20 sticky=on shadow=off padding_right=10 padding_left=10 notch_width=0
+else
+  sketchybar --bar position=top height=30 color=0xff11111b blur_radius=20 sticky=on shadow=off padding_right=10 padding_left=10 margin=12 notch_width=0
+fi
 # sketchybar --bar position=top height=27 color=0xff11111b blur_radius=20 sticky=on shadow=off padding_right=10 padding_left=10 y_offset=5 margin=12 notch_width=0 corner_radius=4
 # sketchybar --bar position=top height=27 color=0xff11111b padding=0 blur_radius=20 sticky=off margin=5 corner_radius=15  y_offset=5  border_width=0 
 
@@ -38,7 +42,7 @@ default=(
 sketchybar --default "${default[@]}"
 
 sketchybar --add item logo left \
-           --set logo update_freq=10 icon="󰀶 " icon.padding_right=10 label.drawing=off icon.color=0xff89b4fa   icon.font="$FONT_FACE:Regular:20.0"
+           --set logo icon="󰀶 " icon.padding_right=10 label.drawing=off icon.color=0xff89b4fa   icon.font="$FONT_FACE:Regular:20.0"
 
 
 ##### Adding Right Items #####
