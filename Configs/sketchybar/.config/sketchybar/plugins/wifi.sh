@@ -3,7 +3,7 @@
 update() {
   # Verifica si el WiFi está activado
   if [[ $(networksetup -getairportpower en0) == *"Off"* ]]; then
-    sketchybar --set "$NAME" icon="􀙇" label="Off"
+    sketchybar --set "$NAME" icon="󰤭 " label="Off"
     exit 0
   fi
 

@@ -33,6 +33,6 @@ return {
   lazy = false,
   keys = {
     { "-", "<cmd>Oil --float<CR>", desc = "Open Floating Filesystem" },
-    { "<leader>-", "<cmd>Oil<CR>", desc = "Open Floating Filesystem" },
+    { "<leader><leader>-", "<cmd>Oil<CR>", desc = "Open Floating Filesystem" },
   },
 }
