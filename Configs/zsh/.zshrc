@@ -43,6 +43,8 @@ alias lld='eza -lbhHFGmuSa --group-directories-first --icons'
 # alias lazygit/lazydocker
 alias lg=lazygit
 alias ld=lazydocker
+# alias tmux
+alias mux="tmuxinator"
 
 # petersen alias 
 alias cenv="$WORK_PROJECT/apache-tomcat-9.0.68/shared/changeenvironment.sh"

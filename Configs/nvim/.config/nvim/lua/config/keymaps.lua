@@ -17,6 +17,9 @@ keymap.set("v", "K", "<cmd>m '<-2<CR>gv=gv")
 keymap.set("n", "<TAB>", "<cmd>bn<CR>")
 keymap.set("n", "<S-TAB>", "<cmd>bp<CR>")
 
+--lsp
+keymap.set('n', 'gV', ':vsplit<CR><cmd>lua vim.lsp.buf.definition()<CR>', { silent = true,desc="Split & Goto definition" })
+
 local goto_preview = require("goto-preview")
 keymap.set("n", "gpd", function()
   goto_preview.goto_preview_definition({})

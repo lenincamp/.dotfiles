@@ -42,18 +42,47 @@ vim.api.nvim_create_autocmd({ "BufWritePost" }, {
   end,
 })
 
-local function apply_folds(bufnr)
-  if vim.b[bufnr].folds_applied then
+-- local function apply_folds(bufnr)
+--   if vim.b[bufnr].folds_applied then
+--     return
+--   end
+--   vim.cmd("normal! zM")
+--   vim.cmd("normal! 3zr")
+--   local import_line = vim.fn.search("^import", "n")
+--   if import_line > 0 then
+--     vim.api.nvim_win_set_cursor(0, { import_line, 0 })
+--     vim.cmd("normal! zc")
+--   end
+--   vim.b[bufnr].folds_applied = true
+-- end
+local function apply_folds(bufnr, retry_count)
+  retry_count = retry_count or 0
+
+  if not vim.api.nvim_buf_is_valid(bufnr) or vim.b[bufnr].folds_applied then
     return
   end
-  vim.cmd("normal! zM")
-  vim.cmd("normal! 3zr")
-  local import_line = vim.fn.search("^import", "n")
-  if import_line > 0 then
-    vim.api.nvim_win_set_cursor(0, { import_line, 0 })
-    vim.cmd("normal! zc")
+
+  local success, err = pcall(function()
+    vim.cmd("normal! zM")
+    vim.cmd("normal! 3zr")
+    local import_line = vim.fn.search("^import", "n")
+    if import_line > 0 then
+      vim.api.nvim_win_set_cursor(0, { import_line, 0 })
+      vim.cmd("normal! zc")
+    end
+  end)
+
+  if success then
+    vim.b[bufnr].folds_applied = true
+  else
+    if retry_count < 1 then
+      vim.defer_fn(function()
+        apply_folds(bufnr, retry_count + 1)
+      end, 500)
+    else
+      vim.b[bufnr].folds_applied = true
+    end
   end
-  vim.b[bufnr].folds_applied = true
 end
 
 vim.api.nvim_create_autocmd({ "BufEnter" }, {
@@ -62,7 +91,7 @@ vim.api.nvim_create_autocmd({ "BufEnter" }, {
     local bufnr = args.buf
     if not vim.b[bufnr].folds_applied then
       vim.b[bufnr].folds_applied = false
-      apply_folds(bufnr)
+      apply_folds(bufnr, 0)
     end
   end,
 })
