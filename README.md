@@ -16,6 +16,7 @@ Install fzf, fzf-tab, zsh-syntax-highlighting from [git](https://github.com/ohmy
 * **eza:** colorls
 * **z:** save index in cd
 * **tmux:** terminal multiplexer
+* **tmuxinator:** tmux project admin
 * **aerospace:** macos tiling window manager
 * **ghostty:** terminal emulator
 * **jdtls:** for neovim java lsp
@@ -53,7 +54,8 @@ Install fzf, fzf-tab, zsh-syntax-highlighting from [git](https://github.com/ohmy
 ```sh
 ##unix tools
 brew install --cask font-maple-mono font-maple-mono-nf
-brew install eza z tmux ghostty jdtls lazygit lazydocker speedtest-cli tldr thefuck ncdu btop jadx zbar neofetch axel ffmpeg kanata httpie
+## After install tmuxinator set completions see zsh https://github.com/tmuxinator/tmuxinator
+brew install eza z tmux ghostty jdtls lazygit lazydocker speedtest-cli tldr thefuck ncdu btop jadx zbar neofetch axel ffmpeg kanata httpie tmuxinator
 
 cargo install ttyper
 ## locate => index db to find files in system
