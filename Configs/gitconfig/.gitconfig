@@ -1,7 +1,5 @@
 [include]
 	path = $HOME/.config/bat/themes/catppuccin.gitconfig
-[include]
-	path = ~/.local/.gitconfig
 [core]
   pager = delta
 [interactive]

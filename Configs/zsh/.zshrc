@@ -4,7 +4,7 @@ source $ZSH/custom/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
 plugins=(
         git
         zsh-vi-mode
-        z
+        zoxide
         fzf
         fzf-tab
         zsh-syntax-highlighting
@@ -19,7 +19,6 @@ alias nv='nvim'
 alias v='nvim'
 alias vim='nvim'
 alias gitalias='alias | grep git | fzf'
-alias cd=z
 
 #alias git
 alias fgcot='gco $(g tag | fzf)'
@@ -36,7 +35,7 @@ alias lx='eza -lbhHigUmuSa@ --time-style=long-iso --git --color-scale --icons' #
 
 # alias specialty views
 alias lS='eza -1 --icons'                                                              # one column, just names
-alias lt='eza --tree --level=2 --icons'                                         # tree
+alias lt='eza --tree --level=3 --icons'                                         # tree
 alias llt='eza -l --git --icons --tree '                                         # tree
 alias lld='eza -lbhHFGmuSa --group-directories-first --icons'
 
@@ -165,6 +164,7 @@ eval "$(fnm env --use-on-cd)"
 eval "$(starship init zsh)"
 eval "$(pyenv init -)"
 eval "$(jenv init -)"
+export ZOXIDE_CMD_OVERRIDE="cd"
 eval "$(zoxide init zsh)"
 
 ########################### PATH variables ################################
@@ -225,3 +225,4 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools/
 export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin/ # Validar que exista la carpeta latest previamente
 export PATH=$PATH:$ANDROID_HOME/build-tools
 export PATH=$PATH:$ANDROID_HOME/emulator/
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
