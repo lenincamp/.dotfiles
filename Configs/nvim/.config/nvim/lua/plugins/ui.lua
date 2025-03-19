@@ -19,6 +19,7 @@ return {
   },
   {
     "nvim-lualine/lualine.nvim",
+    event = "VeryLazy",
     config = function()
       local theme = {
         normal = { a = { fg = colors.peach }, b = { fg = colors.blue }, c = { fg = colors.teal } },

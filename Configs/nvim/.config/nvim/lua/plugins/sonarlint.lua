@@ -2,6 +2,7 @@ return {
   url = "https://gitlab.com/schrieveslaach/sonarlint.nvim",
   lazy = true,
   ft = { "java" },
+  -- enabled = false,
   config = function()
     require("sonarlint").setup({
       server = {

@@ -18,7 +18,12 @@ keymap.set("n", "<TAB>", "<cmd>bn<CR>")
 keymap.set("n", "<S-TAB>", "<cmd>bp<CR>")
 
 --lsp
-keymap.set('n', 'gV', ':vsplit<CR><cmd>lua vim.lsp.buf.definition()<CR>', { silent = true,desc="Split & Goto definition" })
+keymap.set(
+  "n",
+  "gV",
+  ":vsplit<CR><cmd>lua vim.lsp.buf.definition()<CR>",
+  { silent = true, desc = "Split & Goto definition" }
+)
 
 local goto_preview = require("goto-preview")
 keymap.set("n", "gpd", function()
@@ -56,6 +61,18 @@ keymap.set(
   [["vy:%s/\V<C-r>=escape(@v, '/\')<CR>/<C-r>v/gI<Left><Left><Left>]],
   { desc = "Replace all ocurrencies" }
 )
+
+vim.keymap.set("n", "gps", function()
+  local clients = vim.lsp.get_clients({ name = "sonarlint.nvim" })
+  if #clients > 0 then
+    vim.lsp.stop_client(clients)
+    vim.notify("SonarLint desactivado", vim.log.levels.INFO)
+  else
+    local sonarlint = require("lazy.core.config").plugins["sonarlint.nvim"]
+    require("lazy.core.loader").reload(sonarlint)
+    vim.notify("SonarLint activado", vim.log.levels.INFO)
+  end
+end, { desc = "Enable/Disable SonarLint" })
 
 local function copy_relative_path_and_show_notify()
   local cwd = vim.fn.getcwd()

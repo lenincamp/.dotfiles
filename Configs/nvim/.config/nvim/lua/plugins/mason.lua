@@ -21,6 +21,7 @@ return {
       "taplo",
       "vtsls",
       "yaml-language-server",
+      "llm-ls",
     },
   },
 }
