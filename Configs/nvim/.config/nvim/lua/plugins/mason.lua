@@ -22,6 +22,7 @@ return {
       "vtsls",
       "yaml-language-server",
       "llm-ls",
+      "ktlint",
     },
   },
 }

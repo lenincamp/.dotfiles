@@ -32,6 +32,7 @@ return {
       "toml",
       "xml",
       "yaml",
+      "kotlin",
     },
   },
 }
