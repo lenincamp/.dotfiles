@@ -49,10 +49,10 @@ return {
       },
       {
         type = "java",
-        request = "launch",
-        name = "Attach to port 5005",
+        request = "attach",
+        name = "Remote Attach 5005",
+        hostName = "localhost",
         port = 5005,
-        shortenCommandLine = "argfile",
       },
       {
         type = "java",
