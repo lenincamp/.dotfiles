@@ -46,7 +46,7 @@ alias ld=lazydocker
 alias mux="tmuxinator"
 
 # petersen alias 
-alias cenv="$WORK_PROJECT/apache-tomcat-9.0.68/shared/changeenvironment.sh"
+alias cenv="$WORK_PROJECT/changeenvironment.sh"
 alias openApk="open $WORK_PROJECT/ar-petersen-cdp/mobile/platforms/android/app/build/outputs/apk/debug/"
 if [[ $(hostname) == "Lenins-MacBook-Pro.local" ]]; then
     export DOCKER_HOST='unix:///var/folders/p9/pldrp6g96lb22zk1hyd9mtc00000gn/T/podman/podman-machine-default-api.sock'
