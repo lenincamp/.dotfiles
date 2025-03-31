@@ -26,7 +26,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "java",
+  pattern = { "java", "xml" },
   group = vim.api.nvim_create_augroup("java", { clear = true }),
   callback = function(opts)
     vim.opt.tabstop = 4
@@ -55,43 +55,43 @@ vim.api.nvim_create_autocmd({ "BufWritePost" }, {
 --   end
 --   vim.b[bufnr].folds_applied = true
 -- end
-local function apply_folds(bufnr, retry_count)
-  retry_count = retry_count or 0
-
-  if not vim.api.nvim_buf_is_valid(bufnr) or vim.b[bufnr].folds_applied then
-    return
-  end
-
-  local success, err = pcall(function()
-    vim.cmd("normal! zM")
-    vim.cmd("normal! 3zr")
-    local import_line = vim.fn.search("^import", "n")
-    if import_line > 0 then
-      vim.api.nvim_win_set_cursor(0, { import_line, 0 })
-      vim.cmd("normal! zc")
-    end
-  end)
-
-  if success then
-    vim.b[bufnr].folds_applied = true
-  else
-    if retry_count < 1 then
-      vim.defer_fn(function()
-        apply_folds(bufnr, retry_count + 1)
-      end, 500)
-    else
-      vim.b[bufnr].folds_applied = true
-    end
-  end
-end
-
-vim.api.nvim_create_autocmd({ "BufEnter" }, {
-  pattern = { "*.java", "*.js", "*.jsx", "*.ts", "*.tsx" },
-  callback = function(args)
-    local bufnr = args.buf
-    if not vim.b[bufnr].folds_applied then
-      vim.b[bufnr].folds_applied = false
-      apply_folds(bufnr, 0)
-    end
-  end,
-})
+-- local function apply_folds(bufnr, retry_count)
+--   retry_count = retry_count or 0
+--
+--   if not vim.api.nvim_buf_is_valid(bufnr) or vim.b[bufnr].folds_applied then
+--     return
+--   end
+--
+--   local success, err = pcall(function()
+--     vim.cmd("normal! zM")
+--     vim.cmd("normal! 3zr")
+--     local import_line = vim.fn.search("^import", "n")
+--     if import_line > 0 then
+--       vim.api.nvim_win_set_cursor(0, { import_line, 0 })
+--       vim.cmd("normal! zc")
+--     end
+--   end)
+--
+--   if success then
+--     vim.b[bufnr].folds_applied = true
+--   else
+--     if retry_count < 1 then
+--       vim.defer_fn(function()
+--         apply_folds(bufnr, retry_count + 1)
+--       end, 500)
+--     else
+--       vim.b[bufnr].folds_applied = true
+--     end
+--   end
+-- end
+--
+-- vim.api.nvim_create_autocmd({ "BufEnter" }, {
+--   pattern = { "*.java", "*.js", "*.jsx", "*.ts", "*.tsx" },
+--   callback = function(args)
+--     local bufnr = args.buf
+--     if not vim.b[bufnr].folds_applied then
+--       vim.b[bufnr].folds_applied = false
+--       apply_folds(bufnr, 0)
+--     end
+--   end,
+-- })

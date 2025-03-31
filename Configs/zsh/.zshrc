@@ -11,6 +11,7 @@ plugins=(
         zsh-autosuggestions
 )
 source $ZSH/oh-my-zsh.sh
+source <(fzf --zsh)
 
 ######################## ALIASES ###############################
 alias cat='bat --paging=never'

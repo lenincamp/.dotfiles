@@ -7,12 +7,12 @@ return {
         settings = {
           javascript = {
             preferences = {
-              importModuleSpecifier = "relative",
+              importModuleSpecifier = "absolute",
             },
           },
           typescript = {
             preferences = {
-              importModuleSpecifier = "relative",
+              importModuleSpecifier = "absolute",
             },
           },
         },
