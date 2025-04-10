@@ -116,9 +116,9 @@ nnoremap gt :action GotoTest<CR>
 nnoremap gm :action GotoSuperMethod<CR>
 nnoremap gpd :action QuickImplementations<CR>
 nnoremap K :action QuickJavaDoc<CR>
-
-nnoremap <leader>gr :action FindUsages<CR>" find references
-nnoremap <leader>gR :action ShowUsages<CR>
+" find references
+nnoremap <leader>gr :action FindUsages<CR>
+nnoremap gr :action ShowUsages<CR>
 nnoremap <leader>sh :action ShowHoverInfo<CR>
 nnoremap <leader>ss :action FileStructurePopup<CR>
 nnoremap <leader>ch :action CallHierarchy<CR>
@@ -176,8 +176,8 @@ nnoremap <leader>Jo :action OptimizeImports<CR>
 "nnoremap <leader>cF :action RearrangeCode<CR>" Organice Code
 
 "-------- Moving Code ---------
-nmap <C-S-j> <Action>(MoveStatementDown)
-nmap <C-S-k> <Action>(MoveStatementUp)
+map <C-S-j> <Action>(MoveStatementDown)
+map <C-S-k> <Action>(MoveStatementUp)
 nmap <leader>cap <Action>(CopyAbsolutePath)
 nmap <leader>cn <Action>(CopyFileName)
 nmap <leader>cp <Action>(CopyContentRootPath)
@@ -210,7 +210,7 @@ nmap <leader>k <Plug>(easymotion-F2)
 
 nnoremap <leader>en :action EditSourceInNewWindow<CR>
 nnoremap <leader>n :action NextWindow<CR>
-"nnoremap <leader>q :action CloseEditor<CR>
+nnoremap <leader>bd :q!<CR>
 inoremap jj <Esc>
 nnoremap <leader>uz :action ToggleDistractionFreeMode<CR>
 nnoremap <C-/> :action ActivateTerminalToolWindow<CR>
@@ -243,3 +243,4 @@ nnoremap ,n :action ActivateDebugToolWindow<CR>
 
 " Scape characters
 xnoremap <leader>ec :action com.materkey.codepoints.ToCodePointsConverter<CR>
+imap <C-j> <Action>(com.github.continuedev.continueintellijextension.autocomplete.AcceptAutocompleteAction)
