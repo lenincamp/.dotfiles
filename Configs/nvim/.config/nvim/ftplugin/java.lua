@@ -15,7 +15,7 @@ local function get_jdtls()
   -- local mason_registry = require("mason-registry")
   -- local jdtls_mason = mason_registry.get_package("jdtls")
   -- local jdtls_path = jdtls_mason:get_install_path() --NOTE: present error on workpace machine
-  local jdtls_path = "/opt/homebrew/Cellar/jdtls/1.45.0/libexec" -- homebrew path
+  local jdtls_path = "/opt/homebrew/Cellar/jdtls/1.46.1/libexec" -- homebrew path
   -- local jdtls_path = "/Users/lcampoverde/Documents/projects/petersen/jdtls-1.9.0" -- homebrew path
 
   local launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar")

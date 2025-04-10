@@ -55,16 +55,16 @@ nnoremap <leader>h :nohlsearch<CR>
 nnoremap Y y$
 vnoremap <leader>p "_dP
 " go to the left split
-map <A-h> <C-w>h
+nnoremap <C-h> <C-w>h
 " go to the bottom split
-map <A-j> <C-w>j
+nnoremap <C-j> <C-w>j
 " go to the top split
-map <A-k> <C-w>k
+nnoremap <C-k> <C-w>k
 " go to the right split
-map <A-l> <C-w>l
+nnoremap <C-l> <C-w>l
 "move visual block
-vnoremap <S-Down> :m '>+1<CR>
-vnoremap <S-Up> :m '>-2<CR>
+xnoremap J :action MoveLineDown<CR>
+xnoremap K :action MoveLineUp<CR>
 " go to start of line
 nnoremap H ^
 " go to end of line
@@ -79,8 +79,8 @@ nnoremap <c-a> gg<S-v>G
 nnoremap n nzz
 nnoremap N Nzz
 "Some search and replace shorcouts
-nnoremap <leader><leader>r :%s//g<Left><Left>
-xnoremap <leader><leader>r :s//g<Left><Left>
+nnoremap <leader>rr :%s//g<Left><Left>
+xnoremap <leader>rr :s//g<Left><Left>
 "open recent project dialog box
 nnoremap <leader><leader>m :action ManageRecentProjects<CR>
 
@@ -88,139 +88,132 @@ nnoremap <leader><leader>m :action ManageRecentProjects<CR>
 "nmap <leader><leader> <c-^>
 
 "NERDTree
-nmap <c-e> :NERDTreeToggle<CR>
-nmap <leader>;n :NERDTreeFocus<CR>
+nnoremap <leader>e :NERDTreeToggle<CR>
+nnoremap <leader>_ :NERDTreeFocus<CR>
 " reload vimrc
 nnoremap \e :e ~/.ideavimrc<CR>
 nnoremap \r :action IdeaVim.ReloadVimRc.reload<CR>
 "save file
 "nnoremap <leader>w :w!<CR>
-map <leader>w <Action>(SaveAll)
+nnoremap <C-s> :action SaveAll<CR>
 
 "-------- Window management --------
-map <leader>mv <Action>(SplitVertically)
-map <leader>mh <Action>(SplitHorizontally)
-map <leader>mw <Action>(Unsplit)
-map <leader>ma <Action>(UnsplitAll)
+nnoremap <leader>\| :action SplitVertically<CR>
+nnoremap <leader>- :action SplitHorizontally<CR>
+nnoremap <leader>mw :action Unsplit<CR>
+nnoremap <leader>ma :action UnsplitAll<CR>
 "-------- Source code navigation --------
-map <leader>sc <Action>(GotoClass)
-map <leader>sf <Action>(GotoFile)
-map <leader>ss <Action>(GotoSymbol)
-map <leader>sa <Action>(GotoAction)
-map <leader>gd <Action>(GotoDeclaration)
-map <leader>gy <Action>(GotoTypeDeclaration)
-map <leader>gi <Action>(GotoImplementation)
-map <leader>gt <Action>(GotoTest)
-map <leader>gm <Action>(GotoSuperMethod)
-map <leader>gl <Action>(GotoLine)
+nnoremap <leader>fF :action GotoClass<CR>
+nnoremap <leader>ff :action GotoFile<CR>
+nnoremap <leader>sS :action GotoSymbol<CR>
+nnoremap <leader>sA :action GotoAction<CR>
+nnoremap <leader>gl :action GotoLine<CR>
 
-map <leader>ug <Action>(FindUsages)
-map <leader>uu <Action>(ShowUsages)
-map <leader>vs <Action>(ViewSource)
-map <leader>im <Action>(QuickImplementations)
-map <leader>td <Action>(QuickTypeDefinition)
-map <leader>ti <Action>(ExpressionTypeInfo)
-map <leader>sh <Action>(ShowHoverInfo)
-map <leader>oo <Action>(FileStructurePopup)
+nnoremap gD :action GotoDeclaration<CR>
+nnoremap gy :action GotoTypeDeclaration<CR>
+nnoremap gi :action GotoImplementation<CR>
+nnoremap gt :action GotoTest<CR>
+nnoremap gm :action GotoSuperMethod<CR>
+nnoremap gpd :action QuickImplementations<CR>
+nnoremap K :action QuickJavaDoc<CR>
 
-map <leader>s <Action>(GotoRelated)
-map <leader>ch <Action>(CallHierarchy)
+nnoremap <leader>gr :action FindUsages<CR>" find references
+nnoremap <leader>gR :action ShowUsages<CR>
+nnoremap <leader>sh :action ShowHoverInfo<CR>
+nnoremap <leader>ss :action FileStructurePopup<CR>
+nnoremap <leader>ch :action CallHierarchy<CR>
+nnoremap <leader>gh  :action LocalHistory.ShowHistory<CR>
 
-map <leader>lh  <Action>(LocalHistory.ShowHistory)
-
-map gc <Action>(CommentByLineComment)
-map gb <Action>(CommentByBlockComment)
-map K <Action>(QuickJavaDoc)
+nnoremap gc :action CommentByLineComment<CR>
+nnoremap gb :action CommentByBlockComment<CR>
 
 
 "-------- Find and Replace ---------
-map <S-f> <Action>(Find)
-map <S-r> <Action>(Replace)
-map <leader>ff <Action>(FindInPath)
-map <leader>fr <Action>(ReplaceInPath)
+nnoremap <S-f> :action Find<CR>
+nnoremap <S-r> :action Replace<CR>
+nnoremap <leader>sg :action FindInPath<CR>
+nnoremap <leader>sr :action ReplaceInPath<CR>
 
 "-------- Refactoring ---------
-map <leader>rn <Action>(RenameElement)
-map <leader>rm <Action>(ExtractMethod)
-map <leader>rv <Action>(IntroduceVariable)
-map <leader>rf <Action>(IntroduceField)
-map <leader>rc <Action>(IntroduceConstant)
-map <leader>rp <Action>(IntroduceParameter)
-map <leader>rs <Action>(ChangeSignature)
-map <leader>rr <Action>(Refactorings.QuickListPopupAction)
-nmap <leader>in <Action>(Inline)
-nmap <leader>mm <Action>(Move)
-map <leader>ry <Action>(CopyElement)
+nnoremap <leader>cr :action RenameElement<CR>
+nnoremap <leader>rf :action ExtractMethod<CR>
+nnoremap <leader>rx :action IntroduceVariable<CR>
+nnoremap <leader>rF :action IntroduceField<CR>
+nnoremap <leader>rc :action IntroduceConstant<CR>
+nnoremap <leader>rp :action IntroduceParameter<CR>
+nnoremap <leader>rcs :action ChangeSignature<CR>
+nnoremap <leader>rql :action Refactorings.QuickListPopupAction<CR>
+nnoremap <leader>ri :action Inline<CR>
+nnoremap <leader>rm :action Move<CR>
+nnoremap <leader>ry :action CopyElement<CR>
 
 "-------- Editing ---------
-map <leader>aa <Action>(ShowIntentionActions)
-map <leader>sw <Action>(SurroundWith)
-map <S-space> <Action>(Generate)
-"map <S-k> <Action>(EditorDuplicateLines)
-imap <C-]> <Action>(EditorCompleteStatement)
+nnoremap <leader>ca :action ShowIntentionActions<CR>"code actions
+vnoremap gsA :action SurroundWith<CR>
+nnoremap <S-space> :action Generate<CR>
+inoremap <C-]> :action EditorCompleteStatement<CR>
 
 "-------- Jumping ---------
-map <leader>en <Action>(GotoNextError)
-map <leader>ep <Action>(GotoPreviousError)
-map <leader>se <Action>(ShowErrorDescription)
-map <leader>vn <Action>(VcsShowNextChangeMarker)
-map <leader>vp <Action>(VcsShowPrevChangeMarker)
-map <leader>lc <Action>(JumpToLastChange)
-map <leader>jn <Action>(JumpToNextChange)
-map <leader>ll <Action>(RecentLocations)
-map ,o <Action>(RecentFiles)
-map <C-i> <Action>(Forward)
-map <C-o> <Action>(Back)
-map [[ <Action>(MethodUp)
-map ]] <Action>(MethodDown)
-"map <leader>nn <Action>(NextTab)
-"map <leader>pp <Action>(PreviousTab)
+nnoremap ]e :action GotoNextError<CR>
+nnoremap [e :action GotoPreviousError<CR>
+nnoremap <leader>cd :action ShowErrorDescription<CR>"toggle line diagnostics
+nnoremap ]v :action VcsShowNextChangeMarker<CR>
+nnoremap [v :action VcsShowPrevChangeMarker<CR>
+nnoremap [c :action JumpToLastChange<CR>
+nnoremap ]c :action JumpToNextChange<CR>
+nnoremap <leader>ll :action RecentLocations<CR>
+nnoremap <leader>fR :action RecentFiles<CR>
+nnoremap <C-i> :action Forward<CR>
+nnoremap <C-o> :action Back<CR>
+nnoremap [[ :action MethodUp<CR>
+nnoremap ]] :action MethodDown<CR>
+"nnoremap <Tab> :action NextTab<CR>
+"nnoremap <S-Tab> :action PreviousTab<CR>
 
 "-------- Code Style ---------
-map <leader><leader> <Action>(ReformatCode)
-map <leader>oi <Action>(OptimizeImports)
-map <leader>ra <Action>(RearrangeCode)
+nmap <leader>cf <Action>(ReformatCode)\|<Action>(RearrangeCode)
+nnoremap <leader>Jo :action OptimizeImports<CR>
+"nnoremap <leader>cF :action RearrangeCode<CR>" Organice Code
 
 "-------- Moving Code ---------
-map <C-j> <Action>(MoveLineDown)
-map <C-k> <Action>(MoveLineUp)
-map <C-S-j> <Action>(MoveStatementDown)
-map <C-S-k> <Action>(MoveStatementUp)
-map <leader>ca <Action>(CopyAbsolutePath)
-map <leader>cn <Action>(CopyFileName)
-map <leader>cp <Action>(CopyContentRootPath)
+nmap <C-S-j> <Action>(MoveStatementDown)
+nmap <C-S-k> <Action>(MoveStatementUp)
+nmap <leader>cap <Action>(CopyAbsolutePath)
+nmap <leader>cn <Action>(CopyFileName)
+nmap <leader>cp <Action>(CopyContentRootPath)
 
 "-------- File Management ---------
-map <leader>fs <Action>(NewScratchFile)
-map <leader>qq <Action>(CloseContent)
+nmap <leader>fn <Action>(NewScratchFile)
+nmap <leader>wq <Action>(CloseContent)
 "map <leader>-
-map <leader>qa <Action>(CloseAllEditors)
-map <leader>nf <Action>(NewFile)
-map <leader>nd <Action>(NewDir)
-map <leader>re <Action>(RenameFile)
-map <leader>of <Action>(OpenFile)
-map <leader>ri <Action>(RestartIde)
-map <C-S-m> <Action>(MoveEditorToOppositeTabGroup)
-map <C-m> <Action>(MaximizeEditorInSplit)
-map <C-=> <Action>(EditorSelectWord)
-map \\ <Action>(Switcher)
-map <leader>b <Action>(ShowNavBar)
+nmap <leader>wo <Action>(CloseAllEditors)
+nmap <leader>nf <Action>(NewFile)
+nmap <leader>nd <Action>(NewDir)
+nmap <leader>cR <Action>(RenameFile)
+nmap <leader>of <Action>(OpenFile)
+nmap <leader>rs <Action>(RestartIde)
+nmap <C-S-h> <Action>(MoveEditorToOppositeTabGroup)
+nmap <leader>w\| <Action>(MaximizeEditorInSplit)
+nmap <leader>w_ <Action>(MaximizeEditorInSplit)
+nmap <leader>w= <Action>(MaximizeEditorInSplit)
+nmap <C-=> <Action>(EditorSelectWord)
+nmap <leader>fb <Action>(Switcher)
+nmap <leader>b <Action>(ShowNavBar)
 
 "-------- easymotion ---------
-map <leader>j <Plug>(easymotion-s2)
-map <leader>k <Plug>(easymotion-F2)
+nmap <leader>j <Plug>(easymotion-s2)
+nmap <leader>k <Plug>(easymotion-F2)
 
 " Use 'm' instead - functiontextobj
-"map im <Plug>InnerFunction
-map am <Plug>OuterFunction
+"nmap im <Plug>InnerFunction
+"map af <Plug>OuterFunction
 
-"nnoremap <leader>en :action EditSourceInNewWindow<CR>
-"nnoremap <leader>n :action NextWindow<CR>
+nnoremap <leader>en :action EditSourceInNewWindow<CR>
+nnoremap <leader>n :action NextWindow<CR>
 "nnoremap <leader>q :action CloseEditor<CR>
-
-imap jj <Esc>
-nnoremap <C-z> :action ToggleDistractionFreeMode<CR>
-nnoremap <C-t> :action ActivateTerminalToolWindow<CR>
+inoremap jj <Esc>
+nnoremap <leader>uz :action ToggleDistractionFreeMode<CR>
+nnoremap <C-/> :action ActivateTerminalToolWindow<CR>
 nnoremap <leader>t :action Terminal.OpenInTerminal<CR>
 
 
@@ -229,8 +222,8 @@ vnoremap > >gv
 vnoremap = =gv
 nnoremap zc :action CollapseRegion<CR>
 nnoremap zo :action ExpandRegion<CR>
-nnoremap <leader>zc :action CollapseAllRegions<CR>
-nnoremap <leader>zo :action ExpandAllRegions<CR>
+nnoremap zM :action CollapseAllRegions<CR>
+nnoremap zR :action ExpandAllRegions<CR>
 
 nnoremap <c-p> :action JumpToLastWindow<CR>
 nnoremap <c-x> :action HideAllWindows<CR>
@@ -238,15 +231,15 @@ nnoremap <c-x> :action HideAllWindows<CR>
 
 " Debugging
 nnoremap ,r :action ContextRun<CR>
-nnoremap ,c :action RunClass<CR>
-nnoremap ,f :action ChooseRunConfiguration<CR>
+nnoremap <leader>Jc :action RunClass<CR>
+nnoremap <leader>dc :action ChooseRunConfiguration<CR>
 nnoremap ,t :action ActivateRunToolWindow<CR>
 nnoremap ,u :action Rerun<CR>
 nnoremap ,f :action RerunFailedTests<CR>
 
-nnoremap ,b :action ToggleLineBreakpoint<CR>
+nnoremap <leader>db :action ToggleLineBreakpoint<CR>
 nnoremap ,d :action ContextDebug<CR>
 nnoremap ,n :action ActivateDebugToolWindow<CR>
 
 " Scape characters
-xmap <leader>sc :action com.materkey.codepoints.ToCodePointsConverter<CR>
+xnoremap <leader>ec :action com.materkey.codepoints.ToCodePointsConverter<CR>
