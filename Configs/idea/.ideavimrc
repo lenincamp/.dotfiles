@@ -13,6 +13,8 @@ set visualbell
 set noerrorbells
 set which-key
 set functiontextobj
+set indent-object
+set textobj-entire
 
 " disable the timeout option
 set notimeout
@@ -244,3 +246,8 @@ nnoremap ,n :action ActivateDebugToolWindow<CR>
 " Scape characters
 xnoremap <leader>ec :action com.materkey.codepoints.ToCodePointsConverter<CR>
 imap <C-j> <Action>(com.github.continuedev.continueintellijextension.autocomplete.AcceptAutocompleteAction)
+imap <C-y> <Action>(EditorChooseLookupItem)
+"Surround as lazy-vim
+nmap gsr <Plug>CSurround
+nmap gsd <Plug>DSurround
+xmap gsa <Plug>VSurround
