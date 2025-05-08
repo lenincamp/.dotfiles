@@ -105,8 +105,8 @@ nnoremap <leader>- :action SplitHorizontally<CR>
 nnoremap <leader>mw :action Unsplit<CR>
 nnoremap <leader>ma :action UnsplitAll<CR>
 "-------- Source code navigation --------
-nnoremap <leader>fF :action GotoClass<CR>
-nnoremap <leader>ff :action GotoFile<CR>
+nnoremap <leader>fC :action GotoClass<CR>
+nnoremap <leader>fF :action GotoFile<CR>
 nnoremap <leader>sS :action GotoSymbol<CR>
 nnoremap <leader>sA :action GotoAction<CR>
 nnoremap <leader>gl :action GotoLine<CR>
@@ -133,7 +133,7 @@ nnoremap gb :action CommentByBlockComment<CR>
 "-------- Find and Replace ---------
 nnoremap <S-f> :action Find<CR>
 nnoremap <S-r> :action Replace<CR>
-nnoremap <leader>sg :action FindInPath<CR>
+"nnoremap <leader>sg :action FindInPath<CR>
 nnoremap <leader>sr :action ReplaceInPath<CR>
 
 "-------- Refactoring ---------
@@ -150,7 +150,8 @@ nnoremap <leader>rm :action Move<CR>
 nnoremap <leader>ry :action CopyElement<CR>
 
 "-------- Editing ---------
-nnoremap <leader>ca :action ShowIntentionActions<CR>"code actions
+"code actions
+nnoremap <leader>ca :action ShowIntentionActions<CR>
 vnoremap gsA :action SurroundWith<CR>
 nnoremap <S-space> :action Generate<CR>
 inoremap <C-]> :action EditorCompleteStatement<CR>
@@ -158,13 +159,14 @@ inoremap <C-]> :action EditorCompleteStatement<CR>
 "-------- Jumping ---------
 nnoremap ]e :action GotoNextError<CR>
 nnoremap [e :action GotoPreviousError<CR>
-nnoremap <leader>cd :action ShowErrorDescription<CR>"toggle line diagnostics
+"toggle line diagnostics
+nnoremap <leader>cd :action ShowErrorDescription<CR>
 nnoremap ]v :action VcsShowNextChangeMarker<CR>
 nnoremap [v :action VcsShowPrevChangeMarker<CR>
 nnoremap [c :action JumpToLastChange<CR>
 nnoremap ]c :action JumpToNextChange<CR>
 nnoremap <leader>ll :action RecentLocations<CR>
-nnoremap <leader>fR :action RecentFiles<CR>
+"nnoremap <leader>fR :action RecentFiles<CR>
 nnoremap <C-i> :action Forward<CR>
 nnoremap <C-o> :action Back<CR>
 nnoremap [[ :action MethodUp<CR>
@@ -199,7 +201,7 @@ nmap <leader>w\| <Action>(MaximizeEditorInSplit)
 nmap <leader>w_ <Action>(MaximizeEditorInSplit)
 nmap <leader>w= <Action>(MaximizeEditorInSplit)
 nmap <C-=> <Action>(EditorSelectWord)
-nmap <leader>fb <Action>(Switcher)
+"nmap <leader>fb <Action>(Switcher)
 nmap <leader>b <Action>(ShowNavBar)
 
 "-------- easymotion ---------
@@ -210,7 +212,7 @@ nmap <leader>k <Plug>(easymotion-F2)
 "nmap im <Plug>InnerFunction
 "map af <Plug>OuterFunction
 
-nnoremap <leader>en :action EditSourceInNewWindow<CR>
+nnoremap <leader>wn :action EditSourceInNewWindow<CR>
 nnoremap <leader>n :action NextWindow<CR>
 nnoremap <leader>bd :q!<CR>
 inoremap jj <Esc>
@@ -234,12 +236,18 @@ nnoremap <c-x> :action HideAllWindows<CR>
 " Debugging
 nnoremap ,r :action ContextRun<CR>
 nnoremap <leader>Jc :action RunClass<CR>
-nnoremap <leader>dc :action ChooseRunConfiguration<CR>
+nnoremap <leader>dC :action ChooseRunConfiguration<CR>
 nnoremap ,t :action ActivateRunToolWindow<CR>
 nnoremap ,u :action Rerun<CR>
 nnoremap ,f :action RerunFailedTests<CR>
 
 nnoremap <leader>db :action ToggleLineBreakpoint<CR>
+nnoremap <leader>dO :action StepOver<CR>
+nnoremap <leader>do :action StepOut<CR>
+nnoremap <leader>di :action StepInto<CR>
+nnoremap <leader>dc :action Resume<CR>
+vnoremap <leader>de :action EvaluateExpression<CR>
+
 nnoremap ,d :action ContextDebug<CR>
 nnoremap ,n :action ActivateDebugToolWindow<CR>
 
@@ -251,3 +259,11 @@ imap <C-y> <Action>(EditorChooseLookupItem)
 nmap gsr <Plug>CSurround
 nmap gsd <Plug>DSurround
 xmap gsa <Plug>VSurround
+
+nmap <leader>ff <Action>(com.fuzzyfilesearch.SearchInProjectPath)
+nmap <leader>fR <Action>(com.fuzzyfilesearch.SearchInRecentFiles)
+nmap <leader>fb <Action>(com.fuzzyfilesearch.BufSearch)
+"nmap <Leader>ff <action>(com.mituuz.fuzzier.Fuzzier)
+nmap <Leader>fm <action>(com.mituuz.fuzzier.FuzzyMover)
+nmap <Leader>fg <action>(com.mituuz.fuzzier.FuzzierVCS)
+nmap <Leader>sg <action>(com.mituuz.fuzzier.FuzzyGrep)
