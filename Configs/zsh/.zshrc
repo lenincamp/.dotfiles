@@ -227,3 +227,4 @@ export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin/ # Validar que exista l
 export PATH=$PATH:$ANDROID_HOME/build-tools
 export PATH=$PATH:$ANDROID_HOME/emulator/
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+export XDG_DATA_DIRS="/opt/homebrew/share:$XDG_DATA_DIRS"
