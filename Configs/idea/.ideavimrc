@@ -90,7 +90,8 @@ nnoremap <leader><leader>m :action ManageRecentProjects<CR>
 "nmap <leader><leader> <c-^>
 
 "NERDTree
-nnoremap <leader>e :NERDTreeToggle<CR>
+"nnoremap <leader>e :NERDTreeToggle<CR>
+nnoremap <leader>e :action SelectInProjectView<CR>
 nnoremap <leader>_ :NERDTreeFocus<CR>
 " reload vimrc
 nnoremap \e :e ~/.ideavimrc<CR>
@@ -133,7 +134,7 @@ nnoremap gb :action CommentByBlockComment<CR>
 "-------- Find and Replace ---------
 nnoremap <S-f> :action Find<CR>
 nnoremap <S-r> :action Replace<CR>
-"nnoremap <leader>sg :action FindInPath<CR>
+nnoremap <leader>sg :action FindInPath<CR>
 nnoremap <leader>sr :action ReplaceInPath<CR>
 
 "-------- Refactoring ---------
@@ -169,8 +170,10 @@ nnoremap <leader>ll :action RecentLocations<CR>
 "nnoremap <leader>fR :action RecentFiles<CR>
 nnoremap <C-i> :action Forward<CR>
 nnoremap <C-o> :action Back<CR>
-nnoremap [[ :action MethodUp<CR>
-nnoremap ]] :action MethodDown<CR>
+nnoremap [f :action MethodUp<CR>
+nnoremap [F :action MethodDown<CR>
+nnoremap ]f :action MethodDown<CR>
+nnoremap ]F :action MethodUp<CR>
 "nnoremap <Tab> :action NextTab<CR>
 "nnoremap <S-Tab> :action PreviousTab<CR>
 
@@ -266,4 +269,4 @@ nmap <leader>fb <Action>(com.fuzzyfilesearch.BufSearch)
 "nmap <Leader>ff <action>(com.mituuz.fuzzier.Fuzzier)
 nmap <Leader>fm <action>(com.mituuz.fuzzier.FuzzyMover)
 nmap <Leader>fg <action>(com.mituuz.fuzzier.FuzzierVCS)
-nmap <Leader>sg <action>(com.mituuz.fuzzier.FuzzyGrep)
+"nmap <Leader>sg <action>(com.mituuz.fuzzier.FuzzyGrep)

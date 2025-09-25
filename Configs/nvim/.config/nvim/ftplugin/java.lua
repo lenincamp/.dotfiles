@@ -15,7 +15,7 @@ local function get_jdtls()
   -- local mason_registry = require("mason-registry")
   -- local jdtls_mason = mason_registry.get_package("jdtls")
   -- local jdtls_path = jdtls_mason:get_install_path() --NOTE: present error on workpace machine
-  local jdtls_path = "/opt/homebrew/Cellar/jdtls/1.46.1/libexec" -- homebrew path
+  local jdtls_path = "/opt/homebrew/Cellar/jdtls/1.50.0/libexec" -- homebrew path
   -- local jdtls_path = "/Users/lcampoverde/Documents/projects/petersen/jdtls-1.9.0" -- homebrew path
 
   local launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar")
@@ -26,17 +26,12 @@ local function get_jdtls()
 end
 
 local function get_bundles()
-  local mason_registry = require("mason-registry")
-  local java_debug = mason_registry.get_package("java-debug-adapter")
-  local java_debug_path = java_debug:get_install_path()
-
   local bundles = {
-    vim.fn.glob(java_debug_path .. "/extension/server/com.microsoft.java.debug.plugin-*.jar", 1),
+    -- vim.fn.globpath("$MASON/packages/java-debug-adapter/extension/server", "*.jar", true, true),
+    vim.fn.glob("$MASON/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar", 1),
   }
 
-  local java_test = mason_registry.get_package("java-test")
-  local java_test_path = java_test:get_install_path()
-  vim.list_extend(bundles, vim.split(vim.fn.glob(java_test_path .. "/extension/server/*.jar", 1), "\n"))
+  vim.list_extend(bundles, vim.fn.globpath("$MASON/packages/java-test/extension/server", "*.jar", true, true))
 
   -- [ [ local bundles = vim.fn.glob(
   --   home
@@ -153,8 +148,12 @@ end
 
 local function get_capabilities()
   local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities = require("blink.cmp").get_lsp_capabilities(capabilities)
+  -- capabilities = require("blink.cmp").get_lsp_capabilities(capabilities)
+  -- capabilities.textDocument.completion.completionItem.snippetSupport = true
   capabilities.textDocument.completion.completionItem.snippetSupport = true
+  capabilities.textDocument.completion.completionItem.resolveSupport = {
+    properties = { "documentation", "detail", "additionalTextEdits" },
+  }
   local extendedClientCapabilities = jdtls.extendedClientCapabilities
   extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
   -- extendedClientCapabilities.onCompletionItemSelectedCommand = "editor.action.triggerParameterHints"
@@ -163,9 +162,10 @@ end
 
 local launcher, jdtls_os_config, lombok = get_jdtls()
 local capabilities, extendedClientCapabilities = get_capabilities()
+local java_24 = "/opt/homebrew/Cellar/openjdk/24.0.2/libexec/openjdk.jdk/Contents/Home"
 local config = {
   cmd = {
-    "/opt/homebrew/Cellar/openjdk/23.0.2/libexec/openjdk.jdk/Contents/Home/bin/java",
+    java_24 .. "/bin/java",
     -- "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin/java",
     -- "java",
     "-Declipse.application=org.eclipse.jdt.ls.core.id1",
@@ -258,11 +258,11 @@ local config = {
         runtimes = {
           {
             name = "JavaSE-17",
-            path = home .. "/Library/Java/JavaVirtualMachines/azul-17.0.11/Contents/Home",
+            path = home .. "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/",
           },
           {
-            name = "JavaSE-23",
-            path = "/opt/homebrew/Cellar/openjdk/23.0.2/libexec/openjdk.jdk/Contents/Home",
+            name = "JavaSE-24",
+            path = java_24,
           },
           {
             name = "JavaSE-1.8",
