@@ -33,6 +33,9 @@ return {
       "xml",
       "yaml",
       "kotlin",
+      "apex",
+      "soql",
+      "sosl",
     },
   },
 }

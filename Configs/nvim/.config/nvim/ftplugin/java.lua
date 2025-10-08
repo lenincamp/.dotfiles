@@ -15,7 +15,7 @@ local function get_jdtls()
   -- local mason_registry = require("mason-registry")
   -- local jdtls_mason = mason_registry.get_package("jdtls")
   -- local jdtls_path = jdtls_mason:get_install_path() --NOTE: present error on workpace machine
-  local jdtls_path = "/opt/homebrew/Cellar/jdtls/1.50.0/libexec" -- homebrew path
+  local jdtls_path = "/opt/homebrew/Cellar/jdtls/1.51.0/libexec/" -- homebrew path
   -- local jdtls_path = "/Users/lcampoverde/Documents/projects/petersen/jdtls-1.9.0" -- homebrew path
 
   local launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar")
@@ -147,9 +147,11 @@ local on_attach = function(_, bufnr)
 end
 
 local function get_capabilities()
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  -- capabilities = require("blink.cmp").get_lsp_capabilities(capabilities)
-  -- capabilities.textDocument.completion.completionItem.snippetSupport = true
+  local capabilities = vim.tbl_deep_extend(
+    "force",
+    vim.lsp.protocol.make_client_capabilities(),
+    require("blink.cmp").get_lsp_capabilities()
+  )
   capabilities.textDocument.completion.completionItem.snippetSupport = true
   capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = { "documentation", "detail", "additionalTextEdits" },
@@ -162,7 +164,8 @@ end
 
 local launcher, jdtls_os_config, lombok = get_jdtls()
 local capabilities, extendedClientCapabilities = get_capabilities()
-local java_24 = "/opt/homebrew/Cellar/openjdk/24.0.2/libexec/openjdk.jdk/Contents/Home"
+-- local java_24 = "/opt/homebrew/Cellar/openjdk/24.0.2/libexec/openjdk.jdk/Contents/Home"
+local java_24 = "/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home"
 local config = {
   cmd = {
     java_24 .. "/bin/java",
