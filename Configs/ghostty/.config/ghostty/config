@@ -11,19 +11,18 @@ mouse-scroll-multiplier=2
 keybind = global:ctrl+grave_accent=toggle_quick_terminal
 clipboard-paste-protection = false
 copy-on-select = true
-
 font-size = 15
 font-family = Maple Mono NF
 font-synthetic-style=true
-theme = catppuccin-mocha
+theme = light:catppuccin-latte,dark:catppuccin-mocha
 cursor-style = block
 cursor-style-blink = true
 adjust-cell-height = 35%
 #background = #11111b 
-# background = #181825
-background = #1E1E2E
-background-opacity = 0.75
-background-blur-radius = 45
+# background = #eff1f5
+# background = #1E1E2E
+# background-opacity = 0.95
+# background-blur-radius = 20
 window-padding-balance = true
 window-padding-color = extend 
 window-padding-x = 0

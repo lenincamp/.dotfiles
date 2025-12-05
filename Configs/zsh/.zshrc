@@ -1,6 +1,34 @@
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="lambda"
-source $ZSH/custom/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
+
+get_system_theme() {
+  # macOS
+  if [[ "$OSTYPE" == darwin* ]]; then
+    if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]; then
+      echo "dark"
+    else
+      echo "light"
+    fi
+    return
+  fi
+
+  # GNOME Linux
+  if command -v gsettings >/dev/null; then
+    scheme=$(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null)
+    if [[ "$scheme" == "'prefer-dark'" ]]; then
+      echo "dark"
+    else
+      echo "light"
+    fi
+    return
+  fi
+
+  # Default fallback
+  echo "light"
+}
+THEME_MODE=$(get_system_theme)
+
+# source $ZSH/custom/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
 plugins=(
         git
         zsh-vi-mode
@@ -179,6 +207,18 @@ eval "$(zoxide init zsh)"
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
+LAZYGIT_PATH="$HOME/Library/Application Support/lazygit"
+if [[ "$THEME_MODE" == "dark" ]]; then
+    source $ZSH/custom/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh
+    export BAT_THEME="Catppuccin Mocha"
+    export LG_CONFIG_FILE="$LAZYGIT_PATH/config.yml"
+else
+    source $ZSH/custom/themes/catppuccin_latte-zsh-syntax-highlighting.zsh
+    export BAT_THEME="Catppuccin Latte"
+    export LG_CONFIG_FILE="$LAZYGIT_PATH/config-light.yml"
+fi
+
+
 export LANG=en_US.UTF-8
 export PATH="$HOME/.jenv/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
@@ -191,7 +231,7 @@ export EDITOR="nvim"
 export VISUAL=$EDITOR
 
 #bat theme - https://github.com/catppuccin/bat
-export BAT_THEME="Catppuccin Mocha"
+# export BAT_THEME="Catppuccin Mocha"
 
 ######### fzf #######
 export FZF_DEFAULT_COMMAND='fd --type f --color=never --hidden'
@@ -219,8 +259,8 @@ export ANDROID_HOME=$HOME/workspace/DevTools/Android/sdk # Ruta descrita en “A
 export ANDROID_SDK_ROOT=$HOME/workspace/DevTools/Android/sdk # Ruta descrita en “Android SDK Location” en el paso anterior
 # export JAVA_HOME=$HOME/Library/Java/JavaVirtualMachines/azul-17.0.10/Contents/Home
 # export CORDOVA_JAVA_HOME=$HOME/Library/Java/JavaVirtualMachines/azul-17.0.10/Contents/Home
-export JAVA_HOME=/opt/homebrew/Cellar/openjdk/23.0.2/libexec/openjdk.jdk/Contents/Home
-export CORDOVA_JAVA_HOME=/opt/homebrew/Cellar/openjdk/23.0.2/libexec/openjdk.jdk/Contents/Home
+export JAVA_HOME=/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home
+export CORDOVA_JAVA_HOME=/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home
 
 export PATH=$PATH:$ANDROID_HOME/platform-tools/
 export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin/ # Validar que exista la carpeta latest previamente

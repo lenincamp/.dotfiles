@@ -21,3 +21,5 @@ cursor-text = 11111b
 selection-background = 353749
 selection-foreground = cdd6f4
 split-divider-color = 313244
+background-opacity = 0.80
+background-blur-radius = 20
