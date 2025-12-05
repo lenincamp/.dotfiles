@@ -1,3 +1,6 @@
 {
-    "runtime.unicodeName": true
+    "runtime.unicodeName": true,
+    "diagnostics.disable": [
+        "need-check-nil"
+    ]
 }

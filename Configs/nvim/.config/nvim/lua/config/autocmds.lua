@@ -44,6 +44,13 @@ vim.api.nvim_create_autocmd({ "BufWritePost" }, {
   end,
 })
 
+vim.filetype.add({
+  pattern = {
+    [".*/*.cls"] = "apex",
+    [".*/*.apex"] = "apex",
+  },
+})
+
 -- local function apply_folds(bufnr)
 --   if vim.b[bufnr].folds_applied then
 --     return

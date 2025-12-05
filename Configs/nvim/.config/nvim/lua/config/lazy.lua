@@ -14,6 +14,24 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+local function is_system_dark()
+  local handle = io.popen("defaults read -g AppleInterfaceStyle 2>/dev/null")
+  local result = handle:read("*a")
+  handle:close()
+  return result:match("Dark") ~= nil
+end
+
+local function apply_system_theme()
+  local is_dark = is_system_dark()
+  if is_dark then
+    vim.o.background = "dark"
+    return "catppuccin-mocha"
+  else
+    vim.o.background = "light"
+    return "catppuccin-latte"
+  end
+end
+
 require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
@@ -26,7 +44,7 @@ require("lazy").setup({
           lazyvim = true,
           neovim = true,
         },
-        colorscheme = "catppuccin-mocha",
+        colorscheme = apply_system_theme(),
       },
     },
     { import = "lazyvim.plugins.extras.util.mini-hipatterns" },

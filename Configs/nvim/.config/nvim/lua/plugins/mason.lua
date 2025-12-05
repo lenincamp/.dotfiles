@@ -23,6 +23,8 @@ return {
       "yaml-language-server",
       "llm-ls",
       "ktlint",
+      "apex-language-server",
+      "lwc-language-server",
     },
   },
 }

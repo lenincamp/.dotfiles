@@ -36,6 +36,8 @@ return {
       "apex",
       "soql",
       "sosl",
+      "css",
     },
+    highlight = { enable = true },
   },
 }

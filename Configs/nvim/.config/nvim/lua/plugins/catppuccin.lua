@@ -1,3 +1,4 @@
+-- local transparent_background = vim.o.background == "dark"
 local transparent_background = true
 return {
   "catppuccin/nvim",

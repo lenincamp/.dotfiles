@@ -1,4 +1,4 @@
-local colors = require("catppuccin.palettes").get_palette("mocha")
+local colors = require("catppuccin.palettes").get_palette(vim.o.background == "dark" and "mocha" or "latte")
 
 return {
   {
@@ -30,6 +30,15 @@ return {
         inactive = { a = { fg = colors.green }, b = { fg = colors.blue }, c = { fg = colors.green } },
       }
       require("lualine").setup({
+        sections = {
+          lualine_c = {
+            "filename",
+            {
+              "require'salesforce.org_manager':get_default_alias()",
+              icon = "󰢎",
+            },
+          },
+        },
         options = {
           icons_enabled = true,
           theme = theme,
@@ -60,9 +69,14 @@ return {
           if vim.bo[props.buf].modified then
             filename = "[+] " .. filename
           end
+          local alias = ""
+          local ok, sf = pcall(require, "salesforce.org_manager")
+          if ok and sf then
+            alias = sf.get_default_alias() or ""
+          end
 
           local icon, color = require("nvim-web-devicons").get_icon_color(filename)
-          return { { icon, guifg = colors.peach }, { " " }, { filename } }
+          return { { icon, guifg = colors.peach }, { " " }, { filename }, { "󰢎 " .. alias, guifg = "#fab387" } }
         end,
       })
     end,
