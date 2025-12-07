@@ -1,0 +1,4 @@
+#Open adroid emulator
+function openAdv() {
+  $ANDROID_SDK_ROOT/emulator/emulator @Medium_Phone_API_34
+}
