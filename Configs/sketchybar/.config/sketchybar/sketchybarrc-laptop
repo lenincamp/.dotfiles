@@ -9,7 +9,7 @@ MEDIUM_FONT_SIZE=12.0
 LARGE_FONT_SIZE=15.0
 
 sketchybar --bar \
-    height=32 \
+    height=38 \
     color=0x66494d64 \
     margin=0 \
     sticky=on \
