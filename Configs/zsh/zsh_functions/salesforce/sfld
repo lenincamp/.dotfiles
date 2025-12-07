@@ -1,0 +1,46 @@
+# List and retrieve/download specific type components using fzf
+function sfld() {
+    if ! command -v fzf &> /dev/null || ! command -v jq &> /dev/null; then
+        echo "❌ Error: requires 'fzf' and 'jq'."
+        return 1
+    fi
+
+    echo "🔍 Step 1: Select Metadata Type..."
+    
+    local mtype=$(sf org list metadata-types --json | \
+        jq -r '.result.metadataObjects[].xmlName' | \
+        sort | \
+        fzf --prompt="📂 Type > " \
+            --height=40% --layout=reverse --border --info=inline)
+
+    if [[ -z "$mtype" ]]; then
+        echo "❌ Canceled in Type Selection."
+        return
+    fi
+
+    echo "⏳ Getting list of components for: \033[1;34m$mtype\033[0m ..."
+
+    local selected_components=$(sf org list metadata -m "$mtype" --json | \
+        jq -r '.result[]?.fullName' | \
+        sort | \
+        fzf --multi \
+            --prompt="📄 Select Component(s) > " \
+            --header="💡 Tip: Use TAB to select multiple, Enter to confirm" \
+            --height=50% --layout=reverse --border)
+
+    if [[ -z "$selected_components" ]]; then
+        echo "❌ Cancelled in component selection."
+        return
+    fi
+
+    local formatted_components=$(echo "$selected_components" | tr '\n' ',' | sed 's/,$//')
+
+    echo ""
+    echo "🎯 Retrieving: $mtype : $formatted_components"
+    echo "---------------------------------------------------"
+
+    local cmd="sf project retrieve start -m \"$mtype:$formatted_components\""
+    
+    echo "🚀 Executing: $cmd"
+    eval $cmd
+}

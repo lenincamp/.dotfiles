@@ -1,0 +1,18 @@
+# List specific type components using fzf
+function sfl() {
+    echo "Select the type to list its components..."
+    local type=$(sf org list metadata-types --json | jq -r '.result.metadataObjects[].xmlName' | fzf --prompt="Type > " --height=40% --layout=reverse)
+    
+    if [[ -n "$type" ]]; then
+        echo "Looking for components in the org to $type..."
+        
+        sf org list metadata -m "$type" --json | \
+        jq -r '.result[]?.fullName' | \
+        sort | \
+        fzf --prompt="🔎 Filter components > " \
+            --height=50% \
+            --layout=reverse \
+            --border \
+            --info=inline
+    fi
+}

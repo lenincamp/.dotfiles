@@ -1,0 +1,8 @@
+#fuzzy docker exec
+function fdex() {
+	CONTAINER=`dclsa | rg -v CONTAINER | awk '-F ' ' {print $NF}' | fzf`
+	if [ ! -z $CONTAINER ]
+	then
+		docker exec -it $CONTAINER bash
+	fi
+}

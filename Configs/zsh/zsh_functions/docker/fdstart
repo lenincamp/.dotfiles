@@ -1,0 +1,8 @@
+#fuzzy docker start
+function fdstart() {
+	CONTAINER=`docker ps -a | rg -v CONTAINER | awk '-F ' ' {print $NF}' | fzf`
+	if [ ! -z $CONTAINER ]
+	then
+		docker start $CONTAINER
+	fi
+}

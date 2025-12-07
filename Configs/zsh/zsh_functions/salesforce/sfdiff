@@ -1,0 +1,163 @@
+# diff with org
+function sfdiff() {
+    local local_path="$1"
+
+    if [[ -z "$local_path" ]]; then
+        echo "❌ Error: You must provide the local file path."
+        echo "Uso: sfnd force-app/main/default/classes/MyClass.cls"
+        return 1
+    fi
+    if [[ ! -f "$local_path" ]]; then
+        echo "❌ Error: Local file not found at: $local_path"
+        return 1
+    fi
+    if ! command -v nvim &> /dev/null; then
+        echo "❌ Error: 'nvim' not found. Ensure it is installed."
+        return 1
+    fi
+    
+    local mtype=""
+    local mname=""
+    # Path segment after 'default/' for analysis
+    local path_segment=${local_path#*default/}
+    local temp_dir=$(mktemp -d)
+
+    trap "echo '🧹 Cleaning up temporary files...' && rm -rf '$temp_dir'" EXIT
+
+    # === 3. Robust Inference Logic (Expanded) ===
+    local basename_no_ext=$(basename "$local_path")
+    local regex_result=() # Usado por el operador =~
+
+    case $path_segment in
+        # Code (Classes, Triggers, Pages)
+        classes/*.cls)
+            mtype="ApexClass"
+            mname=$(basename "$local_path" .cls)
+            ;;
+        triggers/*.trigger)
+            mtype="ApexTrigger"
+            mname=$(basename "$local_path" .trigger)
+            ;;
+        pages/*.page)
+            mtype="ApexPage"
+            mname=$(basename "$local_path" .page)
+            ;;
+
+        # Components (LWC, Aura)
+        lwc/*/*)
+            mtype="LightningComponentBundle"
+            mname=$(basename "$(dirname "$local_path")")
+            ;;
+        aura/*/*)
+            mtype="AuraDefinitionBundle"
+            mname=$(basename "$(dirname "$local_path")")
+            ;;
+
+        # Flows and Layouts
+        flows/*.flow-meta.xml)
+            mtype="Flow"
+            mname=$(basename "$local_path" .flow-meta.xml)
+            ;;
+        layouts/*.layout-meta.xml)
+            mtype="Layout"
+            mname=$(basename "$local_path" .layout-meta.xml)
+            ;;
+
+        # Approval Process
+        approvalProcesses/*.approvalProcess-meta.xml)
+            mtype="ApprovalProcess"
+            mname=$(basename "$local_path" .approvalProcess-meta.xml)
+            ;;
+
+        # Queues (Queue)
+        queues/*.queue-meta.xml)
+            mtype="Queue"
+            mname=$(basename "$local_path" .queue-meta.xml)
+            ;;
+
+        # Permissions/Profiles
+        permissionsets/*.permissionset-meta.xml)
+            mtype="PermissionSet"
+            mname=$(basename "$local_path" .permissionset-meta.xml)
+            ;;
+        profiles/*.profile-meta.xml)
+            mtype="Profile"
+            mname=$(basename "$local_path" .profile-meta.xml)
+            ;;
+
+        # Custom Objects (CustomObject)
+        objects/*.object-meta.xml)
+            mtype="CustomObject"
+            mname=$(basename "$local_path" .object-meta.xml)
+            ;;
+
+        # Custom Fields (CustomField - Complex Logic)
+        objects/*/fields/*.field-meta.xml)
+            if [[ $path_segment =~ objects/([^/]+)/fields/([^/]+)\.field-meta\.xml ]]; then
+                # $BASH_REMATCH[1] is the Object name (e.g.: Account)
+                # $BASH_REMATCH[2] is the Field name (e.g.: MyField__c)
+                local object_name="${BASH_REMATCH[1]}"
+                local field_name="${BASH_REMATCH[2]}"
+                mtype="CustomField"
+                # Formato: ObjectAPIName.FieldAPIName (ej: Account.MyField__c)
+                mname="$object_name.$field_name"
+            fi
+            ;;
+
+        # Generic Types (CustomLabels, StaticResource, etc.)
+        # Assumes the filename is the metadata name.
+        labels/*.labels-meta.xml)
+            mtype="CustomLabel"
+            mname=$(basename "$local_path" .labels-meta.xml)
+            ;;
+        staticresources/*.resource-meta.xml)
+            mtype="StaticResource"
+            mname=$(basename "$local_path" .resource-meta.xml)
+            ;;
+
+        # FALLBACK Logic
+        *)
+            echo "⚠️ Metadata type not automatically recognized in: \033[1;33m$local_path\033[0m"
+            # If inference fails, we ask manually before failing
+            echo -n "✍️  Enter the Metadata Type (e.g.: RemoteSiteSetting): "
+            read mtype
+            echo -n "✍️  Enter the Full Name (e.g.: MyRemoteSite): "
+            read mname
+            if [[ -z "$mtype" || -z "$mname" ]]; then 
+                echo "❌ Manual inference incomplete. Cancelled."
+                return 1
+            fi
+            ;;
+    esac
+
+    if [[ -z "$mtype" || -z "$mname" ]]; then
+        echo "❌ Could not infer metadata type and name. Cancelled."
+        return 1
+    fi
+
+    echo "⚙️  Inferred Metadata: \033[1;32m$mtype:$mname\033[0m"
+    echo "---------------------------------------------------"
+    echo "⏳ Step 4: Downloading Org version to: $temp_dir"
+    
+    # === 4. Execute Retrieve to Temporary Folder ===
+    if ! sf project retrieve start -m "$mtype:$mname" --output-dir "$temp_dir" > /dev/null; then
+        echo "❌ Failed to download file from the Org. Check the name, format, or connection."
+        return 1
+    fi
+
+    # === 5. Locate Remote File ===
+    # We search for the file by its base name within the temporary folder
+    local retrieved_path=$(find "$temp_dir" -name "$(basename "$local_path")" -print -quit)
+
+    if [[ -z "$retrieved_path" ]]; then
+        echo "❌ Error: Downloaded file not found in temporary folder ($mtype:$mname)."
+        return 1
+    fi
+
+    # === 6. Execute nvimdiff ===
+    echo "---------------------------------------------------"
+    echo "🚀 Opening \033[1;36mnvimdiff\033[0m (Local Version vs Remote Version)..."
+
+    # Execute nvim in diff mode
+    nvim -d "$local_path" "$retrieved_path"
+}

@@ -1,0 +1,25 @@
+function get_system_theme() {
+  # macOS
+  if [[ "$OSTYPE" == darwin* ]]; then
+    if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]; then
+      echo "dark"
+    else
+      echo "light"
+    fi
+    return
+  fi
+
+  # GNOME Linux
+  if command -v gsettings >/dev/null; then
+    scheme=$(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null)
+    if [[ "$scheme" == "'prefer-dark'" ]]; then
+      echo "dark"
+    else
+      echo "light"
+    fi
+    return
+  fi
+
+  # Default fallback
+  echo "light"
+}
