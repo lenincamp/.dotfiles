@@ -1,0 +1,8 @@
+#fuzzy docker stop
+function fdstop() {
+	CONTAINER=`docker ps | rg -v CONTAINER | awk '-F ' ' {print $NF}' | fzf`
+	if [ ! -z $CONTAINER ]
+	then
+		docker stop $CONTAINER
+	fi
+}

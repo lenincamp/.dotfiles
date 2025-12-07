@@ -1,0 +1,8 @@
+#fuzzy docker log
+function fdlog() {
+	CONTAINER=`docker ps | rg -v CONTAINER | awk '-F ' ' {print $NF}' | fzf`
+	if [ ! -z $CONTAINER ]
+	then
+		docker logs -f $CONTAINER
+	fi
+}

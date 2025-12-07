@@ -1,0 +1,63 @@
+function sftr() {
+    # Requiere fzf
+    if ! command -v fzf &> /dev/null; then
+        echo "❌ Error: 'fzf' is required for interactive selection."
+        return 1
+    fi
+    
+    echo "🔎 Scanning local Apex test classes..."
+
+    # 1. Obtener la lista de clases Apex locales
+    local class_names=$(find . -path '*/main/default/classes/*.cls' -print 2>/dev/null | xargs -n 1 basename | sed 's/\.cls$//')
+
+    if [[ -z "$class_names" ]]; then
+        echo "❌ No Apex classes found in the project's default folders."
+        return 1
+    fi
+
+    # 2. Selección Interactiva con FZF (permite selección múltiple con TAB)
+    local selected_classes=$(echo "$class_names" | sort | fzf --multi \
+        --prompt="📝 Select Apex Test Class(es) or Method(s): " \
+        --header="Use TAB to select multiple, type Name.Method for specific methods." \
+        --height=50% --layout=reverse --border)
+
+    if [[ -z "$selected_classes" ]]; then
+        echo "❌ Test execution cancelled."
+        return
+    fi
+
+    # 3. Formatear para el comando SF (Clase1,Clase2 o Clase1.Metodo1)
+    # CORRECCIÓN: Reemplazamos saltos de línea por comas y eliminamos la coma final.
+    local run_parameter=$(echo "$selected_classes" | tr '\n' ',' | sed 's/,$//')
+    
+    # 4. Ejecución de Prueba y Obtención del Log
+    echo "---------------------------------------------------"
+    echo "🔥 Executing tests for: \033[1;36m$run_parameter\033[0m"
+    echo "---------------------------------------------------"
+
+    # Comando de ejecución
+    local test_command="sf apex run test --class-names $run_parameter --json"
+
+    # Ejecutar y capturar el JSON del resultado
+    local result_json=$(eval $test_command)
+    local exit_code=$?
+
+    if [[ $exit_code -ne 0 ]]; then
+        echo "❌ Test execution failed. Showing raw output."
+        echo "$result_json"
+        return $exit_code
+    fi
+
+    # Extracción de Log ID: Limpiamos caracteres de control para jq.
+    local log_id=$(echo "$result_json" | tr -d '[:cntrl:]' | jq -r '.result.debugLogId')
+
+    if [[ -n "$log_id" && "$log_id" != "null" ]]; then
+        echo "✅ Tests finished successfully. Opening log: \033[1;33m$log_id\033[0m"
+        echo "---------------------------------------------------"
+        
+        # 5. Abrir el Log (Usamos 'tail' para verlo en la terminal)
+        sf apex get log --log-id "$log_id" --output-dir .
+    else
+        echo "⚠️ Tests completed, but could not retrieve a debug log ID."
+    fi
+}
