@@ -1,7 +1,7 @@
 local colors = require("catppuccin.palettes").get_palette(vim.o.background == "dark" and "mocha" or "latte")
 local function get_sf_alias(sf_module)
   if sf_module and sf_module.get_default_alias then
-    return sf_module.get_default_alias() or ""
+    return sf_module:get_default_alias() or ""
   end
   return ""
 end
