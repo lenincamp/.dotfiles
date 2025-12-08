@@ -32,10 +32,10 @@
   prompt = true
 [mergetool "nvimdiff"]
   cmd = "nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd W' -c 'wincmd J'"
-#[diff]
-#	tool = nvimdiff
-#  colorMoved = default
-#[difftool]
-#  prompt = false
-#[difftool "nvimdiff"]
-#  cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
+[diff]
+  tool = nvimdiff
+  colorMoved = default
+[difftool]
+  prompt = false
+[difftool "nvimdiff"]
+  cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
