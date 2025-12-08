@@ -36,6 +36,13 @@ sketchybar --default \
     label.padding_right=5
 
 
+# spacer específico para la zona derecha del notch
+sketchybar --add item spotify_spacer e \
+    --set spotify_spacer \
+      width=28 \
+      background.drawing=off \
+      label.drawing=off \
+      icon.drawing=off
 
 sketchybar --add event spotify_change $SPOTIFY_EVENT \
     --add item spotify e \

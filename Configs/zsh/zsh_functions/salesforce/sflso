@@ -1,0 +1,50 @@
+function sflso() {
+    # 1. Check dependencies
+    if ! command -v fzf &> /dev/null || ! command -v jq &> /dev/null; then
+        echo "❌ Error: 'fzf' and 'jq' are required."
+        return 1
+    fi
+
+    echo "⏳ Retrieving authorized organizations..."
+    # Get the list of authorized orgs in JSON format, suppressing stderr for cleaner output
+    local org_list=$(sf org list --json 2>/dev/null)
+
+    if [[ -z "$org_list" ]]; then
+        echo "❌ No authorized orgs found."
+        return 1
+    fi
+
+    # 2. Extract Alias/Username for FZF
+    # Extract the alias, or the username if alias is null, from scratch and non-scratch orgs.
+    local aliases=$(echo "$org_list" | jq -r '.result | [ (.nonScratchOrgs?[] | .alias // .username), (.scratchOrgs?[] | .alias // .username) ] | .[]' | sort)
+
+    if [[ -z "$aliases" ]]; then
+        echo "❌ Could not extract aliases/usernames from the list."
+        return 1
+    fi
+
+    # 3. Interactive Selection via FZF
+    local selected_alias=$(echo "$aliases" | fzf \
+      --prompt="🎯 Select Org to set as DEFAULT: " \
+      --height=30% \
+      --layout=reverse \
+      --border \
+      --margin=5% \
+      --padding=1
+    )
+
+    if [[ -z "$selected_alias" ]]; then
+        echo "❌ Operation cancelled."
+        return
+    fi
+
+    echo "⚙️ Setting \033[1;36m$selected_alias\033[0m as the default organization..."
+
+    # 4. Set Default Org using 'sf config set'
+    if sf config set target-org "$selected_alias"; then
+        echo "✅ Success! \033[1;32m$selected_alias\033[0m is now the default org."
+    else
+        echo "❌ Failed to set the default org."
+        return 1
+    fi
+}
