@@ -140,13 +140,19 @@ nnoremap <leader>sr :action ReplaceInPath<CR>
 "-------- Refactoring ---------
 nnoremap <leader>cr :action RenameElement<CR>
 nnoremap <leader>rf :action ExtractMethod<CR>
+vmap <leader>rf :action ExtractMethod<CR>
 nnoremap <leader>rx :action IntroduceVariable<CR>
+vmap <leader>rx :action IntroduceVariable<CR>
 nnoremap <leader>rF :action IntroduceField<CR>
+vmap <leader>rF :action IntroduceField<CR>
 nnoremap <leader>rc :action IntroduceConstant<CR>
+vmap <leader>rc :action IntroduceConstant<CR>
 nnoremap <leader>rp :action IntroduceParameter<CR>
+vmap <leader>rp :action IntroduceParameter<CR>
 nnoremap <leader>rcs :action ChangeSignature<CR>
 nnoremap <leader>rql :action Refactorings.QuickListPopupAction<CR>
 nnoremap <leader>ri :action Inline<CR>
+vmap <leader>ri :action Inline<CR>
 nnoremap <leader>rm :action Move<CR>
 nnoremap <leader>ry :action CopyElement<CR>
 
@@ -179,6 +185,7 @@ nnoremap ]F :action MethodUp<CR>
 
 "-------- Code Style ---------
 nmap <leader>cf <Action>(ReformatCode)\|<Action>(RearrangeCode)
+vmap <leader>cf <Action>(ReformatCode)\|<Action>(RearrangeCode)
 nnoremap <leader>Jo :action OptimizeImports<CR>
 "nnoremap <leader>cF :action RearrangeCode<CR>" Organice Code
 
@@ -203,7 +210,7 @@ nmap <C-S-h> <Action>(MoveEditorToOppositeTabGroup)
 nmap <leader>w\| <Action>(MaximizeEditorInSplit)
 nmap <leader>w_ <Action>(MaximizeEditorInSplit)
 nmap <leader>w= <Action>(MaximizeEditorInSplit)
-nmap <C-=> <Action>(EditorSelectWord)
+map <C-=> <Action>(EditorSelectWord)
 "nmap <leader>fb <Action>(Switcher)
 nmap <leader>b <Action>(ShowNavBar)
 
