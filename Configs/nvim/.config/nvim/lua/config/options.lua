@@ -11,10 +11,25 @@ vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 vim.o.termguicolors = true
 vim.opt.cursorline = false
+vim.opt.splitright = true -- Nuevos splits a la derecha
+vim.opt.splitbelow = true -- Nuevos splits abajo
 
 -- Undercurl
 vim.cmd([[let &t_Cs = "\e[4:3m"]])
 vim.cmd([[let &t_Ce = "\e[4:0m"]])
+local diffopt = {
+  "internal", -- Usar el algoritmo interno de diff
+  "filler", -- Mostrar líneas de relleno para mantener sincronización
+  "closeoff", -- Cerrar diff cuando solo queda una ventana
+  "hiddenoff", -- Desactivar diff cuando el buffer se oculta
+  "foldcolumn:1", -- Mostrar columna de pliegues
+  "context:999999", -- Mostrar todo el contexto (no colapsar)
+  "vertical", -- Splits verticales por defecto
+  "algorithm:histogram", -- Algoritmo más semántico (mejor que myers)
+  "indent-heuristic", -- Usar heurística de indentación para mejores diffs
+  "linematch:60", -- Mejor detección de líneas movidas (Neovim 0.9+)
+}
+vim.opt.diffopt:append(table.concat(diffopt, ","))
 
 if vim.fn.getenv("TERM_PROGRAM") == "ghostty" then
   vim.opt.title = true
