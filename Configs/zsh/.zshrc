@@ -22,6 +22,8 @@ fpath=(
 )
 #Functions Lazy Load
 autoload -U sfcov sfdiff sfl sfld sftr sflso sfow fdex fdlog fdstart fdstop get_system_theme get_system_ip y buildApp openAdv tol
+autoload -Uz compinit
+compinit
 ######################## ALIASES ###############################
 local ZSH_CONFIG_DIR="$HOME/zsh_config"
 local ALIASES="$ZSH_CONFIG_DIR/aliases.zsh"
