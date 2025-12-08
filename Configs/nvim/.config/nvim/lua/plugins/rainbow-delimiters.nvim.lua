@@ -1,7 +1,8 @@
 return {
-  url = "https://gitlab.com/HiPhish/rainbow-delimiters.nvim",
+  "HiPhish/rainbow-delimiters.nvim",
   lazy = true,
   event = "VeryLazy",
+  opts = {},
   config = function()
     require("rainbow-delimiters.setup").setup({
       strategy = {
