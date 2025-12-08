@@ -1,27 +1,4 @@
 local colors = require("catppuccin.palettes").get_palette(vim.o.background == "dark" and "mocha" or "latte")
-local function get_sf_alias(sf_module)
-  if sf_module and sf_module.get_default_alias then
-    return sf_module:get_default_alias() or ""
-  end
-  return ""
-end
-
-local sf_org_manager = nil
-
-local function load_salesforce_module()
-  local project_root = vim.fn.resolve(vim.fn.getcwd())
-  local sf_project_file = project_root .. "/sfdx-project.json"
-
-  if vim.fn.filereadable(sf_project_file) == 1 then
-    local ok, sf = pcall(require, "salesforce.org_manager")
-    if ok then
-      return sf
-    else
-      vim.notify("Error al cargar salesforce.org_manager: " .. tostring(sf), vim.log.levels.ERROR)
-    end
-  end
-  return nil
-end
 return {
   {
     "akinsho/bufferline.nvim",
@@ -75,7 +52,7 @@ return {
     event = "BufReadPre",
     priority = 1200,
     config = function()
-      sf_org_manager = load_salesforce_module()
+      -- represent filename as tab
       require("incline").setup({
         highlight = {
           groups = {
@@ -92,13 +69,8 @@ return {
           if vim.bo[props.buf].modified then
             filename = "[+] " .. filename
           end
-          local alias = get_sf_alias(sf_org_manager)
           local icon, color = require("nvim-web-devicons").get_icon_color(filename)
-          local alias_component = {}
-          if alias ~= "" then
-            table.insert(alias_component, { "󰢎 " .. alias, guifg = "#fab387" })
-          end
-          return vim.list_extend({ { icon, guifg = colors.peach }, { " " }, { filename } }, alias_component)
+          return { { icon, guifg = colors.peach }, { " " }, { filename } }
         end,
       })
     end,

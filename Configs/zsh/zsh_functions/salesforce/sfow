@@ -1,0 +1,51 @@
+function sfow() {
+    # 1. Check dependencies
+    if ! command -v fzf &> /dev/null || ! command -v jq &> /dev/null; then
+        echo "❌ Error: 'fzf' and 'jq' are required."
+        return 1
+    fi
+
+    echo "⏳ Retrieving authorized organizations..."
+    local org_list=$(sf org list --json 2>/dev/null)
+
+    if [[ -z "$org_list" ]]; then
+        echo "❌ No authorized orgs found."
+        return 1
+    fi
+
+    # 2. Extract Alias/Username for FZF
+    local aliases=$(echo "$org_list" | jq -r '.result | [ (.nonScratchOrgs?[] | .alias // .username), (.scratchOrgs?[] | .alias // .username) ] | .[]' | sort)
+
+    if [[ -z "$aliases" ]]; then
+        echo "❌ Could not extract aliases/usernames from the list."
+        return 1
+    fi
+
+    # 3. Interactive Selection via FZF
+    local selected_alias=$(echo "$aliases" | fzf \
+      --prompt="🎯 Select Org to open on web browser: " \
+      --height=30% \
+      --layout=reverse \
+      --border \
+      --margin=5% \
+      --padding=1
+    )
+
+
+    if [[ -z "$selected_alias" ]]; then
+        echo "❌ Operation cancelled."
+        return
+    fi
+
+    echo "🚀 Opening \033[1;36m$selected_alias\033[0m in your web browser..."
+
+    # 4. Open the Org using 'sf org open'
+    # The --target-org flag is optional here if the org is already the default, 
+    # but we specify it for safety.
+    if sf org open -o "$selected_alias"; then
+        echo "✅ Success! The Org should be opening now."
+    else
+        echo "❌ Failed to open the org. Check the connection."
+        return 1
+    fi
+}
