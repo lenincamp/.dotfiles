@@ -18,7 +18,7 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = { "json", "jsonc" },
   callback = function()
     vim.wo.spell = false
-    vim.wo.canceallevel = 0
+    vim.wo.conceallevel = 0
     vim.opt.tabstop = 2
     vim.opt.shiftwidth = 2
     vim.opt.softtabstop = 2
