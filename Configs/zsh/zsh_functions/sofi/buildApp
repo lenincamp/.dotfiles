@@ -2,15 +2,19 @@ function buildApp(){
   jenv shell 17.0.10
   pyenv shell 2.7.18
   fnm use v14.21.3
-  cd $WORK_PROJECT/ar-petersen-cdp/mobile
+  cd "$WORK_PROJECT/ar-petersen-cdp/mobile"
   if [ $# -eq 0 ] || [ -z "$1" -a -z "$2" ]; then
+      fnm use 20
       python release.py lcampoverde --debug --no-ios --verbose
       exit 1
   fi
   if [ $1 = "--r" ]; then
-        cd ../web
-        yarn build
-        cd ../mobile
+      fnm use v14.21.3
+      cd ../web
+      yarn add @playsistemico/store-maps-lib --ignore-engines
+      yarn --ignore-engines && yarn build
+      cd ../mobile
+      fnm use 20
   fi
   python release.py lcampoverde --debug $2 --verbose
   # Obtener la dirección IP de la máquina actual

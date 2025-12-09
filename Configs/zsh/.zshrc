@@ -65,3 +65,4 @@ local SETTINGS_PATH="$ZSH_CONFIG_DIR/path.zsh"
 if [ -f "$SETTINGS_PATH" ]; then
     source "$SETTINGS_PATH"
 fi
+
