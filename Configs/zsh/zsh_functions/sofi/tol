@@ -3,5 +3,5 @@ function tol() {
   name=$1
   name=${name:u}
   logPath=$WORK_PROJECT/apache-tomcat-9.0.68/shared/shared_"$name"/omnichannel.log
-  zed $logPath
+  lnav $logPath
 }
