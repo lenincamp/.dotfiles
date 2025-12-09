@@ -25,6 +25,8 @@ return {
       "ktlint",
       "apex-language-server",
       "lwc-language-server",
+      "visualforce-language-server",
+      "vim-language-server",
     },
   },
 }
