@@ -11,11 +11,13 @@ if vim.fn.has("mac") == 1 then
 end
 
 local home = os.getenv("HOME")
+local brew_path = "/opt/homebrew/Cellar"
+local jdtls_path = brew_path .. "/jdtls/1.54.0/libexec"
+local java_path = brew_path .. "/openjdk/25.0.1/libexec/openjdk.jdk/Contents/Home"
 local function get_jdtls()
   -- local mason_registry = require("mason-registry")
   -- local jdtls_mason = mason_registry.get_package("jdtls")
   -- local jdtls_path = jdtls_mason:get_install_path() --NOTE: present error on workpace machine
-  local jdtls_path = "/opt/homebrew/Cellar/jdtls/1.51.0/libexec/" -- homebrew path
   -- local jdtls_path = "/Users/lcampoverde/Documents/projects/petersen/jdtls-1.9.0" -- homebrew path
 
   local launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar")
@@ -164,11 +166,10 @@ end
 
 local launcher, jdtls_os_config, lombok = get_jdtls()
 local capabilities, extendedClientCapabilities = get_capabilities()
--- local java_24 = "/opt/homebrew/Cellar/openjdk/24.0.2/libexec/openjdk.jdk/Contents/Home"
-local java_24 = "/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home"
+-- local java_24 = "/opt/homebrew/Cellar/openjdk/25.0.1/libexec/openjdk.jdk/Contents/Home"
 local config = {
   cmd = {
-    java_24 .. "/bin/java",
+    java_path .. "/bin/java",
     -- "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin/java",
     -- "java",
     "-Declipse.application=org.eclipse.jdt.ls.core.id1",
@@ -260,17 +261,17 @@ local config = {
         updateBuildConfiguration = "interactive",
         runtimes = {
           {
-            name = "JavaSE-17",
-            path = home .. "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/",
-          },
-          {
-            name = "JavaSE-24",
-            path = java_24,
-          },
-          {
-            name = "JavaSE-1.8",
-            path = "/Library/Java/JavaVirtualMachines/jdk1.8.0_202.jdk/Contents/Home",
+            name = "Java-17",
+            path = home .. "Library/Java/JavaVirtualMachines/azul-17.0.10/Contents/Home",
             default = true,
+          },
+          {
+            name = "Java-21",
+            path = brew_path .. "/openjdk@21/21.0.9/libexec/openjdk.jdk/Contents/Home",
+          },
+          {
+            name = "Java-1.8",
+            path = "/Library/Java/JavaVirtualMachines/jdk1.8.0_202.jdk/Contents/Home",
           },
         },
       },
