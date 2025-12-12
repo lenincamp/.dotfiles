@@ -1,0 +1,874 @@
+{
+	"Assert Are Equals": {
+		"body": [
+			"Assert.areEqual(${1:expected}, ${2:actual}, ${3:message});",
+			"$0"
+		],
+		"description": "Assert equals condition in a test",
+		"prefix": [
+			"assertAreEqual",
+			"aae"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Assert Are Not Equals": {
+		"body": [
+			"Assert.areNotEqual(${1:expected}, ${2:actual}, ${3:message});",
+			"$0"
+		],
+		"description": "Assert not equals condition in a test",
+		"prefix": [
+			"assertAreNotEqual",
+			"aane"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Assert Fail": {
+		"body": [
+			"Assert.fail(${1:message});",
+			"$0"
+		],
+		"description": "Immediately return an error",
+		"prefix": [
+			"assertFail",
+			"af"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Assert Is False": {
+		"body": [
+			"Assert.isFalse(${1:condition}, ${2:message});",
+			"$0"
+		],
+		"description": "Asserts that the specified condition is false",
+		"prefix": [
+			"assertIsFalse",
+			"aif"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Assert Is Instance of type": {
+		"body": [
+			"Assert.isInstanceOfType(${1:ObjectInstance}, ${2:SystemType}, ${3:message});",
+			"$0"
+		],
+		"description": "Asserts that the instance is of the specified type",
+		"prefix": [
+			"assertIsInstanceOfType",
+			"aii"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Assert Is Not Instance of type": {
+		"body": [
+			"Assert.isNotInstanceOfType(${1:ObjectInstance}, ${2:SystemType}, ${3:message});",
+			"$0"
+		],
+		"description": "Asserts that the instance isn’t of the specified type",
+		"prefix": [
+			"assertIsNotInstanceOfType",
+			"aini"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Assert Is Not Null": {
+		"body": [
+			"Assert.isNotNull(${1:variable}, ${2:message});",
+			"$0"
+		],
+		"description": "Asserts that the value isn’t null.",
+		"prefix": [
+			"assertIsNotNull",
+			"ainn"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Assert Is Null": {
+		"body": [
+			"Assert.isNull(${1:variable}, ${2:message});",
+			"$0"
+		],
+		"description": "Asserts that the value is null.",
+		"prefix": [
+			"assertIsNull",
+			"ain"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Assert Is True": {
+		"body": [
+			"Assert.isTrue(${1:condition}, ${2:message});",
+			"$0"
+		],
+		"description": "Asserts that the specified condition is true",
+		"prefix": [
+			"assertIsTrue",
+			"ait"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Database Execute Batch": {
+		"body": [
+			"Id ${1:jobIdVariable} = Database.executeBatch(${2:batchInstance}, ${3:batchSize});$0"
+		],
+		"description": "Execute a batch",
+		"prefix": [
+			"databaseExecuteBatch",
+			"deb"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"for": {
+		"prefix": "for",
+		"body": [
+			"for (${1:type} ${2:variable} : ${3:List_or_set}) {",
+			"\t$0",
+			"}"
+		],
+		"description": "for loop",
+		"scope": "apex,apex-anon"
+	},
+	"Reverse for loop": {
+		"prefix": "forr",
+		"body": [
+			"for (Integer ${1:i} = ${2:length} - 1; ${1:i} >= 0 ; ${1:i}--) {",
+			"\t$0",
+			"}"
+		],
+		"description": "Reverse for loop",
+		"scope": "apex,apex-anon"
+
+	},
+	"For loop for elements of an array": {
+		"body": [
+			"for (Integer ${1:loopVariable} = 0; ${1:loopVariable} < ${2:selectedArray}.size(); ${1:loopVariable}++) {",
+			"\t${3:ArrayElementType} ${4:elementName} = ${2:selectedArray}[${1:loopVariable}];",
+			"\t$0",
+			"}"
+		],
+		"description": "Create for loop for elements of an array",
+		"prefix": [
+			"fori",
+			"itar"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"For loop for elements of an array in reversed order": {
+		"body": [
+			"for (Integer ${1:loopVariable} = ${2:selectedArray}.size()-1; ${1:loopVariable} >= 0; ${1:loopVariable}--) {",
+			"\t${3:ArrayElementType} ${4:elementName} = ${2:selectedArray}[${1:loopVariable}];",
+			"\t$0",
+			"}"
+		],
+		"description": "Create for loop for elements of an array in reversed order",
+		"prefix": [
+			"forReversedOrder",
+			"ritar"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"For loop for entries of a Map": {
+		"body": [
+			"for (${1:SelectedMapKeyType} ${2:keyVariableName} : ${3:selectedMap}.keySet()) {",
+			"\t${4:SelectedMapValueType} ${5:valueVariableName} = ${3:selectedMap}.get(${2:keyVariableName});",
+			"\t$0",
+			"}"
+		],
+		"description": "Create for loop for entries of a Map",
+		"prefix": [
+			"forMap",
+			"itme"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"For Loop for queried SObjects": {
+		"body": [
+			"for (${1:Type} ${2:variable} : [SELECT ${3:fieldsList} FROM ${1:Type}) {",
+			"\t$0",
+			"}"
+		],
+		"description": "Create for loop for results of SOQL query",
+		"prefix": [
+			"forSoql",
+			"foro"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Future Method": {
+		"body": [
+			"@future",
+			"public static void ${1:methodName}() {",
+			"\t$0",
+			"}"
+		],
+		"description": "Future method.",
+		"prefix": "future",
+		"scope": "apex,apex-anon"
+	},
+	"If": {
+		"body": [
+			"if(${1:condition}) {",
+			"\t$0",
+			"}"
+		],
+		"description": "If statement",
+		"prefix": "if",
+		"scope": "apex,apex-anon"
+	},
+	"If Else": {
+		"body": [
+			"if(${1:condition}) {",
+			"\t$0",
+			"} else {",
+			"\t",
+			"}"
+		],
+		"description": "If statement",
+		"prefix": [
+			"ifElse",
+			"ife"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Else statement": {
+		"prefix": "else",
+		"body": [
+			"else {",
+			"\t$0",
+			"}"
+		],
+		"description": "Else statement",
+		"scope": "apex,apex-anon"
+
+	},
+	"if null statement": {
+		"prefix": "ifnull",
+		"body": [
+			"if (${1:condition} == null) {",
+			"\t$0",
+			"}"
+		],
+		"description": "if null statement",
+		"scope": "apex,apex-anon"
+	},
+	"if not null statement": {
+		"prefix": "ifnotnull",
+		"body": [
+			"if (${1:condition} != null) {",
+			"\t$0",
+			"}"
+		],
+		"description": "if not null statement",
+		"scope": "apex,apex-anon"
+
+	},
+	"ternary": {
+		"prefix": "ter",
+		"body": [
+			"${1:condition} ? ${2:exprIfTrue} : ${3:exprIfFalse};"
+		],
+		"description": "x ? y : z;",
+		"scope": "apex,apex-anon"
+	},
+	"constructor": {
+		"prefix": "constructor",
+		"body": [
+			"${1|private,public,global|} ${2:${TM_FILENAME_BASE}}($3) {",
+			"\t${0:super();}",
+			"}"
+		],
+		"description": "New constructor",
+		"scope": "apex,apex-anon"
+	},
+	"new object": {
+		"prefix": "newobj",
+		"body": [
+			"${1:Object} ${2:var} = new ${1:Object}();"
+		],
+		"description": "New Object",
+		"scope": "apex,apex-anon"
+	},
+	"Field": {
+		"prefix": "field",
+		"body": [
+			"${1|private,public,global|} ${2:String} ${3:name};"
+		],
+		"description": "Field",
+		"scope": "apex,apex-anon"
+	},
+	"method": {
+		"prefix": "method",
+		"body": [
+			"${1|private,public,global|} ${2:void} ${3:name}($4) {",
+			"\t$0",
+			"}"
+		],
+		"description": "New method",
+		"scope": "apex,apex-anon"
+	},
+	"static method": {
+		"prefix": "staticmethod",
+		"body": [
+			"${1|private,public,global|} static ${2:void} ${3:name}($4) {",
+			"\t$0",
+			"}"
+		],
+		"description": "New static method",
+		"scope": "apex,apex-anon"
+	},
+	"Instance Of": {
+		"body": [
+			"if (${1:Variable} instanceof ${2:Type}) {",
+			"\t${2:Type} ${3:castVariable} = (${2:Type}) ${1:Variable};",
+			"\t$0",
+			"}"
+		],
+		"description": "Check instance of and downcast",
+		"prefix": [
+			"instanceOf",
+			"inst"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Invocable Method": {
+		"body": [
+			"@InvocableMethod(label='${1:Label}' description='${2:Description}' category='${3:Category}')",
+			"public static List<${4:Type}> ${5:methodName}() {",
+			"\t$0",
+			"}"
+		],
+		"description": "Invocable method.",
+		"prefix": "invocableMethod",
+		"scope": "apex,apex-anon"
+	},
+	"Is Assignable": {
+		"body": [
+			"isAssignableFrom(${2:SourceType});"
+		],
+		"description": "Check if Child Type is assignable from Source Type",
+		"prefix": "isAssignableFrom",
+		"scope": "apex,apex-anon"
+	},
+	"Last element of list": {
+		"body": [
+			"${1:selectedList}[${1:selectedList}.size() - 1]$0"
+		],
+		"description": "Get last element of list",
+		"prefix": [
+			"lastListElement",
+			"lst"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Lazy instantiation": {
+		"body": [
+			"if (${1:selectedVariable} == null) {",
+			"\t${1:selectedVariable} = new ${2:SelectedVariableType}($0);",
+			"}"
+		],
+		"description": "Lazy instantiation",
+		"prefix": "lazy",
+		"scope": "apex,apex-anon"
+	},
+	"New List": {
+		"prefix": ["List", "nl"],
+		"scope": "apex,apex-anon",
+		"body": [
+			"List<${1:Object}> ${2:listName} = new List<$1>();"
+		],
+		"description": "List constructor"
+	},
+	"New Map": {
+		"prefix": ["Map", "nm"],
+		"scope": "apex,apex-anon",
+		"body": [
+			"Map<${1:Object}, ${2:Object}> ${3:mapName} = new Map<$1, $2>();"
+		],
+		"description": "Map constructor"
+	},
+	"New Map from list of records": {
+		"prefix": ["mapFromList", "nmfl"],
+		"body": [
+			"Map<Id, ${1:SObject}> ${2:variable} = new Map<Id, ${1}>(${3:recordList});"
+		],
+		"description": "Map from List of records",
+		"scope": "apex,apex-anon"
+
+	},
+	"New Set": {
+		"prefix": ["Set", "ns"],
+		"body": [
+			"Set<${1:Object}> ${2:setName} = new Set<$1>();"
+		],
+		"description": "Set constructor",
+		"scope": "apex,apex-anon"
+
+	},
+	"Set Ids from list of records": {
+		"prefix": [
+			"setOfIds",
+			"nsfl"
+		],
+		"scope": "apex,apex-anon",
+		"body": [
+			"Set<Id> ${1:variable} = new Map<Id, SObject>(${2:recordList}).keySet();"
+		],
+		"description": "Set of Ids from List of records"
+	},
+	"@AuraEnabled": {
+		"prefix": "@AuraEnabled",
+		"scope": "apex,apex-anon",
+		"body": [
+			"@AuraEnabled",
+			"${1|public,global|} static ${2:string} ${3:methodName}(){",
+			"\ttry {",
+			"\t\t$0",
+			"\t} catch (Exception e) {",
+			"\t\tthrow new AuraHandledException(e.getMessage());",
+			"\t}",
+			"}"
+		],
+		"description": "Aura Enabled Apex Method with Aura safe exception handling."
+	},
+	"AuraHandledException": {
+		"prefix": "auraHandledException",
+		"scope": "apex,apex-anon",
+		"body": [
+			"throw new AuraHandledException('${1:exceptionText}');"
+		],
+		"description": "Throw an exception for a lightning component to display"
+	},
+
+	"Property Read Only": {
+		"body": [
+			"{get; private set;}"
+		],
+		"description": "Create read-only property getter and setter",
+		"prefix": "pro",
+		"scope": "apex,apex-anon"
+	},
+	"Property Read Write": {
+		"body": [
+			"{get; set;}"
+		],
+		"description": "Create read/write property getter and setter",
+		"prefix": "prw",
+		"scope": "apex,apex-anon"
+	},
+	"Public Static Final": {
+		"body": [
+			"public static final"
+		],
+		"description": "Begin declaration of a public static final field",
+		"prefix": [
+			"final",
+			"psf"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Public Static Final Integer": {
+		"body": [
+			"public static final Integer ${1:VARIABLE_NAME} = ${2:value};"
+		],
+		"description": "Begin declaration of a public static final Integer field",
+		"prefix": [
+			"finalInteger",
+			"psfi"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Public Static Final String": {
+		"body": [
+			"public static final String ${1:VARIABLE_NAME} = ${2:value};"
+		],
+		"description": "Begin declaration of a public static final String field",
+		"prefix": [
+			"finalString",
+			"psfs"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Select": {
+		"body": [
+			"SELECT ${2:FieldsList} FROM ${1:SObject}$0"
+		],
+		"description": "Create a SOQL query",
+		"prefix": [
+			"select",
+			"SEL"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Select All Fields": {
+		"body": [
+			"SELECT FIELDS(ALL) FROM ${1:SObject}$0 LIMIT 200"
+		],
+		"description": "Create a SOQL query with all fields",
+		"prefix": [
+			"selectAll",
+			"SELALL"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Select to list": {
+		"body": [
+			"List<${1:SObjectType}> ${2:variableName} = [SELECT ${3:fieldsList} FROM ${1:SObjectType}$0];"
+		],
+		"description": "Create a SOQL query and assign result to list",
+		"prefix": [
+			"SelectToList",
+			"sql"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Select to list single record": {
+		"body": [
+			"List<${1:SObjectType}> ${2:variableName} = [SELECT ${3:fieldsList} FROM ${1:SObjectType}$4 LIMIT 1];",
+			"${1:SObjectType} ${5:singleVariableName} = ${2:variableName}.size() == 1 ? ${2:variableName}.get(0) : null;$0"
+		],
+		"description": "Create a SOQL query and assign result safely to list",
+		"prefix": [
+			"SelectToObject",
+			"sql1"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Select to map": {
+		"body": [
+			"Map<Id, ${1:SObjectType}> ${2:variableName} = new Map<Id, ${1:SObjectType}>([SELECT ${3:fieldsList} FROM ${1:SObjectType} $0]);"
+		],
+		"description": "Create a SOQL query and assign result to map",
+		"prefix": [
+			"selectToMap",
+			"sqm"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"System Assert": {
+		"body": [
+			"System.assert(${1:expected}, ${2:message});"
+		],
+		"description": "Assert a condition in a unit test",
+		"prefix": [
+			"systemAssert",
+			"sa"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"System Assert Equals": {
+		"body": [
+			"System.assertEquals(${1:expected}, ${2:actual}, ${3:message});"
+		],
+		"description": "Assert that a value is an expected value in a unit test",
+		"prefix": [
+			"systemAssertEquals",
+			"sae"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"System Assert Equals Null": {
+		"body": [
+			"System.assertEquals(null, $0, ${1:message});"
+		],
+		"description": "Assert that a value is null in a unit test",
+		"prefix": [
+			"systemAssertEquals",
+			"san"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"System Assert Fail": {
+		"body": [
+			"System.assert(false, $0);"
+		],
+		"description": "Fail unit test when this assert is reached",
+		"prefix": [
+			"systemAssertFail",
+			"saf"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"System Assert Not Equals": {
+		"body": [
+			"System.assertNotEquals(${1:expected}, ${2:actual}, ${3:message});"
+		],
+		"description": "Assert that a value is not an expected value in a unit test",
+		"prefix": [
+			"SystemAssertNotEquals",
+			"sane"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"System Assert Not Equals Null": {
+		"body": [
+			"System.assertNotEquals(null, $0, ${1:message});"
+		],
+		"description": "Assert that a value is not null in a unit test ",
+		"prefix": [
+			"systemAssertNotEqualsMessage",
+			"sann"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"System Assert False": {
+		"prefix": "sysassf",
+		"body": [
+			"System.assert(false, ${1:message});"
+		],
+		"description": "System.assert(false, message);",
+		"scope": "apex,apex-anon"
+	},
+	"System Debug": {
+		"body": [
+			"System.debug(LoggingLevel.${1|DEBUG,ERROR,WARN,INFO,FINE,FINER,FINEST,NONE|}, '$2: ' + $0);"
+		],
+		"description": "Debug",
+		"prefix": [
+			"systemDebug",
+			"sd"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"System Debug Serialize Pretty": {
+		"body": [
+			"System.debug(LoggingLevel.${1|DEBUG,ERROR,WARN,INFO,FINE,FINER,FINEST,NONE|}, '$2: ' + JSON.SerializePretty($0));"
+		],
+		"description": "Debug objects or collections",
+		"prefix": [
+			"systemDebugPretty",
+			"sdp"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"System Run As": {
+		"body": [
+			"System.runAs(${1:user}) {",
+			"\t$0",
+			"}"
+		],
+		"description": "System Run As User statement.",
+		"prefix": [
+			"systemRunAs",
+			"sra"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Test Method": {
+		"body": [
+			"@IsTest",
+			"static void ${1:testMethodName}() {",
+			"\t$0",
+			"\tTest.startTest();",
+			"\t",
+			"\tTest.stopTest();",
+			"}"
+		],
+		"description": "Test setup for creating data before test methods run.",
+		"prefix": [
+			"isTest",
+			"tstm"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"TestSetup": {
+		"body": [
+			"@TestSetup",
+			"static void setup() {",
+			"\t$0",
+			"}"
+		],
+		"description": "Test setup for creating data before test methods run.",
+		"prefix": [
+			"testSetup",
+			"tsts"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Throw exception": {
+		"body": [
+			"throw new ${1:exceptionType}($0);"
+		],
+		"description": "Throw an exception",
+		"prefix": [
+			"throw",
+			"thr"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Try Catch": {
+		"body": [
+			"try {",
+			"\t$0",
+			"} catch (${1:exceptionType}) {",
+			"\t",
+			"}"
+		],
+		"description": "Try Catch statement.",
+		"prefix": [
+			"tryCatch",
+			"tc"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Try Catch Finally": {
+		"body": [
+			"try {",
+			"\t$0",
+			"} catch (${1:exceptionType}) {",
+			"\t",
+			"} finally {",
+			"\t",
+			"}"
+		],
+		"description": "Try Catch statement.",
+		"prefix": [
+			"tryCatchFinally",
+			"tcf"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Try finally": {
+		"prefix": "tryf",
+		"body": [
+			"try {",
+			"\t$1",
+			"} finally {",
+			"\t$0",
+			"}"
+		],
+		"description": "Try finally",
+		"scope": "apex,apex-anon"
+	},
+	"Switch statement": {
+		"prefix": "switch",
+		"body": [
+			"switch on ${1:switch_on} {",
+			"\twhen $2 {",
+			"\t\t$3",
+			"\t}",
+			"\twhen else {",
+			"\t\t$0",
+			"\t}",
+			"}"
+		],
+		"description": "Switch statement",
+		"scope": "apex,apex-anon"
+	},
+	"do...while loop": {
+		"prefix": "do",
+		"body": [
+			"do {",
+			"\t$0",
+			"} while (${1:condition});"
+		],
+		"description": "do...while loop",
+		"scope": "apex,apex-anon"
+	},
+	"While": {
+		"body": [
+			"while (${1:condition}) {",
+			"\t$0",
+			"}"
+		],
+		"description": "While statement.",
+		"prefix": [
+			"while",
+			"wh"
+		],
+		"scope": "apex,apex-anon"
+	},
+	"Class": {
+		"prefix": "class",
+		"body": [
+			"${1|global,public,private|} with sharing class ${2:MyClass} {",
+			"\t$0",
+			"}"
+		],
+		"description": "Class",
+		"scope": "apex,apex-anon"
+	},
+	"Interface": {
+		"prefix": "interface",
+		"body": [
+			"${1|global,public,private|} interface ${2:MyInterface} {",
+			"\t$0",
+			"}"
+		],
+		"description": "Interface",
+		"scope": "apex,apex-anon"
+	},
+	"Enum": {
+		"prefix": "enum",
+		"body": [
+			"${1|global,public,private|} enum ${2:MyEnum} {",
+			"\t$0",
+			"}"
+		],
+		"description": "Enum",
+		"scope": "apex,apex-anon"
+	},
+	"DescribeFieldResult": {
+		"prefix": "dfr",
+		"body": [
+			"${1:SObjectType}.SObjectType.fields.${2:SObjectField}.getDescribe()"
+		],
+		"description": "Get DescribeFieldResult",
+		"scope": "apex,apex-anon"
+	},
+	"DescribeSObjectResult": {
+		"prefix": "dsr",
+		"body": [
+			"${1:SObjectType}.SObjectType.getDescribe()"
+		],
+		"description": "Get DescribeSObjectResult",
+		"scope": "apex,apex-anon"
+	},
+	"CustomException": {
+		"prefix": "customException",
+		"body": [
+			"${1|global,public,private|} class ${2:MyException} extends Exception {",
+			"\t$0",
+			"}"
+		],
+		"description": "Class",
+		"scope": "apex,apex-anon"
+	},
+	"MockCallout": {
+		"prefix": "mockCallout",
+		"body": [
+			"global HTTPResponse respond(HTTPRequest req) {",
+			"\t",
+			"\tHttpResponse res = new HttpResponse();",
+			"\tres.setHeader('Content-Type', '${1:application/json}');",
+			"\tres.setBody('{",
+			"\t\t\"example\": \"test\"",
+			"\t}');",
+			"\tres.setStatusCode(${2:200});",
+			"\treturn res;",
+			"}"
+		],
+		"description": "Create a mock for an http callout for apex testing",
+		"scope": "apex,apex-anon"
+	},
+	"Create User in Test Class": {
+		"body": [
+      "Profile ${1:p} = [SELECT Id FROM Profile WHERE Name='${2:Standard User}'];",
+      "User ${3:u} = new User(",
+        "\tAlias = '${4:standt}', ",
+        "\tEmail='${5:testuser@example.com}', ",
+        "\tEmailEncodingKey='UTF-8', ",
+        "\tLastName='${6:lastName}', ",
+        "\tLanguageLocaleKey='en_US', ",
+        "\tLocaleSidKey='en_US', ",
+        "\tProfileId = $1.Id, ",
+        "\tTimeZoneSidKey='America/Los_Angeles', ",
+        "\tUserName='$5'",
+      ");"
+		],
+		"description": "Create a SOQL query",
+		"prefix": [
+			"cusr"
+		],
+		"scope": "apex,apex-anon"
+	}
+}

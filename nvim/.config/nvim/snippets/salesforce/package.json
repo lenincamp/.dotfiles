@@ -1,0 +1,88 @@
+{
+  "name": "salesforce-snippets-beyondthecloud",
+  "displayName": "Salesforce Snippets",
+  "description": "Snippets for Salesforce Apex and LWC",
+  "icon": "images/logo.png",
+  "version": "1.5.0",
+  "publisher": "BeyondTheCloud",
+  "repository": "https://github.com/beyond-the-cloud-dev/vsc-salesforce-code-snippets",
+  "engines": {
+    "vscode": "^1.0.0"
+  },
+  "scripts": {
+    "deploy": "vsce publish",
+    "deploy-patch": "vsce publish patch",
+    "deploy-minor": "vsce publish minor",
+    "deploy-major": "vsce publish major"
+  },
+  "categories": [
+    "Snippets"
+  ],
+  "keywords": [
+    "snippets",
+    "salesforce",
+    "apex",
+    "lwc",
+    "lightning components"
+  ],
+  "badges": [
+    {
+      "description": "Visual Studio Marketplace Installs",
+      "url": "https://img.shields.io/visual-studio-marketplace/i/BeyondTheCloud.salesforce-snippets-beyondthecloud?color=darkgreen",
+      "href": "https://marketplace.visualstudio.com/items?itemName=BeyondTheCloud.salesforce-snippets-beyondthecloud"
+    },
+    {
+      "description": "Stars",
+      "url": "https://badgen.net/github/stars/beyond-the-cloud-dev/vsc-salesforce-code-snippets",
+      "href": "https://github.com/beyond-the-cloud-dev/vsc-salesforce-code-snippets/stargazers"
+    },
+    {
+      "description": "LastCommit",
+      "url": "https://img.shields.io/github/last-commit/beyond-the-cloud-dev/vsc-salesforce-code-snippets",
+      "href": "https://github.com/beyond-the-cloud-dev/vsc-salesforce-code-snippets"
+    },
+    {
+      "description": "Apex",
+      "url": "https://img.shields.io/badge/Apex-52-green?style=flat-square",
+      "href": "#apex"
+    },
+    {
+      "description": "LWC-HTML",
+      "url": "https://img.shields.io/badge/LWC_HTML-13-yellow?style=flat-square",
+      "href": "#html"
+    },
+    {
+      "description": "LWC-JS",
+      "url": "https://img.shields.io/badge/LWC_JavaScript-33-blue?style=flat-square",
+      "href": "#js"
+    },
+    {
+      "description": "LWC-XML",
+      "url": "https://img.shields.io/badge/LWC_XML-6-red?style=flat-square",
+      "href": "#xml"
+    }
+  ],
+  "contributes": {
+    "snippets": [
+      {
+        "language": "apex",
+        "path": "./apex.json"
+      },
+      {
+        "language": "html",
+        "path": "./lwc-html.json"
+      },
+      {
+        "language": "javascript",
+        "path": "./lwc-js.json"
+      },
+      {
+        "language": "xml",
+        "path": "./lwc-xml.json"
+      }
+    ]
+  },
+  "devDependencies": {
+    "vsce": "^2.11.0"
+  }
+}
