@@ -20,6 +20,50 @@ return {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
     config = function()
+      local lualine_c = {}
+      table.insert(lualine_c, {
+        "filename",
+        {
+          "require'salesforce.org_manager':get_default_alias()",
+          icon = "󰢎",
+        },
+      })
+
+      table.insert(lualine_c, {
+        function()
+          return " "
+        end,
+        color = function()
+          local status = require("sidekick.status").get()
+          if status then
+            if status.kind == "Error" then
+              return "DiagnosticError"
+            elseif status.busy then
+              return "DiagnosticWarn"
+            else
+              return "Special"
+            end
+          end
+        end,
+        cond = function()
+          --write a function fibonacci in lua
+          return require("sidekick.status").get() ~= nil
+        end,
+      })
+
+      table.insert(lualine_c, {
+        function()
+          local status = require("sidekick.status").cli()
+          return " " .. (#status > 1 and #status or "")
+        end,
+        cond = function()
+          return #require("sidekick.status").cli() > 0
+        end,
+        color = function()
+          return "Special"
+        end,
+      })
+
       local theme = {
         normal = { a = { fg = colors.peach }, b = { fg = colors.blue }, c = { fg = colors.teal } },
         insert = { a = { fg = colors.blue } },
@@ -30,13 +74,7 @@ return {
       }
       require("lualine").setup({
         sections = {
-          lualine_c = {
-            "filename",
-            {
-              "require'salesforce.org_manager':get_default_alias()",
-              icon = "󰢎",
-            },
-          },
+          lualine_c = lualine_c,
         },
         options = {
           icons_enabled = true,

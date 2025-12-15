@@ -1,6 +1,6 @@
 return {
   "huggingface/llm.nvim",
-  enabled = true,
+  enabled = false,
   event = "VeryLazy",
   keys = {
     {
