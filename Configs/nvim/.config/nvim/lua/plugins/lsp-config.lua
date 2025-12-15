@@ -71,7 +71,7 @@ return {
           "typescriptreact",
           "html",
         },
-        root_dir = require("lspconfig.util").root_pattern(".git", "package.json", "sfdx-project.json"),
+        root_dir = util.root_pattern(".git", "package.json", "sfdx-project.json"),
         settings = {
           workingDirectories = {
             { directory = "${workspaceFolder}", changeProcessCWD = true },
