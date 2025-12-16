@@ -1,0 +1,23 @@
+# ~/.tmuxinator/patagonia.yml
+name: patagonia
+root: ~/workspace/projects/patagonia/ar-patagonia-cdp/
+startup_window: backend
+startup_pane: 1
+on_project_first_start: podman machine start
+on_project_stop: task stop && docker stop ms-sql-patagonia && docker stop nginx-proxy && podman machine stop
+# enable_pane_titles: "off"
+windows:
+  - backend-api:
+      layout: main-vertical
+      root: ~/workspace/projects/patagonia/ar-patagonia-cdp/api
+      panes: nvim
+  - frontend-apps:
+      layout: main-vertical
+      root: ~/workspace/projects/patagonia/ar-patagonia-cdp/frontend
+      panes: fnm use 24 && nvim
+  - servers:
+      root: ~/workspace/projects/patagonia/ar-patagonia-cdp/frontend
+      layout: even-vertical
+      panes:
+        - backend-server: docker start ms-sql-patagonia && task up && docker start nginx-proxy && task azlogin
+        - frontend-server: fnm use 20 && pnpm reinstall && pnpm start

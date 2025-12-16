@@ -1,0 +1,26 @@
+layout {
+    startup-command="podman machine start"
+
+    tab name="backend-api" {
+        pane cwd="~/workspace/projects/patagonia/ar-patagonia-cdp/api" {
+            command="nvim"
+        }
+    }
+
+    tab name="frontend-apps" {
+        pane cwd="~/workspace/projects/patagonia/ar-patagonia-cdp/frontend" {
+            command="fnm use 24 && nvim"
+        }
+    }
+
+    tab name="servers" {
+        pane cwd="~/workspace/projects/patagonia/ar-patagonia-cdp/frontend" {
+            command="docker start ms-sql-patagonia && task up && docker start nginx-proxy && task azlogin"
+        }
+        pane cwd="~/workspace/projects/patagonia/ar-patagonia-cdp/frontend" {
+            command="fnm use 20 && pnpm reinstall && pnpm start"
+        }
+    }
+
+    shutdown-command="task stop && docker stop ms-sql-patagonia && docker stop nginx-proxy && podman machine stop"
+}
