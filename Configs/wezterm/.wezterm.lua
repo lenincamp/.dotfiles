@@ -12,7 +12,7 @@ end
 config.font = wezterm.font_with_fallback({
 	{ family = "Maple Mono NF", scale = 1.30 },
 })
-config.line_height = 1.5
+config.line_height = 1.45
 config.window_decorations = "RESIZE"
 config.window_background_opacity = 0.9
 config.macos_window_background_blur = 24
@@ -22,8 +22,8 @@ config.default_workspace = "main"
 
 -- Dim inactive panes
 config.inactive_pane_hsb = {
-	saturation = 0.24,
-	brightness = 0.5,
+	saturation = 0.95,
+	brightness = 0.8,
 }
 config.window_padding = {
 	left = 0,
