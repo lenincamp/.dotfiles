@@ -12,7 +12,7 @@ end
 config.font = wezterm.font_with_fallback({
 	{ family = "Maple Mono NF", scale = 1.30 },
 })
-
+config.line_height = 1.5
 config.window_decorations = "RESIZE"
 config.window_background_opacity = 0.9
 config.macos_window_background_blur = 24
@@ -24,6 +24,12 @@ config.default_workspace = "main"
 config.inactive_pane_hsb = {
 	saturation = 0.24,
 	brightness = 0.5,
+}
+config.window_padding = {
+	left = 0,
+	right = 0,
+	top = 0,
+	bottom = 0,
 }
 
 local function scheme_for_appearance(appearance)
