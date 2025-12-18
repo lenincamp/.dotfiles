@@ -1,7 +1,10 @@
-local BTOP_CONF=$(readlink "$HOME/.config/btop/btop.conf")
-local LAZYGIT_PATH="$HOME/Library/Application Support/lazygit"
-local LAZYDOCKER_PATH="$HOME/Library/Application Support/lazydocker"
-local EZA_PATH="$HOME/.config/eza"
+local APP_SUPPORT_PATH="$HOME/Library/Application Support"
+local CONFIG_PATH="$HOME/.config/"
+local BTOP_CONF=$(readlink "$CONFIG_PATH/btop/btop.conf")
+local STARSHIP_CONF=$(readlink "$CONFIG_PATH/starship.toml")
+local LAZYGIT_PATH="$APP_SUPPORT_PATH/lazygit"
+local LAZYDOCKER_PATH="$APP_SUPPORT_PATH/lazydocker"
+local EZA_PATH="$CONFIG_PATH/eza"
 
 local THEME_MODE=$(get_system_theme)
 if [[ "$THEME_MODE" == "dark" ]]; then
@@ -26,7 +29,8 @@ fi
 cp "$LD_SRC" "$LAZYDOCKER_PATH/config.yml"
 cp "$EZA_SRC" "$EZA_PATH/theme.yml"
 sed -i '' "s/color_theme = \".*\"/color_theme = \"$THEME\"/" "$BTOP_CONF"
-sed -i '' "s/theme \".*\"/theme \"$ZELLIJ_THEME\"/" $(readlink "$HOME/.config/zellij/config.kdl")
+sed -i '' "s/palette = \".*\"/palette = \"$THEME\"/" "$STARSHIP_CONF"
+sed -i '' "s/theme \".*\"/theme \"$ZELLIJ_THEME\"/" $(readlink "$CONFIG_PATH/zellij/config.kdl")
 touch "$HOME/.config/zellij/config.kdl"
 
 # zle reset-prompt
