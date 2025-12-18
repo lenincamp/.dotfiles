@@ -14,7 +14,7 @@ config.font = wezterm.font_with_fallback({
 })
 
 config.window_decorations = "RESIZE"
-config.window_background_opacity = 0.8
+config.window_background_opacity = 0.9
 config.macos_window_background_blur = 24
 config.window_close_confirmation = "AlwaysPrompt"
 config.scrollback_lines = 3000
@@ -25,10 +25,6 @@ config.inactive_pane_hsb = {
 	saturation = 0.24,
 	brightness = 0.5,
 }
-
--- max fps
-config.max_fps = 240
-config.animation_fps = 240
 
 local function scheme_for_appearance(appearance)
 	if appearance:find("Dark") then
