@@ -108,3 +108,9 @@ local function copy_relative_path_and_show_notify()
 end
 
 vim.keymap.set("n", "<leader>cp", copy_relative_path_and_show_notify, { desc = "[C]opy absolute [P]ath to clipboard" })
+vim.keymap.set("n", "<leader>an", function()
+  require("sidekick.nes").apply()
+end, { desc = "Sidekick: Apply NES" })
+vim.keymap.set("n", "<leader>au", function()
+  require("sidekick.nes").update()
+end, { desc = "Sidekick: Generate new NES" })
