@@ -1,12 +1,5 @@
 return {
   {
-    "stevearc/conform.nvim",
-    opts = function(_, opts)
-      opts.formatters_by_ft["xml"] = { "lemminx" }
-      return opts
-    end,
-  },
-  {
     "rmagatti/goto-preview",
     dependencies = { "rmagatti/logger.nvim" },
     event = "BufEnter",
