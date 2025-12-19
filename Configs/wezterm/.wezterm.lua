@@ -39,6 +39,11 @@ local function scheme_for_appearance(appearance)
 		return "Catppuccin Latte"
 	end
 end
+-- load plugin
+local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
+-- set path to zoxide
+workspace_switcher.zoxide_path = "/opt/homebrew/bin/zoxide"
+
 config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
 
 -- shortcut_configuration
@@ -50,7 +55,7 @@ config.keys = {
 	{ key = ":", mods = "LEADER", action = act.ActivateCommandPalette },
 
 	-- Workspace (similar to session in Tmux)
-	{ key = "s", mods = "LEADER", action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) },
+	{ key = "s", mods = "LEADER", action = act.ActivateKeyTable({ name = "session", one_shot = false }) },
 
 	-- Tab (similar to window in Tmux)
 	{ key = "w", mods = "LEADER", action = act.ShowTabNavigator },
@@ -124,6 +129,15 @@ config.key_tables = {
 		{ key = "j", action = act.MoveTabRelative(-1) },
 		{ key = "k", action = act.MoveTabRelative(1) },
 		{ key = "l", action = act.MoveTabRelative(1) },
+		{ key = "Escape", action = "PopKeyTable" },
+		{ key = "Enter", action = "PopKeyTable" },
+	},
+	session = {
+		{ key = "w", action = workspace_switcher.switch_workspace() },
+		{ key = "s", action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) },
+		{ key = "[", action = act.SwitchWorkspaceRelative(1) },
+		{ key = "]", action = act.SwitchWorkspaceRelative(-1) },
+		{ key = "p", action = act.SwitchToWorkspace({ name = "main" }) },
 		{ key = "Escape", action = "PopKeyTable" },
 		{ key = "Enter", action = "PopKeyTable" },
 	},
