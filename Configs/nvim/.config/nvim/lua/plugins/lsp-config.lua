@@ -45,7 +45,10 @@ return {
       lwc_ls = {
         cmd = { "lwc-language-server", "--stdio" },
         filetypes = { "javascript", "html" },
-        root_markers = { "sfdx-project.json" },
+        -- root_markers = { "sfdx-project.json" },
+        root_dir = function(fname)
+          return require("lspconfig.util").root_pattern("sfdx-project.json")(fname)
+        end,
         init_options = {
           embeddedLanguages = {
             javascript = true,

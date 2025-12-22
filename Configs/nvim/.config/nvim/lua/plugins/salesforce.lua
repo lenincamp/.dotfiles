@@ -1,4 +1,5 @@
 return {
+  lazy = true,
   "jonathanmorris180/salesforce.nvim",
   dependencies = {
     "nvim-lua/plenary.nvim",

@@ -1,5 +1,8 @@
 return {
+  lazy = true,
   "MeanderingProgrammer/render-markdown.nvim",
   enabled = true,
-  opts = {},
+  opts = {
+    file_types = { "markdown", "copilot-chat" },
+  },
 }

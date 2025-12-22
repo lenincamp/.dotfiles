@@ -6,7 +6,7 @@ local keymap = vim.keymap
 -- local opts = { noremap = true, silent = true }
 -- Delete a word backwards
 keymap.set("n", "dw", "vb_d")
-keymap.set("v", "p", '"_dP')
+-- keymap.set("v", "p", '"_dP')
 
 --Jump
 keymap.set("n", "L", "$")

@@ -1,15 +1,6 @@
 return {
-  "nvim-dap",
-  dependencies = {
-    "rcarriga/nvim-dap-ui",
-    "theHamsta/nvim-dap-virtual-text",
-    {
-      "mason-org/mason.nvim",
-      opts = { ensure_installed = { "java-debug-adapter", "java-test" } },
-    },
-  },
-  opts = function()
-    -- Auto abrir/cerrar UI cuando se inicia/termina la depuración
+  "mfussenegger/nvim-dap",
+  config = function()
     local dapui, dapvirtualtext, dap = require("dapui"), require("nvim-dap-virtual-text"), require("dap")
     dapui.setup()
     dapvirtualtext.setup()
@@ -26,6 +17,9 @@ return {
       dapui.close()
     end
 
+    local function project_root()
+      return vim.fs.root(0, { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }) or vim.fn.getcwd()
+    end
     dap.configurations.java = {
       {
         type = "java",
@@ -34,7 +28,7 @@ return {
         hostName = "127.0.0.1",
         port = 51922,
         modulePaths = {},
-        classPaths = { "/Users/lcampoverde/Documents/projects/petersen/ar-petersen-cdp" },
+        classPaths = project_root(),
         mainClass = "",
         projectName = "api",
         shortenCommandLine = "argfile",
@@ -61,13 +55,12 @@ return {
         hostName = "127.0.0.1",
         port = 5005,
         modulePaths = {},
-        classPaths = { "/Users/lcampoverde/Documents/projects/petersen/ar-petersen-cdp" },
+        classPaths = project_root(),
         mainClass = "",
         projectName = "api",
         shortenCommandLine = "argfile",
       },
     }
-    -- dap.continue()
     if not dap.adapters.kotlin then
       dap.adapters.kotlin = {
         type = "executable",
