@@ -10,8 +10,10 @@ if wezterm.config_builder then
 end
 
 config.font = wezterm.font_with_fallback({
+	{ family = "0xProto", scale = 1.30 },
 	{ family = "Maple Mono NF", scale = 1.30 },
 })
+config.harfbuzz_features = { "zero", "ss01", "cv05" }
 config.line_height = 1.45
 config.window_decorations = "RESIZE"
 config.window_background_opacity = 0.9
@@ -223,9 +225,14 @@ wezterm.on("update-status", function(window, pane)
 		{ Text = wezterm.nerdfonts.oct_table .. "  " .. stat },
 		{ Text = " |" },
 	}))
+	local zoomed = ""
+	if pane:is_zoomed() then
+		zoomed = wezterm.nerdfonts.fae_maximize .. "  ZOOMED " .. " | "
+	end
 
 	-- Right status
 	window:set_right_status(wezterm.format({
+		{ Text = zoomed },
 		-- Wezterm has a built-in nerd fonts
 		-- https://wezfurlong.org/wezterm/config/lua/wezterm/nerdfonts.html
 		{ Text = wezterm.nerdfonts.md_folder .. "  " .. cwd },
