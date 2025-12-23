@@ -18,6 +18,7 @@ return {
         width = 0.4,
       },
       auto_follow_cursor = false,
+      model = "gpt-5",
     }
   end,
   keys = {
