@@ -15,8 +15,7 @@ return {
         tool = "󰊳  Tool ",
       },
       window = {
-        -- width = 0.4,
-        layout = "float",
+        width = 0.4,
       },
       auto_follow_cursor = false,
     }
