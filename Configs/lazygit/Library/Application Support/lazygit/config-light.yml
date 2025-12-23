@@ -1,4 +1,5 @@
 gui:
+  # sidePanelWidth: 0.2 # gives you more space to show things side-by-side
   theme:
     activeBorderColor:
       - "#1e66f5"
@@ -19,6 +20,8 @@ gui:
       - "#4c4f69"
     searchingActiveBorderColor:
       - "#df8e1d"
-
   authorColors:
     "*": "#7287fd"
+git:
+  pagers:
+    - pager: delta --dark --paging=never --line-numbers --config delta.side-by-side=false
