@@ -188,7 +188,7 @@ config.colors = {
 wezterm.on("update-status", function(window, pane)
 	-- Workspace name
 	local stat = window:active_workspace()
-	local stat_color = scheme.ansi[2]
+	local stat_color = scheme.ansi[6]
 	-- It's a little silly to have workspace name all the time
 	-- Utilize this to display LDR or current key table name
 	if window:active_key_table() then
