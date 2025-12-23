@@ -24,4 +24,4 @@ gui:
     "*": "#7287fd"
 git:
   pagers:
-    - pager: delta --dark --paging=never --line-numbers --config delta.side-by-side=false
+    - pager: delta --paging=never --line-numbers --config delta.side-by-side=false
