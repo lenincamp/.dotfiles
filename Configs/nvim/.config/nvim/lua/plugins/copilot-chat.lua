@@ -73,6 +73,25 @@ return {
         vim.opt_local.number = false
       end,
     })
+    opts.prompts = {
+      ElegantNames = {
+        system_prompt = 'You are a naming advisor following "Elegant Objects".',
+        prompt = [[ For the selected code, propose better names.
+Rules:
+- Types/objects: nouns.
+- Functions/methods: verbs.
+- Ban -er/-or/-ar agent nouns (Manager, Parser, Handler, Reader, Writer,
+  Controller, Actor) and vague roles (Util, Helper, Service, Processor,
+  Data, Info, Thing, Object, Stuff).
+- Prefer precise domain terms; follow language casing.
+- Keep behavior; only naming suggestions.
+
+Output:
+- For each symbol: 3–5 options with one-line rationale.
+- If name ends with -er/-or/-ar, flag it and propose noun/verb alternatives.]],
+        description = "Elegant Objects naming suggestions",
+      },
+    }
 
     chat.setup(opts)
   end,
