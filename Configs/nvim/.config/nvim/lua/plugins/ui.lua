@@ -1,4 +1,5 @@
 local colors = require("catppuccin.palettes").get_palette(vim.o.background == "dark" and "mocha" or "latte")
+
 return {
   {
     "akinsho/bufferline.nvim",
@@ -23,12 +24,17 @@ return {
     event = "VeryLazy",
     config = function()
       local lualine_c = {}
+
       table.insert(lualine_c, {
         "filename",
-        {
-          "require'salesforce.org_manager':get_default_alias()",
-          icon = "󰢎",
-        },
+        path = 1,
+        cond = function()
+          return #vim.api.nvim_tabpage_list_wins(0) == 1
+        end,
+      })
+      table.insert(lualine_c, {
+        "require'salesforce.org_manager':get_default_alias()",
+        icon = "󰢎",
       })
 
       table.insert(lualine_c, {
@@ -48,7 +54,6 @@ return {
           end
         end,
         cond = function()
-          --write a function fibonacci in lua
           return require("sidekick.status").get() ~= nil
         end,
       })
@@ -84,35 +89,65 @@ return {
           component_separators = { left = "", right = "" },
           section_separators = { left = "", right = "" },
         },
-      })
-    end,
-  },
-  {
-    "b0o/incline.nvim",
-    event = "BufReadPre",
-    priority = 1200,
-    config = function()
-      -- represent filename as tab
-      require("incline").setup({
-        highlight = {
-          groups = {
-            InclineNormal = { guifg = colors.peach },
-            InclineNormalNC = { guifg = colors.peach },
+        winbar = {
+          lualine_c = {
+            {
+              "filename",
+              path = 1,
+              symbols = {
+                modified = " ●",
+                readonly = " 🔒",
+              },
+              cond = function()
+                return #vim.api.nvim_tabpage_list_wins(0) > 1
+              end,
+            },
           },
         },
-        window = { margin = { vertical = 0, horizontal = 1 } },
-        hide = {
-          cursorline = true,
+        inactive_winbar = {
+          lualine_c = {
+            {
+              "filename",
+              path = 1,
+              symbols = {
+                modified = " ●",
+                readonly = " 🔒",
+              },
+              cond = function()
+                return #vim.api.nvim_tabpage_list_wins(0) > 1
+              end,
+            },
+          },
         },
-        render = function(props)
-          local filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(props.buf), ":t")
-          if vim.bo[props.buf].modified then
-            filename = "[+] " .. filename
-          end
-          local icon, color = require("nvim-web-devicons").get_icon_color(filename)
-          return { { icon, guifg = colors.peach }, { " " }, { filename } }
-        end,
       })
     end,
   },
+  -- {
+  --   "b0o/incline.nvim",
+  --   event = "BufReadPre",
+  --   priority = 1200,
+  --   config = function()
+  --     -- represent filename as tab
+  --     require("incline").setup({
+  --       highlight = {
+  --         groups = {
+  --           InclineNormal = { guifg = colors.peach },
+  --           InclineNormalNC = { guifg = colors.peach },
+  --         },
+  --       },
+  --       window = { margin = { vertical = 0, horizontal = 1 } },
+  --       hide = {
+  --         cursorline = true,
+  --       },
+  --       render = function(props)
+  --         local filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(props.buf), ":t")
+  --         if vim.bo[props.buf].modified then
+  --           filename = "[+] " .. filename
+  --         end
+  --         local icon, color = require("nvim-web-devicons").get_icon_color(filename)
+  --         return { { icon, guifg = colors.peach }, { " " }, { filename } }
+  --       end,
+  --     })
+  --   end,
+  -- },
 }
