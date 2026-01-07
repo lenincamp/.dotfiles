@@ -167,3 +167,15 @@ vim.api.nvim_create_autocmd("VimLeave", {
   pattern = "*",
   command = "silent !zellij action switch-mode normal",
 })
+
+vim.api.nvim_create_user_command("GitLineHistory", function(opts)
+  local s, e = opts.line1, opts.line2
+  local spec = string.format("%d,%d:%s", s, e, vim.fn.expand("%:p"))
+
+  local cmd = "git -c core.pager=delta -c delta.paging=never -c delta.line-numbers=true -c delta.side-by-side=false "
+    .. "log --color=always -p -L "
+    .. vim.fn.shellescape(spec)
+
+  vim.cmd("vsplit")
+  vim.cmd("terminal " .. cmd)
+end, { range = true })
