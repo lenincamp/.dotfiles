@@ -35,3 +35,4 @@ if vim.fn.getenv("TERM_PROGRAM") == "ghostty" then
   vim.opt.title = true
   vim.opt.titlestring = "%{fnamemodify(getcwd(), ':t')}"
 end
+vim.g.lazyvim_mini_snippets_in_completion = true
