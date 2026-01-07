@@ -63,13 +63,13 @@ local function setup_diff_mappings()
   vim.keymap.set(
     "n",
     "<leader>dh",
-    ":diffget //2<CR>:diffupdate<CR>",
+    ":diffget 1<CR>:diffupdate<CR>",
     { buffer = bufnr, desc = "←  Get from LOCAL (left)" }
   )
   vim.keymap.set(
     "n",
     "<leader>dl",
-    ":diffget //3<CR>:diffupdate<CR>",
+    ":diffget 2<CR>:diffupdate<CR>",
     { buffer = bufnr, desc = "→  Get from REMOTE (right)" }
   )
 
