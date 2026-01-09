@@ -1,5 +1,27 @@
 local colors = require("catppuccin.palettes").get_palette(vim.o.background == "dark" and "mocha" or "latte")
 
+local function has_real_split()
+  local real = 0
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    -- skip floating windows
+    local cfg = vim.api.nvim_win_get_config(win)
+    if cfg.relative == "" then
+      -- skip quickfix/loclist/popup
+      local wnr = vim.fn.win_id2win(win)
+      if vim.fn.win_gettype(wnr) == "" then
+        -- count only normal file buffers
+        local buf = vim.api.nvim_win_get_buf(win)
+        local bt = vim.api.nvim_buf_get_option(buf, "buftype")
+        local mod = vim.api.nvim_buf_get_option(buf, "modifiable")
+        if bt == "" and mod then
+          real = real + 1
+        end
+      end
+    end
+  end
+  return real > 1
+end
+
 return {
   {
     "akinsho/bufferline.nvim",
@@ -29,8 +51,12 @@ return {
         "filename",
         path = 1,
         cond = function()
-          return #vim.api.nvim_tabpage_list_wins(0) == 1
+          return not has_real_split()
         end,
+      })
+      table.insert(lualine_c, {
+        "filename",
+        cond = has_real_split,
       })
       table.insert(lualine_c, {
         "require'salesforce.org_manager':get_default_alias()",
@@ -98,9 +124,7 @@ return {
                 modified = " ●",
                 readonly = " 🔒",
               },
-              cond = function()
-                return #vim.api.nvim_tabpage_list_wins(0) > 1
-              end,
+              cond = has_real_split,
             },
           },
         },
@@ -113,9 +137,7 @@ return {
                 modified = " ●",
                 readonly = " 🔒",
               },
-              cond = function()
-                return #vim.api.nvim_tabpage_list_wins(0) > 1
-              end,
+              cond = has_real_split,
             },
           },
         },
