@@ -200,47 +200,74 @@ wezterm.on("update-status", function(window, pane)
 		stat = "LDR"
 		stat_color = scheme.ansi[3]
 	end
-	local basename = function(s)
-		-- Nothing a little regex can't fix
-		return string.gsub(s, "(.*[/\\])(.*)", "%2")
-	end
 
-	-- Current working directory
-	local cwd = pane:get_current_working_dir()
-	if cwd then
-		cwd = basename(cwd.file_path) --> URL object introduced in 20240127-113634-bbcac864 (type(cwd) == "userdata")
-	else
-		cwd = ""
-	end
-
-	-- Current command
-	local cmd = pane:get_foreground_process_name()
-	-- CWD and CMD could be nil (e.g. viewing log using Ctrl-Alt-l)
-	cmd = cmd and basename(cmd) or ""
-
-	-- Left status (left of the tab line)
 	window:set_left_status(wezterm.format({
 		{ Foreground = { Color = stat_color } },
 		{ Text = "  " },
 		{ Text = wezterm.nerdfonts.oct_table .. "  " .. stat },
 		{ Text = " |" },
 	}))
-	local zoomed = ""
-	if pane:is_zoomed() then
-		zoomed = wezterm.nerdfonts.fae_maximize .. "  ZOOMED " .. " | "
+end)
+local function get_git_branch(cwd)
+	if not cwd then
+		return nil
+	end
+	local handle = io.popen('git -C "' .. cwd .. '" rev-parse --abbrev-ref HEAD 2>/dev/null')
+	if handle then
+		local branch = handle:read("*l")
+		handle:close()
+		return branch
+	end
+	return nil
+end
+
+local function pane_is_zoomed(window)
+	local tab = window:mux_window():active_tab()
+	if not tab then
+		return false
 	end
 
-	-- Right status
-	window:set_right_status(wezterm.format({
-		{ Text = zoomed },
-		-- Wezterm has a built-in nerd fonts
-		-- https://wezfurlong.org/wezterm/config/lua/wezterm/nerdfonts.html
-		{ Text = wezterm.nerdfonts.md_folder .. "  " .. cwd },
-		{ Text = " | " },
-		{ Foreground = { Color = scheme.ansi[4] } },
-		{ Text = wezterm.nerdfonts.fa_code .. "  " .. cmd },
-		{ Text = "  " },
-	}))
+	for _, pane_info in ipairs(tab:panes_with_info()) do
+		if pane_info.is_active and pane_info.is_zoomed then
+			return true
+		end
+	end
+	return false
+end
+wezterm.on("update-right-status", function(window, pane)
+	local basename = function(s)
+		return string.gsub(s, "(.*[/\\])(.*)", "%2")
+	end
+	local cwd = pane:get_current_working_dir()
+	if cwd then
+		cwd = basename(cwd.file_path)
+	else
+		cwd = ""
+	end
+	local cmd = pane:get_foreground_process_name()
+	cmd = cmd and basename(cmd) or ""
+
+	local right = {}
+	if pane_is_zoomed(window) then
+		table.insert(right, { Foreground = { Color = scheme.ansi[6] } })
+		table.insert(right, { Text = wezterm.nerdfonts.fa_window_maximize .. " ZOOMED" })
+		table.insert(right, { Foreground = { Color = scheme.ansi[1] } })
+		table.insert(right, { Text = " | " })
+	end
+	table.insert(right, { Foreground = { Color = scheme.ansi[1] } })
+	table.insert(right, { Text = wezterm.nerdfonts.md_folder .. " " .. cwd })
+	local git_branch = get_git_branch(pane:get_current_working_dir().file_path)
+	if git_branch then
+		table.insert(right, { Text = " | " })
+		table.insert(right, { Text = wezterm.nerdfonts.pl_branch .. " " .. git_branch })
+	end
+	table.insert(right, { Text = " | " })
+	table.insert(right, { Text = wezterm.nerdfonts.cod_terminal_bash .. " " .. cmd })
+
+	local date = wezterm.strftime("%Y-%m-%d %H:%M:%S")
+	table.insert(right, { Text = " | " })
+	table.insert(right, { Text = date .. " " })
+	window:set_right_status(wezterm.format(right))
 end)
 
 return config
