@@ -28,8 +28,8 @@ return {
     event = "VeryLazy",
     lazy = true,
     keys = {
-      { "<Tab>", "<Cmd>BufferLineCycleNext<CR>", desc = "Next tab" },
-      { "<S-Tab>", "<Cmd>BufferLineCyclePrev<CR>", desc = "Prev tab" },
+      { "<Tab>", "<Cmd>tabnext<CR>", desc = "Next tab" },
+      { "<S-Tab>", "<Cmd>tabNext<CR>", desc = "Prev tab" },
     },
     opts = {
       options = {
@@ -42,6 +42,7 @@ return {
   },
   {
     "nvim-lualine/lualine.nvim",
+    enabled = false,
     optional = true,
     event = "VeryLazy",
     config = function()
