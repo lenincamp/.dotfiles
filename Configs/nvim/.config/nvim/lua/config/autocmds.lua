@@ -186,3 +186,13 @@ vim.api.nvim_create_autocmd("VimEnter", {
     vim.api.nvim_set_hl(0, "WinBarNC", { link = "StatusLineNC" })
   end,
 })
+
+vim.api.nvim_create_user_command("DiffContextZero", function()
+  vim.opt.diffopt:remove("context:999999")
+  vim.opt.diffopt:append("context:0")
+end, { desc = "Set diff context Zero" })
+
+vim.api.nvim_create_user_command("DiffContextAll", function()
+  vim.opt.diffopt:remove("context:0")
+  vim.opt.diffopt:append("context:999999")
+end, { desc = "Set diff context All" })

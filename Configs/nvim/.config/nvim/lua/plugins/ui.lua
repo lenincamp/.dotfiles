@@ -190,6 +190,29 @@ return {
       })
     end,
   },
+  {
+    "craftzdog/solarized-osaka.nvim",
+    lazy = true,
+    priority = 1000,
+    opts = {},
+  },
+  {
+    "slugbyte/lackluster.nvim",
+    lazy = true,
+    priority = 1000,
+    config = function()
+      require("lackluster").setup({
+        tweak_syntax = {},
+        tweak_background = {
+          normal = "none",
+          telescope = "none",
+          menu = "none",
+          popup = "none",
+        },
+      })
+    end,
+  },
+
   -- {
   --   "b0o/incline.nvim",
   --   event = "BufReadPre",
