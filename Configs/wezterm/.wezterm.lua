@@ -149,6 +149,7 @@ config.key_tables = {
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.status_update_interval = 1000
+config.hide_tab_bar_if_only_one_tab = true
 
 local scheme = wezterm.color.get_builtin_schemes()[config.color_scheme]
 config.colors = {
