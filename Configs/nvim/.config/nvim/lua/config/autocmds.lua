@@ -180,17 +180,6 @@ vim.api.nvim_create_user_command("GitLineHistory", function(opts)
   vim.cmd("terminal " .. cmd)
 end, { range = true })
 
-function _G.WinbarBreadcrumb()
-  -- local path = vim.fn.expand("%f")
-  local path = vim.fn.expand("%:~:.")
-  if path == "" then
-    return ""
-  end
-  local separator = "\u{202F}\u{202F}"
-
-  return path:gsub("/", separator)
-end
-
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
     vim.api.nvim_set_hl(0, "WinBar", { link = "StatusLine" })

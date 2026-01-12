@@ -33,6 +33,18 @@ if vim.fn.getenv("TERM_PROGRAM") == "ghostty" then
   vim.opt.titlestring = "%{fnamemodify(getcwd(), ':t')}"
 end
 vim.g.lazyvim_mini_snippets_in_completion = true
+
+function _G.WinbarBreadcrumb()
+  -- local path = vim.fn.expand("%f")
+  local path = vim.fn.expand("%:~:.")
+  if path == "" then
+    return ""
+  end
+  local separator = "\u{202F}\u{202F}"
+
+  return path:gsub("/", separator)
+end
+
 vim.opt.winbar = " %m %{v:lua.WinbarBreadcrumb()}%="
 vim.opt.showtabline = 0
 vim.opt.laststatus = 0
