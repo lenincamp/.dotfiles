@@ -1,11 +1,3 @@
-local orig_util = vim.lsp.util.open_floating_preview
----@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.util.open_floating_preview = function(contents, syntax, opts, ...)
-  opts = opts or {}
-  opts.border = "rounded" -- "single", "double", "rounded", "solid"
-  return orig_util(contents, syntax, opts, ...)
-end
-
 local util = require("lspconfig.util")
 return {
   "neovim/nvim-lspconfig",

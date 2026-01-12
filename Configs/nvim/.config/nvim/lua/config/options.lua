@@ -9,6 +9,7 @@ vim.o.termguicolors = true
 vim.opt.cursorline = false
 vim.opt.splitright = true -- Nuevos splits a la derecha
 vim.opt.splitbelow = true -- Nuevos splits abajo
+vim.opt.winborder = "rounded"
 
 -- Undercurl
 vim.cmd([[let &t_Cs = "\e[4:3m"]])
@@ -32,25 +33,7 @@ if vim.fn.getenv("TERM_PROGRAM") == "ghostty" then
   vim.opt.titlestring = "%{fnamemodify(getcwd(), ':t')}"
 end
 vim.g.lazyvim_mini_snippets_in_completion = true
-
-function _G.WinbarBreadcrumb()
-  -- local path = vim.fn.expand("%f")
-  local path = vim.fn.expand("%:~:.")
-  if path == "" then
-    return ""
-  end
-  local separator = "\u{202F}\u{202F}"
-
-  return path:gsub("/", separator)
-end
 vim.opt.winbar = " %m %{v:lua.WinbarBreadcrumb()}%="
 vim.opt.showtabline = 0
 vim.opt.laststatus = 0
 vim.opt.cmdheight = 0
-
-vim.api.nvim_create_autocmd("VimEnter", {
-  callback = function()
-    vim.api.nvim_set_hl(0, "WinBar", { link = "StatusLine" })
-    vim.api.nvim_set_hl(0, "WinBarNC", { link = "StatusLineNC" })
-  end,
-})
