@@ -14,7 +14,7 @@ config.font = wezterm.font_with_fallback({
 	{ family = "Maple Mono NF", scale = 1.30 },
 })
 config.harfbuzz_features = { "zero", "ss01", "cv05" }
-config.line_height = 1.45
+config.line_height = 1.35
 config.window_decorations = "RESIZE"
 config.window_background_opacity = 0.9
 config.macos_window_background_blur = 24
