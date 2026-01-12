@@ -27,16 +27,38 @@ return {
     "akinsho/bufferline.nvim",
     event = "VeryLazy",
     lazy = true,
-    keys = {
-      { "<Tab>", "<Cmd>tabnext<CR>", desc = "Next tab" },
-      { "<S-Tab>", "<Cmd>tabNext<CR>", desc = "Prev tab" },
-    },
+    priority = 1000,
+    enabled = false,
     opts = {
       options = {
-        mode = "tabs",
+        -- mode = "tabs",
         -- separator_style = "slant",
         show_buffer_close_icons = false,
         show_close_icon = false,
+        custom_filter = function()
+          return false
+        end,
+
+        -- Evita texto residual
+        name_formatter = function()
+          return ""
+        end,
+        always_show_bufferline = false,
+        custom_areas = {
+          right = function()
+            local result = {}
+            for i = 1, vim.fn.tabpagenr("$") do
+              local name = vim.fn.gettabvar(i, "tab_name", "")
+              if name ~= "" then
+                table.insert(result, {
+                  text = " " .. name .. " ",
+                  fg = colors.peach,
+                })
+              end
+            end
+            return result
+          end,
+        },
       },
     },
   },
@@ -142,6 +164,29 @@ return {
             },
           },
         },
+      })
+    end,
+  },
+  {
+    "rose-pine/neovim",
+    name = "rose-pine",
+    lazy = true,
+    priority = 1000,
+    config = function()
+      require("rose-pine").setup({
+        styles = {
+          transparency = true,
+        },
+      })
+    end,
+  },
+  {
+    "vague-theme/vague.nvim",
+    lazy = true, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other plugins
+    config = function()
+      require("vague").setup({
+        transparent = true,
       })
     end,
   },
