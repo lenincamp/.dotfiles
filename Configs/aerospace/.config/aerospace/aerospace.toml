@@ -17,15 +17,16 @@ after-login-command = []
 # Run Sketchybar together with AeroSpace
 # sketchbar has a built-in detection of already running process,
 # so it won't be run twice on AeroSpace restart
-after-startup-command = ['exec-and-forget sketchybar']
+# after-startup-command = ['exec-and-forget sketchybar']
+after-startup-command = ['exec-and-forget']
 # after-startup-command = []
 
 # Notify Sketchybar about workspace change
-exec-on-workspace-change = [
-  '/bin/bash',
-  '-c',
-  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE',
-]
+# exec-on-workspace-change = [
+#   '/bin/bash',
+#   '-c',
+#   'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE',
+# ]
 
 # Start AeroSpace at login
 start-at-login = true
@@ -66,21 +67,21 @@ on-focus-changed = "move-mouse window-lazy-center"
 #                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
-outer.top = [
-  { monitor."built-in" = 10 },
-  { monitor."LS24D300G" = 40 },
-  { monitor."Virtual 16:9" = 40 },
-  10,
-]
-outer.bottom = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
-outer.left = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
-outer.right = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
-inner.horizontal = [
-  { monitor."built-in" = 10 },
-  { monitor."LS24D300G" = 12 },
-  10,
-]
-inner.vertical = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
+# outer.top = [
+#   { monitor."built-in" = 10 },
+#   { monitor."LS24D300G" = 40 },
+#   { monitor."Virtual 16:9" = 40 },
+#   10,
+# ]
+# outer.bottom = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
+# outer.left = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
+# outer.right = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
+# inner.horizontal = [
+#   { monitor."built-in" = 10 },
+#   { monitor."LS24D300G" = 12 },
+#   10,
+# ]
+# inner.vertical = [{ monitor."built-in" = 10 }, { monitor."LS24D300G" = 12 }, 10]
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
