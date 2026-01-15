@@ -84,6 +84,7 @@ return {
         },
         grade = {
           enabled = true,
+          downloadSources = true,
         },
         implementationsCodeLens = {
           enabled = true,
