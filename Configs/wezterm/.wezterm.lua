@@ -182,10 +182,10 @@ config.keys = {
 	-- Panes
 	{ key = "-", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
 	{ key = "|", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-	{ key = "h", mods = "LEADER", action = act.ActivatePaneDirection("Left") },
-	{ key = "j", mods = "LEADER", action = act.ActivatePaneDirection("Down") },
-	{ key = "k", mods = "LEADER", action = act.ActivatePaneDirection("Up") },
-	{ key = "l", mods = "LEADER", action = act.ActivatePaneDirection("Right") },
+	{ key = "h", mods = "LEADER", action = act.AdjustPaneSize({ "Left", 15 }) },
+	{ key = "j", mods = "LEADER", action = act.AdjustPaneSize({ "Down", 15 }) },
+	{ key = "k", mods = "LEADER", action = act.AdjustPaneSize({ "Up", 15 }) },
+	{ key = "l", mods = "LEADER", action = act.AdjustPaneSize({ "Right", 15 }) },
 	{ key = "phys:Space", mods = "LEADER", action = act.RotatePanes("Clockwise") },
 	{ key = "m", mods = "LEADER", action = act.TogglePaneZoomState },
 	{ key = "x", mods = "LEADER", action = act.CloseCurrentPane({ confirm = true }) },
@@ -199,6 +199,13 @@ config.keys = {
 
 	-- Resize mode
 	{ key = "r", mods = "LEADER", action = act.ActivateKeyTable({ name = "resize_pane", one_shot = false }) },
+	-- nvim integration
+	{ key = "h", mods = "CTRL", action = wezterm.action({ EmitEvent = "move-left" }) },
+	{ key = "l", mods = "CTRL", action = wezterm.action({ EmitEvent = "move-right" }) },
+	{ key = "j", mods = "CTRL", action = wezterm.action({ EmitEvent = "move-down" }) },
+	{ key = "k", mods = "CTRL", action = wezterm.action({ EmitEvent = "move-up" }) },
+	--move pane
+	{ key = "m", mods = "LEADER|CTRL", action = act.ActivateKeyTable({ name = "move_pane", one_shot = false }) },
 }
 
 -- Quick tab index selection
@@ -208,10 +215,10 @@ end
 
 config.key_tables = {
 	resize_pane = {
-		{ key = "<", action = act.AdjustPaneSize({ "Left", 1 }) },
-		{ key = "-", action = act.AdjustPaneSize({ "Down", 1 }) },
-		{ key = "+", action = act.AdjustPaneSize({ "Up", 1 }) },
-		{ key = ">", action = act.AdjustPaneSize({ "Right", 1 }) },
+		{ key = "h", action = act.AdjustPaneSize({ "Left", 5 }) },
+		{ key = "j", action = act.AdjustPaneSize({ "Down", 5 }) },
+		{ key = "k", action = act.AdjustPaneSize({ "Up", 5 }) },
+		{ key = "l", action = act.AdjustPaneSize({ "Right", 5 }) },
 		{ key = "Escape", action = "PopKeyTable" },
 		{ key = "Enter", action = "PopKeyTable" },
 	},
@@ -229,6 +236,13 @@ config.key_tables = {
 		{ key = "[", action = act.SwitchWorkspaceRelative(1) },
 		{ key = "]", action = act.SwitchWorkspaceRelative(-1) },
 		{ key = "p", action = act.SwitchToWorkspace({ name = "main" }) },
+		{ key = "Escape", action = "PopKeyTable" },
+		{ key = "Enter", action = "PopKeyTable" },
+	},
+	move_pane = {
+		{ key = "h", action = act.RotatePanes("CounterClockwise") },
+		{ key = "l", action = act.RotatePanes("Clockwise") },
+		{ key = "s", action = act.PaneSelect({ mode = "SwapWithActive", alphabet = "adfghjklqwertyuiopzxcvbnm" }) },
 		{ key = "Escape", action = "PopKeyTable" },
 		{ key = "Enter", action = "PopKeyTable" },
 	},
@@ -455,6 +469,39 @@ wezterm.on("update-right-status", function(window, pane)
 		window:set_right_status(formatted)
 		right_status_cache[win_id] = formatted
 	end
+end)
+
+-- ---------------------
+-- split panes nvim integration
+-- ---------------------
+local wez_nvim_action = function(window, pane, action_wez, forward_key_nvim)
+	local cmd = basename(pane:get_foreground_process_name() or "")
+	if cmd == "nvim" then
+		window:perform_action(forward_key_nvim, pane)
+	else
+		window:perform_action(action_wez, pane)
+	end
+end
+
+wezterm.on("move-left", function(window, pane)
+	wez_nvim_action(
+		window,
+		pane,
+		act.ActivatePaneDirection("Left"), -- this will execute when the active pane is not a nvim instance
+		act.SendKey({ key = "h", mods = "CTRL" }) -- this key combination will be forwarded to nvim if the active pane is a nvim instance
+	)
+end)
+
+wezterm.on("move-right", function(window, pane)
+	wez_nvim_action(window, pane, act.ActivatePaneDirection("Right"), act.SendKey({ key = "l", mods = "CTRL" }))
+end)
+
+wezterm.on("move-down", function(window, pane)
+	wez_nvim_action(window, pane, act.ActivatePaneDirection("Down"), act.SendKey({ key = "j", mods = "CTRL" }))
+end)
+
+wezterm.on("move-up", function(window, pane)
+	wez_nvim_action(window, pane, act.ActivatePaneDirection("Up"), act.SendKey({ key = "k", mods = "CTRL" }))
 end)
 
 return config

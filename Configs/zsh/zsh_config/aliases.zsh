@@ -3,7 +3,6 @@ alias fk=thefuck
 alias nv='nvim'
 alias v='nvim'
 alias vim='nvim'
-alias gitalias='alias | grep git | fzf'
 alias gitalias='alias | rg git | fzf'
 
 #alias git
