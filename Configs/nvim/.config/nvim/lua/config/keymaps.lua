@@ -62,7 +62,7 @@ keymap.set(
   { desc = "Replace all ocurrencies" }
 )
 
-vim.keymap.set("n", "gps", function()
+keymap.set("n", "gps", function()
   local clients = vim.lsp.get_clients({ name = "sonarlint.nvim" })
   if #clients > 0 then
     vim.lsp.stop_client(clients)
@@ -107,10 +107,21 @@ local function copy_relative_path_and_show_notify()
   end
 end
 
-vim.keymap.set("n", "<leader>cp", copy_relative_path_and_show_notify, { desc = "[C]opy absolute [P]ath to clipboard" })
-vim.keymap.set("n", "<leader>an", function()
+keymap.set("n", "<leader>cp", copy_relative_path_and_show_notify, { desc = "[C]opy absolute [P]ath to clipboard" })
+keymap.set("n", "<leader>an", function()
   require("sidekick.nes").apply()
 end, { desc = "Sidekick: Apply NES" })
-vim.keymap.set("n", "<leader>au", function()
+keymap.set("n", "<leader>au", function()
   require("sidekick.nes").update()
 end, { desc = "Sidekick: Generate new NES" })
+
+do
+  local is_wezterm = vim.env.WEZTERM_PANE ~= nil or vim.env.TERM_PROGRAM == "WezTerm"
+  if is_wezterm then
+    keymap.set("n", "<C-h>", require("wezterm-mux").wezterm_move_left, { noremap = true })
+    keymap.set("n", "<C-l>", require("wezterm-mux").wezterm_move_right, { noremap = true })
+    keymap.set("n", "<C-j>", require("wezterm-mux").wezterm_move_down, { noremap = true })
+    keymap.set("n", "<C-k>", require("wezterm-mux").wezterm_move_up, { noremap = true })
+    --keymap.set("n", "<A-x>", "<C-w>q") -- some actions dont need from a specific function
+  end
+end

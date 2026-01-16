@@ -14,6 +14,7 @@ return {
   {
     "christoomey/vim-tmux-navigator",
     lazy = true,
+    event = "VeryLazy",
     cmd = {
       "TmuxNavigateLeft",
       "TmuxNavigateDown",
@@ -29,5 +30,11 @@ return {
       { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
       { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
     },
+  },
+  {
+    "jonboh/wezterm-mux.nvim",
+    event = "VeryLazy",
+    lazy = true,
+    priority = 1000,
   },
 }
