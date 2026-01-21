@@ -1,0 +1,132 @@
+{
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "general": {
+    "previewFeatures": true,
+    "vimMode": true,
+    "enablePromptCompletion": true,
+    "preferredEditor": "neovim"
+  },
+  "ui": {
+    "theme": "rose-pine-dawn",
+    "customThemes": {
+      "Catppuccin Mocha": {
+        "name": "Catppuccin Mocha",
+        "type": "custom",
+        "Background": "#1e1e2e",
+        "Foreground": "#cdd6f4",
+        "LightBlue": "#89dceb",
+        "AccentBlue": "#89b4fa",
+        "AccentPurple": "#cba6f7",
+        "AccentCyan": "#94e2d5",
+        "AccentGreen": "#a6e3a1",
+        "AccentYellow": "#f9e2af",
+        "AccentRed": "#f38ba8",
+        "Comment": "#9399b2",
+        "Gray": "#7f849c",
+        "DiffAdded": "#546d5c",
+        "DiffRemoved": "#734a5f",
+        "GradientColors": [
+          "#89b4fa",
+          "#cba6f7",
+          "#f38ba8"
+        ]
+      },
+      "Catppuccin Latte": {
+        "name": "Catppuccin Latte",
+        "type": "custom",
+        "Background": "#eff1f5",
+        "Foreground": "#4c4f69",
+        "LightBlue": "#04a5e5",
+        "AccentBlue": "#1e66f5",
+        "AccentPurple": "#8839ef",
+        "AccentCyan": "#179299",
+        "AccentGreen": "#40a02b",
+        "AccentYellow": "#df8e1d",
+        "AccentRed": "#d20f39",
+        "Comment": "#7c7f93",
+        "Gray": "#8c8fa1",
+        "DiffAdded": "#a9d1a4",
+        "DiffRemoved": "#e397aa",
+        "GradientColors": [
+          "#1e66f5",
+          "#8839ef",
+          "#d20f39"
+        ]
+      },
+      "rose-pine": {
+        "name": "Rosé Pine",
+        "type": "custom",
+        "Background": "#191724",
+        "Foreground": "#e0def4",
+        "LightBlue": "#e0def4",
+        "AccentBlue": "#eb6f92",
+        "AccentPurple": "#c4a7e7",
+        "AccentCyan": "#31748f",
+        "AccentGreen": "#9ccfd8",
+        "AccentYellow": "#f6c177",
+        "AccentRed": "#ebbcba",
+        "Comment": "#908caa",
+        "Gray": "#6e6a86",
+        "DiffAdded": "#9ccfd8",
+        "DiffRemoved": "#eb6f92",
+        "GradientColors": [
+          "#9ccfd8",
+          "#c4a7e7",
+          "#ebbcba"
+        ]
+      },
+      "rose-pine-moon": {
+        "name": "Rosé Pine Moon",
+        "type": "custom",
+        "Background": "#232136",
+        "Foreground": "#e0def4",
+        "LightBlue": "#e0def4",
+        "AccentBlue": "#eb6f92",
+        "AccentPurple": "#c4a7e7",
+        "AccentCyan": "#3e8fb0",
+        "AccentGreen": "#9ccfd8",
+        "AccentYellow": "#f6c177",
+        "AccentRed": "#ea9a97",
+        "Comment": "#908caa",
+        "Gray": "#6e6a86",
+        "DiffAdded": "#9ccfd8",
+        "DiffRemoved": "#eb6f92",
+        "GradientColors": [
+          "#9ccfd8",
+          "#c4a7e7",
+          "#ea9a97"
+        ]
+      },
+      "rose-pine-dawn": {
+        "name": "Rosé Pine Dawn",
+        "type": "custom",
+        "Background": "#faf4ed",
+        "Foreground": "#575279",
+        "LightBlue": "#575279",
+        "AccentBlue": "#b4637a",
+        "AccentPurple": "#907aa9",
+        "AccentCyan": "#286983",
+        "AccentGreen": "#56949f",
+        "AccentYellow": "#ea9d34",
+        "AccentRed": "#d7827e",
+        "Comment": "#797593",
+        "Gray": "#9893a5",
+        "DiffAdded": "#56949f",
+        "DiffRemoved": "#b4637a",
+        "GradientColors": [
+          "#56949f",
+          "#907aa9",
+          "#d7827e"
+        ]
+      }
+    },
+    "showModelInfoInChat": false
+  },
+  "output": {
+    "format": "text"
+  }
+}
