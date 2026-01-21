@@ -11,7 +11,7 @@
     "preferredEditor": "neovim"
   },
   "ui": {
-    "theme": "rose-pine-dawn",
+    "theme": "Catppuccin Latte",
     "customThemes": {
       "Catppuccin Mocha": {
         "name": "Catppuccin Mocha",
