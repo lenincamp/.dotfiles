@@ -41,6 +41,10 @@ bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 bindkey '^[w' kill-region
 bindkey "^O" fzf-cd-widget
+bindkey '^r' atuin-search
+# bind to the up key, which depends on terminal mode
+bindkey '^[[A' atuin-up-search
+bindkey '^[OA' atuin-up-search
 unset LAST_LOGIN
 #######################################################################################
 # History
