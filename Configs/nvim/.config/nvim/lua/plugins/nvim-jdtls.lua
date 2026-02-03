@@ -16,7 +16,7 @@ return {
           enabled = true,
           settings = {
             url = home .. "/.config/nvim/SofiProjectsStyle.xml",
-            profile = "GoogleStyle",
+            profile = "Patagonia-Style",
           },
         },
         signatureHelp = { enabled = true },
