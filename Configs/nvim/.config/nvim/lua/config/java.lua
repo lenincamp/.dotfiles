@@ -118,6 +118,32 @@ function _G.java_keymaps(bufnr)
   --vsc test
   vim.keymap.set("n", "<leader>Ju", "<Cmd>JdtUpdateConfig<CR>", { desc = "[J]ava [U]pdate Config" })
 
+  -- open deccompiled java files on snacks explorer
+  vim.keymap.set("n", "<leader>Jd", function()
+    require("snacks").explorer.open({
+      cwd = vim.fn.expand("$HOME/.cache/java-decompiled/"),
+    })
+  end, { desc = "Java: Explore decompiled Jars" })
+
+  -- find explicit text on decompiled java files with snacks grep
+  vim.keymap.set("n", "<leader>Jg", function()
+    require("snacks").picker.grep({
+      dirs = {
+        vim.fn.expand("$HOME/.cache/java-decompiled/"),
+      },
+    })
+  end, { desc = "Java: Grep decompiled Jars" })
+
+  -- find text in the project and decompiled java files with snacks grep
+  vim.keymap.set("n", "<leader>JG", function()
+    require("snacks").picker.grep({
+      dirs = {
+        vim.fn.getcwd(),
+        vim.fn.expand("$HOME/.cache/java-decompiled/"),
+      },
+    })
+  end, { desc = "Java: Grep project + Jars" })
+
   if vim.api.nvim_buf_is_valid(bufnr) then
     -- nvim-dap
     vim.keymap.set("n", "<leader>dbl", function()

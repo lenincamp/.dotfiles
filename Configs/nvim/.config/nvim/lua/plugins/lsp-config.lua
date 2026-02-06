@@ -11,12 +11,12 @@ return {
         settings = {
           javascript = {
             preferences = {
-              importModuleSpecifier = "absolute",
+              importModuleSpecifier = "non-relative",
             },
           },
           typescript = {
             preferences = {
-              importModuleSpecifier = "absolute",
+              importModuleSpecifier = "non-relative",
             },
           },
         },

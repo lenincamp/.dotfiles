@@ -67,11 +67,11 @@ return {
             {
               name = "Java-17",
               path = home .. "Library/Java/JavaVirtualMachines/azul-17.0.10/Contents/Home",
-              default = true,
             },
             {
               name = "Java-21",
               path = brew_path .. "/openjdk@21/21.0.9/libexec/openjdk.jdk/Contents/Home",
+              default = true,
             },
             {
               name = "Java-1.8",
