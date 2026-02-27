@@ -70,7 +70,7 @@ return {
             },
             {
               name = "Java-21",
-              path = brew_path .. "/openjdk@21/21.0.9/libexec/openjdk.jdk/Contents/Home",
+              path = brew_path .. "/openjdk@21/21.0.10/libexec/openjdk.jdk/Contents/Home",
               default = true,
             },
             {
