@@ -8,7 +8,12 @@
     "previewFeatures": true,
     "vimMode": true,
     "enablePromptCompletion": true,
-    "preferredEditor": "neovim"
+    "preferredEditor": "neovim",
+    "sessionRetention": {
+      "warningAcknowledged": true,
+      "enabled": true,
+      "maxAge": "30d"
+    }
   },
   "ui": {
     "theme": "Catppuccin Latte",
