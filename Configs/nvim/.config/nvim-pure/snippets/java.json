@@ -1,0 +1,142 @@
+{
+  "System.out.println": {
+    "prefix": ["sout", "println"],
+    "body": ["System.out.println($0);"],
+    "description": "System.out.println"
+  },
+  "System.err.println": {
+    "prefix": ["serr"],
+    "body": ["System.err.println($0);"],
+    "description": "System.err.println"
+  },
+  "log.debug": {
+    "prefix": ["logd"],
+    "body": ["log.debug(\"${1:message}\", $0);"],
+    "description": "log.debug(msg, args)"
+  },
+  "log.info": {
+    "prefix": ["logi"],
+    "body": ["log.info(\"${1:message}\", $0);"],
+    "description": "log.info(msg, args)"
+  },
+  "log.warn": {
+    "prefix": ["logw"],
+    "body": ["log.warn(\"${1:message}\", $0);"],
+    "description": "log.warn(msg, args)"
+  },
+  "log.error": {
+    "prefix": ["loge"],
+    "body": ["log.error(\"${1:message}\", $0);"],
+    "description": "log.error(msg, args)"
+  },
+  "log.error with exception": {
+    "prefix": ["logex"],
+    "body": ["log.error(\"${1:message}\", ${2:e});$0"],
+    "description": "log.error(msg, exception)"
+  },
+  "for index loop": {
+    "prefix": ["fori"],
+    "body": [
+      "for (int ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {",
+      "    $0",
+      "}"
+    ],
+    "description": "for (int i = 0; i < n; i++)"
+  },
+  "for each loop": {
+    "prefix": ["fore", "foreach"],
+    "body": [
+      "for (${1:Object} ${2:item} : ${3:collection}) {",
+      "    $0",
+      "}"
+    ],
+    "description": "for (Type item : collection)"
+  },
+  "if not null": {
+    "prefix": ["ifnn"],
+    "body": [
+      "if (${1:obj} != null) {",
+      "    $0",
+      "}"
+    ],
+    "description": "if (x != null)"
+  },
+  "if null": {
+    "prefix": ["ifnull"],
+    "body": [
+      "if (${1:obj} == null) {",
+      "    $0",
+      "}"
+    ],
+    "description": "if (x == null)"
+  },
+  "Optional.ofNullable": {
+    "prefix": ["opt"],
+    "body": ["Optional.ofNullable(${1:value})$0"],
+    "description": "Optional.ofNullable(value)"
+  },
+  "try-catch": {
+    "prefix": ["trycatch", "tc"],
+    "body": [
+      "try {",
+      "    $0",
+      "} catch (${1:Exception} ${2:e}) {",
+      "    log.error(\"${3:Error: }\", ${2:e});",
+      "}"
+    ],
+    "description": "try { } catch (Exception e)"
+  },
+  "throw new RuntimeException": {
+    "prefix": ["throw"],
+    "body": ["throw new ${1:RuntimeException}(\"${2:message}\");$0"],
+    "description": "throw new RuntimeException"
+  },
+  "@Test method": {
+    "prefix": ["test"],
+    "body": [
+      "@Test",
+      "void ${1:should_doSomething_whenCondition}() {",
+      "    $0",
+      "}"
+    ],
+    "description": "@Test void method"
+  },
+  "main method": {
+    "prefix": ["main", "psvm"],
+    "body": [
+      "public static void main(String[] args) {",
+      "    $0",
+      "}"
+    ],
+    "description": "public static void main"
+  },
+  "public static final": {
+    "prefix": ["psf"],
+    "body": ["public static final ${1:String} ${2:NAME} = ${3:value};$0"],
+    "description": "public static final"
+  },
+  "private final field": {
+    "prefix": ["pf"],
+    "body": ["private final ${1:Type} ${2:field};$0"],
+    "description": "private final field"
+  },
+  "var (local variable)": {
+    "prefix": ["var"],
+    "body": ["var ${1:name} = ${2:value};$0"],
+    "description": "var name = value (Java 10+)"
+  },
+  "stream().filter().collect": {
+    "prefix": ["stream"],
+    "body": [
+      "${1:list}.stream()",
+      "    .filter(${2:x} -> $3)",
+      "    .collect(Collectors.toList())$0"
+    ],
+    "description": "stream().filter().collect()"
+  },
+  "Objects.requireNonNull": {
+    "prefix": ["requirenn", "rnn"],
+    "body": ["Objects.requireNonNull(${1:value}, \"${2:field} must not be null\");$0"],
+    "description": "Objects.requireNonNull"
+  }
+}

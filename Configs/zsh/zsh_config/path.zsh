@@ -10,6 +10,10 @@
 # export ARCHFLAGS="-arch x86_64"
 
 export LANG=en_US.UTF-8
+
+# Ensure Homebrew bin is early in PATH (for tools like atuin, starship, etc.)
+export PATH="/opt/homebrew/bin:$PATH"
+
 export PATH="$HOME/.jenv/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 #petersen
