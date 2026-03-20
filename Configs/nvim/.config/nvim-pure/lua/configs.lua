@@ -104,7 +104,7 @@ vim.cmd([[let g:loaded_python3_provider = 0]])
 
 -- Large file defaults (will be overridden per-buffer in autocmds.lua)
 opt.lazyredraw = false  -- enable per-buffer when large file detected
-opt.updatetime = 200    -- default (1000ms when large file detected)
+opt.updatetime = 100    -- default (1000ms when large file detected)
 opt.undolevels = 1000   -- default (100 when large file detected)
 
 -- ── Diff algorithm ────────────────────────────────────────────────────────────
