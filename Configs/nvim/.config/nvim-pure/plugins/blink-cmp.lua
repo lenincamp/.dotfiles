@@ -6,24 +6,24 @@ require("blink.cmp").setup({
 
   -- ── Keymaps ─────────────────────────────────────────────────────────────────
   keymap = {
-    preset = "none",
-    ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
-    ["<C-e>"] = { "hide", "fallback" },
-    ["<C-y>"] = { "select_and_accept", "fallback" },
-    ["<Up>"] = { "select_prev", "fallback" },
-    ["<Down>"] = { "select_next", "fallback" },
-    ["<C-p>"] = { "select_prev", "fallback_to_mappings" },
-    ["<C-n>"] = { "select_next", "fallback_to_mappings" },
-    ["<C-b>"] = { "scroll_documentation_up", "fallback" },
-    ["<C-f>"] = { "scroll_documentation_down", "fallback" },
-    ["<Tab>"] = { "snippet_forward", "fallback" },
-    ["<S-Tab>"] = { "snippet_backward", "fallback" },
-    ["<C-k>"] = { "show_signature", "hide_signature", "fallback" },
-    ["<CR>"]  = { "accept", "fallback" },
-
-    -- Documentation scroll (half page — easier for large Copilot suggestions)
-    ['<C-u>'] = { 'scroll_signature_up', 'fallback' },
-    ['<C-d>'] = { 'scroll_signature_down', 'fallback' },
+    preset = "default",
+    -- ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+    -- ["<C-e>"] = { "hide", "fallback" },
+    -- ["<C-y>"] = { "select_and_accept", "fallback" },
+    -- ["<Up>"] = { "select_prev", "fallback" },
+    -- ["<Down>"] = { "select_next", "fallback" },
+    -- ["<C-p>"] = { "select_prev", "fallback_to_mappings" },
+    -- ["<C-n>"] = { "select_next", "fallback_to_mappings" },
+    -- ["<C-b>"] = { "scroll_documentation_up", "fallback" },
+    -- ["<C-f>"] = { "scroll_documentation_down", "fallback" },
+    -- ["<Tab>"] = { "snippet_forward", "fallback" },
+    -- ["<S-Tab>"] = { "snippet_backward", "fallback" },
+    -- ["<C-k>"] = { "show_signature", "hide_signature", "fallback" },
+    -- ["<CR>"]  = { "accept", "fallback" },
+    --
+    -- -- Documentation scroll (half page — easier for large Copilot suggestions)
+    -- ['<C-u>'] = { 'scroll_signature_up', 'fallback' },
+    -- ['<C-d>'] = { 'scroll_signature_down', 'fallback' },
 
     -- Toggle doc window visibility (see full suggestion or hide to focus)
     -- ["<M-d>"] = { "show_documentation", "hide_documentation" },
@@ -47,7 +47,7 @@ require("blink.cmp").setup({
       },
     },
     documentation = {
-      auto_show          = true,
+      auto_show          = false,
       auto_show_delay_ms = 200,
       -- ── Documentation window — optimised for long Copilot suggestions ──────
       -- Copilot can generate full functions (50-100+ lines).
@@ -153,13 +153,13 @@ require("blink.cmp").setup({
   -- ── Sources ───────────────────────────────────────────────────────────────
 
   sources = {
-    default = { "lsp", "copilot", "path", "snippets", "buffer" },
+    default = { "copilot", "lsp", "path", "snippets", "buffer" },
     providers = {
       -- Copilot source via blink-copilot
       copilot = {
         name         = "copilot",
         module       = "blink-copilot",
-        score_offset = 50,         -- below LSP but above path/buffer
+        score_offset = 100,         -- below LSP but above path/buffer
         async        = true,
         opts = {
           max_completions = 3,
@@ -168,7 +168,7 @@ require("blink.cmp").setup({
           -- Use the SAME icon as appearance.kind_icons.Copilot to avoid conflicts
           kind_icon   = "󰚩",
           -- Reduce debounce for faster suggestions (default is 200ms)
-          debounce    = 75,
+          debounce    = 30,
           auto_refresh = {
             -- Re-fetch when cursor moves within a word (faster feel)
             enabled = true,

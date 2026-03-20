@@ -53,7 +53,17 @@ end
 
 -- ── JVM command ────────────────────────────────────────────────────────────────
 
-local cmd = { "jdtls", "-data", workspace_dir }
+local cmd = {
+    "jdtls",
+    "-vmargs",
+    "-Xms512m",
+    "-Xmx3G",
+    "-XX:+UseG1GC",
+    "-XX:MaxGCPauseMillis=200",
+    "-XX:+UseStringDeduplication",
+    "-data",
+    workspace_dir
+}
 if lombok_jar ~= "" and vim.fn.filereadable(lombok_jar) == 1 then
   -- Only -javaagent is needed for Lombok on Java 9+.
   -- -Xbootclasspath/a is deprecated since Java 9 and causes
@@ -80,7 +90,7 @@ end
 local ext_caps = vim.deepcopy(jdtls.extendedClientCapabilities)
 
 -- ── Config ─────────────────────────────────────────────────────────────────────
-
+local jdtls_state = { dap_configured = false }
 local config = {
   cmd          = cmd,
   root_dir     = root_dir,
@@ -88,7 +98,7 @@ local config = {
 
   -- Faster document sync; allow_incremental_sync reduces CPU on large files
   flags = {
-    debounce_text_changes  = 150,
+    debounce_text_changes  = 300,
     allow_incremental_sync = true,
   },
 
@@ -102,15 +112,15 @@ local config = {
     java = {
 
       -- ── Sources & decompiler ──────────────────────────────────────────────
-      eclipse       = { downloadSources = true },
-      maven         = { downloadSources = true, updateSnapshots = true },
-      gradle        = { enabled = true, downloadSources = true },
+      -- eclipse       = { downloadSources = true },
+      maven         = { enabled = true, downloadSources = true, updateSnapshots = false },
+      gradle        = { enabled = false, downloadSources = true },
       contentProvider = { preferred = "fernflower" },  -- best decompiler
       references    = { includeDecompiledSources = true },
 
       -- ── Indexing & build ──────────────────────────────────────────────────
-      autobuild = { enabled = true },   -- rebuild on save (like IntelliJ auto-make)
-      maxConcurrentBuilds = 4,          -- parallel compilation units
+      autobuild = { enabled = false },   -- rebuild on save (like IntelliJ auto-make)
+      maxConcurrentBuilds = 1,          -- parallel compilation units
 
       -- Exclude noise from project indexing (speeds up initial scan)
       import = {
@@ -119,13 +129,23 @@ local config = {
           "**/.metadata/**",
           "**/archetype-resources/**",
           "**/META-INF/maven/**",
+          "**/target/**",
+          "**/build/**",
+          "**/.gradle/**",
+          "**/.idea/**",
+          "**/.git/**",
+          "**/dist/**",
+          "**/out/**",
+          "**/frontend/**",
+          "**/cybo/**",
+          "**/tools/**",
         },
         maven  = { enabled = true },
-        gradle = { enabled = true },
+        gradle = { enabled = false },
       },
 
       configuration = {
-        updateBuildConfiguration = "automatic",  -- was "interactive" — auto-update
+        updateBuildConfiguration = "interactive",  -- was "interactive" — auto-update
         runtimes = {
           {
             name = "JavaSE-1.8",
@@ -153,7 +173,7 @@ local config = {
       completion = {
         enabled          = true,
         overwrite        = false,     -- insert, not overwrite existing word
-        guessMethodArguments = true,  -- auto-fill method arg types
+        guessMethodArguments = false,  -- auto-fill method arg types
         favoriteStaticMembers = {
           "org.hamcrest.MatcherAssert.assertThat",
           "org.hamcrest.Matchers.*",
@@ -188,13 +208,13 @@ local config = {
       },
 
       -- ── Code lens (like IntelliJ gutter icons) ───────────────────────────
-      implementationsCodeLens = { enabled = true },
-      referencesCodeLens      = { enabled = true },
+      implementationsCodeLens = { enabled = false },
+      referencesCodeLens      = { enabled = false },
 
       -- ── Inlay hints (IntelliJ parameter hints) ────────────────────────────
       inlayHints = {
         parameterNames = {
-          enabled          = "all",      -- show for all methods
+          enabled          = "literals",--"all",      -- show for all methods
           exclusions       = {},
         },
       },
@@ -241,30 +261,39 @@ local config = {
 
   -- ── on_attach ──────────────────────────────────────────────────────────────
 
-  on_attach = function(_, bufnr)
+  on_attach = function(client, bufnr)
     if not vim.api.nvim_buf_is_valid(bufnr) then return end
+    -- Disable expensive semantic tokens
+    client.server_capabilities.semanticTokensProvider = nil
+
+    -- Disable inlay hints if enabled
+    if client.server_capabilities.inlayHintProvider then
+        vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
+    end
+    -- Java utility keymaps (test runners, DAP, Snacks explorer, …)
+    local ok_java, java = pcall(require, "java")
+    if ok_java and type(java.java_keymaps) == "function" then
+        java.java_keymaps(bufnr)
+    end
 
     -- DAP main-class launcher
     local ok_dap, jdtls_dap = pcall(require, "jdtls.dap")
     if ok_dap then
       jdtls_dap.setup_dap_main_class_configs({
         config_overrides = {
-          vmArgs      = "-Xmx2g -XX:+UseG1GC",
+          vmArgs      = "-Xmx1g -XX:+UseG1GC -Dfile.encoding=UTF-8",
           console     = "integratedTerminal",
           stopOnEntry = false,
           stepFilters = {
-            skipClasses = {},
-            skipSynthetics = false,
+            skipClasses = {"java.*", "javax.*", "sun.*", "com.sun.*", "jdk.*", "org.slf4j.*", "ch.qos.logback.*"},
+            skipSynthetics = true,
             skipConstructors = false,
-            skipStaticInitializers = false,
+            skipStaticInitializers = true,
           },
         },
       })
     end
-
-    -- Java utility keymaps (test runners, DAP, Snacks explorer, …)
-    local ok_java, java = pcall(require, "java")
-    if ok_java then java.java_keymaps(bufnr) end
+    jdtls_state.dap_configured = true
   end,
 
   -- Test runner JVM flags

@@ -12,8 +12,12 @@ keybind = global:ctrl+grave_accent=toggle_quick_terminal
 clipboard-paste-protection = false
 copy-on-select = true
 font-size = 15
-font-family = Maple Mono NF
+# font-family = Maple Mono NF
+font-family="0xProto Nerd Font Mono"
 font-synthetic-style=true
+font-feature = zero
+font-feature = ss01
+font-feature = cv05
 theme = light:catppuccin-latte,dark:catppuccin-mocha
 cursor-style = block
 cursor-style-blink = true

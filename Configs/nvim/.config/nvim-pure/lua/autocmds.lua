@@ -299,7 +299,7 @@ vim.api.nvim_create_autocmd("BufLeave", {
     local file_size = vim.fn.getfsize(vim.fn.expand("%"))
     if file_size > LARGE_FILE_THRESHOLD then
       vim.opt.lazyredraw = false
-      vim.opt.updatetime = 200  -- Default
+      vim.opt.updatetime = 100  -- Default
       set_number_options_for_buf(args.buf, true, true)
     end
   end,
@@ -351,7 +351,7 @@ end, { desc = "Disable highlighting/LSP for large JSON" })
 
 vim.api.nvim_create_user_command("JsonOptimizeOff", function()
   vim.opt.lazyredraw = false
-  vim.opt.updatetime = 200
+  vim.opt.updatetime = 100
   pcall(vim.treesitter.start, 0)
   vim.cmd("syntax on")
   detach_all_lsp_clients(0)

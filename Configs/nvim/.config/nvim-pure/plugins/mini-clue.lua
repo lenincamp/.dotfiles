@@ -158,6 +158,7 @@ clue.setup({
     { mode = "n", keys = "<Leader>ut",     desc = "Toggle Transparent Background" },
     { mode = "n", keys = "<Leader>ug",     desc = "Toggle Grep Layout (IntelliJ)" },
     { mode = "n", keys = "<Leader>ui",     desc = "Toggle Cmdline Info (ruler/showcmd)" },
+    { mode = "n", keys = "<Leader>uI",     desc = "Toggle IndentScope" },
 
     -- Windows
     { mode = "n", keys = "<Leader>w",      desc = "+Windows" },
@@ -233,3 +234,11 @@ clue.setup({
     scroll_up   = "<C-u>",
   },
 })
+
+-- Toggle mini.indentscope globally. When re-enabled the per-buffer autocmd
+-- (in mini-indentscope.lua) will re-evaluate on the next BufWinEnter/FileType.
+vim.keymap.set("n", "<Leader>uI", function()
+  vim.g.miniindentscope_disable = not vim.g.miniindentscope_disable
+  local state = vim.g.miniindentscope_disable and "disabled" or "enabled"
+  vim.notify("IndentScope " .. state, vim.log.levels.INFO)
+end, { desc = "Toggle IndentScope" })
