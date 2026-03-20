@@ -2,3 +2,11 @@
 **/session/
 **/complex_modifications/
 settings.local.json
+
+# agents — project-specific / private (not tracked in dotfiles)
+Configs/agents/.agents/projects/
+Configs/agents/.agents/skills/patagonia-cdp/
+Configs/agents/.agents/.skill-lock.json
+
+# mcp — node_modules excluded, code is tracked
+Configs/agents/.agents/mcp/**/node_modules/

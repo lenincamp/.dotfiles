@@ -153,16 +153,41 @@ local function move_pane_key(direction)
 		if is_vim(pane) then
 			window:perform_action(act.SendKey({ key = dir_to_key[direction], mods = "CTRL" }), pane)
 		elseif is_tab_zoomed(window) then
+			-- write_zoom_state runs AFTER all three actions complete so Neovim reads
+			-- accurate state on the very next navigation (no stale-file window)
 			window:perform_action(
-				act.Multiple({ act.TogglePaneZoomState, act.ActivatePaneDirection(direction), act.TogglePaneZoomState }),
+				act.Multiple({
+					act.TogglePaneZoomState,
+					act.ActivatePaneDirection(direction),
+					act.TogglePaneZoomState,
+					wezterm.action_callback(function(win, _) write_zoom_state(win) end),
+				}),
 				pane
 			)
-			write_zoom_state(window)
 		else
 			window:perform_action(act.ActivatePaneDirection(direction), pane)
 		end
 	end)
 end
+
+-- ── Navigation: cross-pane zoom (triggered from Neovim's smart-splits) ──────
+--
+-- Neovim sends OSC 1337 SetUserVar=WEZTERM_ZOOM_NAV=<base64-direction> when
+-- it hits a Neovim window edge while the pane is zoomed. We mirror exactly
+-- what move_pane_key does for non-vim zoomed panes.
+
+wezterm.on("user-var-changed", function(window, pane, name, value)
+	if name ~= "WEZTERM_ZOOM_NAV" then return end
+	window:perform_action(
+		act.Multiple({
+			act.TogglePaneZoomState,
+			act.ActivatePaneDirection(value),
+			act.TogglePaneZoomState,
+			wezterm.action_callback(function(win, _) write_zoom_state(win) end),
+		}),
+		pane
+	)
+end)
 
 -- ── Session actions ─────────────────────────────────────────────────────────
 
@@ -257,8 +282,13 @@ config.keys = {
 	{
 		key = "m", mods = "LEADER",
 		action = wezterm.action_callback(function(window, pane)
-			window:perform_action(act.TogglePaneZoomState, pane)
-			write_zoom_state(window)
+			window:perform_action(
+				act.Multiple({
+					act.TogglePaneZoomState,
+					wezterm.action_callback(function(win, _) write_zoom_state(win) end),
+				}),
+				pane
+			)
 		end),
 	},
 
