@@ -7,6 +7,8 @@
 
 local M = {}
 local dirty = false  -- only true when user modifies breakpoints this session
+local dap_mutators_patched = false
+local active_project_key = nil
 
 -- ── Storage helpers ───────────────────────────────────────────────────────────
 
@@ -39,14 +41,20 @@ local function legacy_project_key()
   return vim.fn.sha256(root):sub(1, 12)
 end
 
-local function bp_path()  return data_dir() .. "/" .. project_key() .. ".json" end
-local function meta_path() return data_dir() .. "/" .. project_key() .. ".meta.json" end
-local function legacy_bp_path() return data_dir() .. "/" .. legacy_project_key() .. ".json" end
+local function bp_path(key)
+  return data_dir() .. "/" .. (key or project_key()) .. ".json"
+end
+local function meta_path(key)
+  return data_dir() .. "/" .. (key or project_key()) .. ".meta.json"
+end
+local function legacy_bp_path()
+  return data_dir() .. "/" .. legacy_project_key() .. ".json"
+end
 
 -- ── Group metadata ────────────────────────────────────────────────────────────
 
-local function load_meta()
-  local f = io.open(meta_path(), "r")
+local function load_meta(key)
+  local f = io.open(meta_path(key), "r")
   if not f then return {} end
   local raw = f:read("*a")
   f:close()
@@ -54,8 +62,8 @@ local function load_meta()
   return ok and t or {}
 end
 
-local function save_meta(meta)
-  local f = io.open(meta_path(), "w")
+local function save_meta(meta, key)
+  local f = io.open(meta_path(key), "w")
   if f then f:write(vim.json.encode(meta)); f:close() end
 end
 
@@ -66,19 +74,22 @@ end
 
 -- nvim-dap can return nested breakpoint tables (grouped by line).
 -- Normalize to a flat list of breakpoint entries for persistence and UI.
-local function iter_breakpoints(list, on_bp)
+local function iter_breakpoints(list, on_bp, seen, depth)
   if type(list) ~= "table" then return end
+  depth = depth or 0
+  if depth > 4 then return end  -- guard against unexpected deep nesting
+  seen = seen or {}
+  if seen[list] then return end
+  seen[list] = true
+
+  if type(list.line) == "number" then
+    on_bp(list)
+    return
+  end
+
   for _, item in ipairs(list) do
     if type(item) == "table" then
-      if item.line then
-        on_bp(item)
-      else
-        for _, nested in ipairs(item) do
-          if type(nested) == "table" and nested.line then
-            on_bp(nested)
-          end
-        end
-      end
+      iter_breakpoints(item, on_bp, seen, depth + 1)
     end
   end
 end
@@ -90,41 +101,71 @@ function M.mark_dirty()
   dirty = true
 end
 
-function M.save()
-  if not dirty then return end
+function M.save(opts)
+  opts = opts or {}
+  if not dirty and not opts.force then return end
+  local key = opts.key or active_project_key or project_key()
   local ok_dap, _ = pcall(require, "dap")
   if not ok_dap then return end
   local bp_mod = require("dap.breakpoints")
 
   local all  = bp_mod.get()
   local data = {}
+  local live_keys = {}
   for bufnr, list in pairs(all) do
+    if type(bufnr) ~= "number" then goto continue end
     local fname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":p")
     if fname ~= "" then
       local out = {}
       iter_breakpoints(list, function(bp)
+        if type(bp.line) ~= "number" then return end
         out[#out + 1] = {
           line         = bp.line,
           condition    = bp.condition,
           logMessage   = bp.logMessage,
           hitCondition = bp.hitCondition,
         }
+        live_keys[bp_key(fname, bp.line)] = true
       end)
       if #out > 0 then data[fname] = out end
     end
+    ::continue::
   end
 
-  local f = io.open(bp_path(), "w")
-  if f then f:write(vim.json.encode(data)); f:close() end
+  if next(data) == nil then
+    os.remove(bp_path(key))
+  else
+    local f = io.open(bp_path(key), "w")
+    if f then f:write(vim.json.encode(data)); f:close() end
+  end
+
+  -- Drop group metadata for breakpoints that no longer exist.
+  local meta = load_meta(key)
+  local changed = false
+  for meta_key, _ in pairs(meta) do
+    if not live_keys[meta_key] then
+      meta[meta_key] = nil
+      changed = true
+    end
+  end
+  if changed then
+    save_meta(meta, key)
+  end
+
+  dirty = false
 end
 
 -- ── Load ─────────────────────────────────────────────────────────────────────
 
-function M.load()
+function M.load(opts)
+  opts = opts or {}
+  local key = opts.key or project_key()
+
   local ok_dap, _ = pcall(require, "dap")
   if not ok_dap then return end
+  local bp_mod = require("dap.breakpoints")
 
-  local path = bp_path()
+  local path = bp_path(key)
   local f = io.open(path, "r")
   if not f then
     local old = legacy_bp_path()
@@ -133,14 +174,24 @@ function M.load()
       path = old
     end
   end
-  if not f then return end
+  if not f then
+    bp_mod.clear()
+    active_project_key = key
+    dirty = false
+    return
+  end
   local raw = f:read("*a")
   f:close()
 
   local ok, data = pcall(vim.json.decode, raw)
-  if not ok or not data then return end
+  if not ok or not data then
+    vim.notify("Failed decoding breakpoints file: " .. bp_path(key), vim.log.levels.WARN)
+    bp_mod.clear()
+    active_project_key = key
+    dirty = false
+    return
+  end
 
-  local bp_mod = require("dap.breakpoints")
   bp_mod.clear()
   local count = 0
   local silently_loaded = {}
@@ -148,25 +199,33 @@ function M.load()
   -- hasn't opened. bufload is needed so line counts are correct for placement.
   local saved_ei = vim.o.eventignore
   vim.o.eventignore = "FileType,BufReadPost,BufEnter,BufWinEnter"
-  for fname, list in pairs(data) do
-    if vim.fn.filereadable(fname) == 1 then
-      local bufnr = vim.fn.bufadd(fname)
-      vim.fn.bufload(bufnr)
-      silently_loaded[#silently_loaded + 1] = bufnr
-      iter_breakpoints(list, function(bp)
-        if not bp.line then return end
-        -- nvim-dap toggle() uses snake_case keys internally,
-        -- but get() returns camelCase. Map back to snake_case.
-        bp_mod.set({
-          condition    = bp.condition,
-          log_message  = bp.logMessage,
-          hit_condition = bp.hitCondition,
-        }, bufnr, bp.line)
-        count = count + 1
-      end)
+
+  local ok_apply, err = pcall(function()
+    for fname, list in pairs(data) do
+      if vim.fn.filereadable(fname) == 1 then
+        local bufnr = vim.fn.bufadd(fname)
+        vim.fn.bufload(bufnr)
+        silently_loaded[#silently_loaded + 1] = bufnr
+        iter_breakpoints(list, function(bp)
+          if type(bp.line) ~= "number" then return end
+          -- nvim-dap toggle() uses snake_case keys internally,
+          -- but get() returns camelCase. Map back to snake_case.
+          bp_mod.set({
+            condition    = bp.condition,
+            log_message  = bp.logMessage,
+            hit_condition = bp.hitCondition,
+          }, bufnr, bp.line)
+          count = count + 1
+        end)
+      end
     end
-  end
+  end)
+
   vim.o.eventignore = saved_ei
+  if not ok_apply then
+    vim.notify("Failed loading breakpoints: " .. tostring(err), vim.log.levels.WARN)
+    return
+  end
 
   -- Re-arm filetype detection: when the user actually opens one of these
   -- buffers, BufWinEnter fires and triggers normal filetype detection.
@@ -184,6 +243,9 @@ function M.load()
       vim.fn.fnamemodify(project_root(), ":t")
     ), vim.log.levels.INFO)
   end
+
+  active_project_key = key
+  dirty = false
 end
 
 -- ── Assign group ─────────────────────────────────────────────────────────────
@@ -198,8 +260,10 @@ function M.assign_group()
   local line  = vim.api.nvim_win_get_cursor(0)[1]
   local fname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":p")
 
+  local bp_mod = require("dap.breakpoints")
+  local by_buf = bp_mod.get(bufnr) or {}
   local has_bp = false
-  iter_breakpoints(require("dap.breakpoints").get(bufnr) or {}, function(bp)
+  iter_breakpoints(by_buf[bufnr] or by_buf, function(bp)
     if (not has_bp) and bp.line == line then has_bp = true end
   end)
   if not has_bp then
@@ -209,11 +273,43 @@ function M.assign_group()
 
   vim.ui.input({ prompt = "Breakpoint group: " }, function(group)
     if not group or group == "" then return end
-    local meta = load_meta()
+    local meta = load_meta(active_project_key)
     meta[bp_key(fname, line)] = group
-    save_meta(meta)
+    save_meta(meta, active_project_key)
     vim.notify("Breakpoint → group «" .. group .. "»", vim.log.levels.INFO)
   end)
+end
+
+local function patch_dap_mutators()
+  if dap_mutators_patched then return end
+  local ok_dap, dap_mod = pcall(require, "dap")
+  if not ok_dap then return end
+
+  -- Use DAP's own listener system instead of monkey-patching functions.
+  -- This is safer with other plugins that also wrap dap methods.
+  local BP_DIRTY_ID = "nvim-pure-bp-dirty"
+  dap_mod.listeners.after.event_stopped[BP_DIRTY_ID] = function() end  -- no-op placeholder
+
+  -- Mark dirty on any breakpoint change via the breakpoints module event
+  local bp_mod = require("dap.breakpoints")
+  if bp_mod.subscribe then
+    bp_mod.subscribe(function() M.mark_dirty() end)
+  else
+    -- Fallback: lightweight wrapping only if subscribe API unavailable
+    local function wrap(name)
+      local orig = dap_mod[name]
+      if type(orig) ~= "function" then return end
+      dap_mod[name] = function(...)
+        orig(...)
+        M.mark_dirty()
+      end
+    end
+    wrap("toggle_breakpoint")
+    wrap("set_breakpoint")
+    wrap("clear_breakpoints")
+  end
+
+  dap_mutators_patched = true
 end
 
 -- ── Picker: browse all breakpoints grouped ───────────────────────────────────
@@ -225,7 +321,7 @@ function M.picker()
   if not ok_dap then return end
 
   local all  = require("dap.breakpoints").get()
-  local meta = load_meta()
+  local meta = load_meta(active_project_key)
   local qf   = {}
 
   for bufnr, list in pairs(all) do
@@ -272,11 +368,26 @@ end
 
 function M.setup()
   local ag = vim.api.nvim_create_augroup("BreakpointsPersist", { clear = true })
+  active_project_key = project_key()
+  patch_dap_mutators()
 
   vim.api.nvim_create_autocmd("VimLeave", {
     group    = ag,
-    callback = M.save,
+    callback = function() M.save({ force = true }) end,
     desc     = "Auto-save breakpoints on exit",
+  })
+
+  vim.api.nvim_create_autocmd("DirChanged", {
+    group = ag,
+    callback = function()
+      local next_key = project_key()
+      if next_key == active_project_key then return end
+      if active_project_key then
+        M.save({ force = true, key = active_project_key })
+      end
+      M.load({ key = next_key })
+    end,
+    desc = "Load breakpoints after project directory changes",
   })
 
   -- Auto-load on startup (deferred so DAP is fully initialised).

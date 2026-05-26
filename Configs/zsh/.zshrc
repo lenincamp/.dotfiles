@@ -96,3 +96,6 @@ fi
 # Added by SoFi Claude Code installer
 export PATH="$HOME/.local/bin:$PATH"
 
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+

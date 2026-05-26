@@ -31,6 +31,7 @@ if root_dir == nil then return end
 
 local project_name  = vim.fn.fnamemodify(root_dir, ":t")
 local workspace_dir = vim.fn.stdpath("data") .. "/jdtls-workspaces/" .. project_name
+vim.g.nvim_pure_java_project_name = project_name
 
 -- ── DAP bundles ────────────────────────────────────────────────────────────────
 

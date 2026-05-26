@@ -8,6 +8,189 @@ end
 local widgets = require("dap.ui.widgets")
 local WATCH_QUEUE_LISTENER_ID = "nvim-pure-watch-queue"
 local pending_watch_exprs = {}
+local java_project_name_cache = {}
+
+local function normalize_path(path)
+  if type(path) ~= "string" or path == "" then return nil end
+  return (vim.fs.normalize(path)):gsub("/+$", "")
+end
+
+local function path_has_prefix(path, prefix)
+  path = normalize_path(path)
+  prefix = normalize_path(prefix)
+  if not path or not prefix then return false end
+  if path == prefix then return true end
+  return path:sub(1, #prefix + 1) == (prefix .. "/")
+end
+
+local function best_jdtls_root(path_hint)
+  local ok_clients, clients = pcall(vim.lsp.get_clients, { name = "jdtls" })
+  if not ok_clients or type(clients) ~= "table" then return nil end
+
+  local normalized_hint = normalize_path(path_hint)
+  local best_root = nil
+  local best_len = -1
+
+  for _, client in ipairs(clients) do
+    local root = normalize_path(client and client.config and client.config.root_dir)
+    if root then
+      if not normalized_hint then
+        if #root > best_len then
+          best_root = root
+          best_len = #root
+        end
+      elseif path_has_prefix(normalized_hint, root) and #root > best_len then
+        best_root = root
+        best_len = #root
+      end
+    end
+  end
+
+  return best_root
+end
+
+local function nearest_java_root(path)
+  local marker = vim.fs.find({ "mvnw", "pom.xml", "settings.gradle", "build.gradle", ".git" }, {
+    path = path or vim.fn.getcwd(),
+    upward = true,
+  })[1]
+  return marker and vim.fs.dirname(marker) or nil
+end
+
+function M.java_project_name(path_hint)
+  local root = best_jdtls_root(path_hint)
+  if root then
+    local cached = java_project_name_cache[root]
+    if cached then return cached end
+    local resolved = vim.fn.fnamemodify(root, ":t")
+    java_project_name_cache[root] = resolved
+    return resolved
+  end
+
+  local global_name = vim.g.nvim_pure_java_project_name
+  if type(global_name) == "string" and global_name ~= "" then
+    return global_name
+  end
+
+  local normalized_hint = normalize_path(path_hint)
+  if not normalized_hint then normalized_hint = normalize_path(vim.fn.expand("%:p:h")) end
+  if not normalized_hint then normalized_hint = normalize_path(vim.fn.getcwd()) end
+  local guessed_root = nearest_java_root(normalized_hint) or nearest_java_root(vim.fn.getcwd())
+  guessed_root = normalize_path(guessed_root)
+  if guessed_root then
+    local cached = java_project_name_cache[guessed_root]
+    if cached then return cached end
+    local resolved = vim.fn.fnamemodify(guessed_root, ":t")
+    java_project_name_cache[guessed_root] = resolved
+    return resolved
+  end
+
+  return nil
+end
+
+local function session_capabilities(session)
+  return (session and session.capabilities) or {}
+end
+
+local function normalize_dap_error(err)
+  if not err then return nil end
+  if type(err) == "string" then return err end
+  if type(err) ~= "table" then return tostring(err) end
+
+  local msg = err.message
+  if not msg and err.body and err.body.error then
+    msg = err.body.error.message
+  end
+  if not msg and err.error then
+    msg = err.error.message or err.error
+  end
+  return msg or vim.inspect(err)
+end
+
+local function notify_java_eval_hint(msg)
+  if not msg then return end
+  local lowered = msg:lower()
+  if lowered:find("classnotfound")
+      or lowered:find("noclassdeffound")
+      or lowered:find("library")
+      or lowered:find("module") then
+    vim.notify(
+      "Java DAP: possible classpath/module issue. Prefer JDTLS main-class config (not Current File), then :JdtUpdateConfig and restart debug session.",
+      vim.log.levels.WARN
+    )
+  end
+
+  if lowered:find("specify projectname") then
+    vim.notify(
+      "Java DAP: missing projectName on attach session. Auto-retry is enabled; if it persists, run :JdtUpdateConfig and re-attach.",
+      vim.log.levels.WARN
+    )
+  end
+end
+
+local function is_missing_project_name_error(msg)
+  if not msg then return false end
+  return msg:lower():find("specify projectname") ~= nil
+end
+
+local function maybe_set_java_project_name(session)
+  if not session or not session.config or session.config.type ~= "java" then return false end
+  if type(session.config.projectName) == "string" and session.config.projectName ~= "" then return true end
+
+  local frame_source_path = session.current_frame
+    and session.current_frame.source
+    and session.current_frame.source.path
+  local buf_path = vim.api.nvim_buf_get_name(0)
+  local hint = frame_source_path or (buf_path ~= "" and buf_path or nil)
+
+  local resolved = M.java_project_name(hint)
+  if not resolved then return false end
+  session.config.projectName = resolved
+  return true
+end
+
+local function run_dap_request(session, command, args, on_success, retry_count)
+  if not session then
+    vim.notify("No active DAP session", vim.log.levels.WARN)
+    return
+  end
+
+  session:request(command, args, function(err, response)
+    if err then
+      local msg = normalize_dap_error(err)
+      if (retry_count or 0) < 1 and is_missing_project_name_error(msg) and maybe_set_java_project_name(session) then
+        run_dap_request(session, command, args, on_success, 1)
+        return
+      end
+      vim.schedule(function()
+        notify_java_eval_hint(msg)
+        vim.notify(string.format("DAP %s error: %s", command, msg), vim.log.levels.ERROR)
+      end)
+      return
+    end
+    if on_success then on_success(response) end
+  end)
+end
+
+local function current_frame_id(session)
+  local frame = session and session.current_frame
+  return frame and frame.id or nil
+end
+
+local function eval_in_repl(session, expr)
+  local frame_id = current_frame_id(session)
+  run_dap_request(session, "evaluate", {
+    expression = expr,
+    context = "repl",
+    frameId = frame_id,
+  }, function(response)
+    local result = response and response.result
+    if result and result ~= "" then
+      dap.repl.append(result)
+      dap.repl.append("\n")
+    end
+  end)
+end
 
 local function method_jump_debug_enabled()
   return vim.g.dap_method_jump_debug == true
@@ -336,9 +519,78 @@ end
 function M.eval_expression_prompt()
   vim.ui.input({ prompt = "Debug eval/set expression: " }, function(expr)
     if not expr or vim.trim(expr) == "" then return end
-    dap.repl.execute(expr, { context = "repl" })
+
+    local session = dap.session()
+    if not session or not session.stopped_thread_id then
+      vim.notify("Debugger must be stopped to eval/set expression", vim.log.levels.INFO)
+      return
+    end
+
+    local trimmed = vim.trim(expr)
+    local caps = session_capabilities(session)
+    local lhs, rhs = trimmed:match("^([%w_%.$%[%]%(%)]+)%s*=%s*(.+)$")
+
+    if lhs and rhs and caps.supportsSetExpression then
+      run_dap_request(session, "setExpression", {
+        expression = vim.trim(lhs),
+        value = vim.trim(rhs),
+        frameId = current_frame_id(session),
+      })
+      M.open_repl_view()
+      return
+    end
+
+    eval_in_repl(session, trimmed)
     M.open_repl_view()
   end)
+end
+
+function M.set_expression_prompt()
+  vim.ui.input({ prompt = "Set expression (name=value): " }, function(expr)
+    if not expr or vim.trim(expr) == "" then return end
+
+    local session = dap.session()
+    if not session or not session.stopped_thread_id then
+      vim.notify("Debugger must be stopped to set variable", vim.log.levels.INFO)
+      return
+    end
+
+    local trimmed = vim.trim(expr)
+    local lhs, rhs = trimmed:match("^([%w_%.$%[%]%(%)]+)%s*=%s*(.+)$")
+    if not lhs or not rhs then
+      vim.notify("Use format: variable=value", vim.log.levels.WARN)
+      return
+    end
+
+    local caps = session_capabilities(session)
+    if caps.supportsSetExpression then
+      run_dap_request(session, "setExpression", {
+        expression = vim.trim(lhs),
+        value = vim.trim(rhs),
+        frameId = current_frame_id(session),
+      })
+      return
+    end
+
+    eval_in_repl(session, string.format("%s = %s", vim.trim(lhs), vim.trim(rhs)))
+  end)
+end
+
+function M.show_dap_capabilities()
+  local session = dap.session()
+  if not session then
+    vim.notify("No active DAP session", vim.log.levels.WARN)
+    return
+  end
+
+  local caps = session_capabilities(session)
+  vim.notify(vim.inspect({
+    adapter = session.config and session.config.type,
+    supportsSetExpression = caps.supportsSetExpression,
+    supportsSetVariable = caps.supportsSetVariable,
+    supportsEvaluateForHovers = caps.supportsEvaluateForHovers,
+    supportsRestartFrame = caps.supportsRestartFrame,
+  }), vim.log.levels.INFO)
 end
 
 local function add_watch_expression(expr)

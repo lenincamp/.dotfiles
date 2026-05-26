@@ -42,6 +42,7 @@ map("n", "<leader>ds", helpers.show_session,   { desc = "Debug: Session" })
 map("n", "<leader>dw", helpers.hover_widget,   { desc = "Debug: Widgets" })
 map({ "n", "v" }, "<leader>de", helpers.hover_widget, { desc = "Debug: Eval" })
 map("n", "<leader>dE", helpers.eval_expression_prompt, { desc = "Debug: Eval/Set Expression" })
+map("n", "<leader>dS", helpers.set_expression_prompt, { desc = "Debug: Set Expression" })
 map("n", "<leader>dW", helpers.add_watch_prompt, { desc = "Debug: Add Watch" })
 map("x", "<leader>dW", helpers.add_watch_from_visual_selection, { desc = "Debug: Add Watch from Selection" })
 map("n", "<leader>dj", dap.down,               { desc = "Debug: Down (stack)" })
@@ -50,6 +51,7 @@ map("n", "<leader>dg", helpers.goto_line_prompt, { desc = "Debug: Go to Line" })
 map("n", "<leader>dm", helpers.run_to_method_breakpoint, { desc = "Debug: Method Breakpoint Picker" })
 map("n", "<leader>da", helpers.continue_with_args_prompt, { desc = "Debug: Run with Args" })
 map("n", "<leader>du", helpers.toggle_dap_view, { desc = "Debug: Toggle DAP View" })
+map("n", "<leader>d?", helpers.show_dap_capabilities, { desc = "Debug: Show Adapter Capabilities" })
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "dap-view",
@@ -119,6 +121,13 @@ local function java_step_filters()
   }
 end
 
+-- Resolve projectName at runtime (nvim-dap calls functions in config values).
+-- java-debug-adapter REQUIRES this for expression evaluation in attach sessions.
+-- Must return nil (not "") when unresolved so nvim-dap omits the field.
+local function java_project_name_resolver()
+  return helpers.java_project_name and helpers.java_project_name() or nil
+end
+
 -- ── Java configurations ───────────────────────────────────────────────────────
 
 dap.configurations.java = {
@@ -128,6 +137,7 @@ dap.configurations.java = {
     name              = "Debug (Attach) — Remote 51922",
     hostName          = "127.0.0.1",
     port              = 51922,
+    projectName       = java_project_name_resolver,
     sourcePaths       = java_source_paths(),
     stepFilters       = java_step_filters(),
   },
@@ -136,6 +146,7 @@ dap.configurations.java = {
     name              = "Current File",
     request           = "launch",
     mainClass         = "${file}",
+    projectName       = java_project_name_resolver,
     shortenCommandLine = "argfile",
   },
   {
@@ -144,8 +155,9 @@ dap.configurations.java = {
     name     = "Remote Attach 5005",
     hostName = "localhost",
     port     = 5005,
-    sourcePaths = java_source_paths(),
-    stepFilters = java_step_filters(),
+    projectName  = java_project_name_resolver,
+    sourcePaths  = java_source_paths(),
+    stepFilters  = java_step_filters(),
   },
   {
     type              = "java",
@@ -153,6 +165,7 @@ dap.configurations.java = {
     request           = "attach",
     hostName          = "127.0.0.1",
     port              = 5005,
+    projectName       = java_project_name_resolver,
     sourcePaths       = java_source_paths(),
     stepFilters       = java_step_filters(),
   },

@@ -30,6 +30,7 @@ M.list = {
   -- Colorscheme
   { "catppuccin", "catppuccin/nvim" },                    -- repo name ≠ dir name
   "ellisonleao/gruvbox.nvim",
+  "craftzdog/solarized-osaka.nvim",
   -- UI
   "folke/snacks.nvim",
   "echasnovski/mini.icons",                               -- filetype icons (snacks picker)

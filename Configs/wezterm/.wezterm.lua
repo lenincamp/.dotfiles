@@ -13,12 +13,12 @@ end
 -- ── Core appearance ────────────────────────────────────────────────────────
 
 config.font = wezterm.font_with_fallback({
-	{ family = "0xProto Nerd Font Mono", scale = 1.30 },
+	-- { family = "0xProto Nerd Font Mono", scale = 1.30 },
 	-- { family = "Maple Mono NF", scale = 1.30 },
 	-- { family = "JetBrainsMono Nerd Font Mono",     scale = 1.3 },
-	-- { family = "Dank Mono",     scale = 1.50, weight = "Bold" },
+	{ family = "Dank Mono",     scale = 1.50, weight = "Medium" },
 	-- { family = "MD IO",     scale = 1.40, weight="Medium" },
-	-- { family = "PlemolJP Console NF",     scale = 1.40, weight = "Medium" },
+	{ family = "PlemolJP Console NF",     scale = 1.40, weight = "Medium" },
 })
 config.harfbuzz_features            = { "zero", "ss01", "cv05" }
 config.line_height                  = 1.35
