@@ -7,6 +7,9 @@ if not ok_copilot then return end
 copilot.setup({
   suggestion = { enabled = false },
   panel      = { enabled = false },
+  root_dir   = function()
+    return vim.fn.getcwd(-1, -1)
+  end,
 })
 
 local ok_chat, chat = pcall(require, "CopilotChat")
