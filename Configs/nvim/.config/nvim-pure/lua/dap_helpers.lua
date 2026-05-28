@@ -516,33 +516,99 @@ function M.hover_widget()
   widgets.hover()
 end
 
+-- Collapse multi-line expression to single physical line (DAP evaluate requires it).
+local function flatten_expr(text)
+  if not text or text == "" then return "" end
+  -- Strip line comments (// ...) before joining so two slashes don't kill the rest.
+  local cleaned = {}
+  for _, ln in ipairs(vim.split(text, "\n", { plain = true })) do
+    cleaned[#cleaned + 1] = ln:gsub("//[^\n]*$", "")
+  end
+  local joined = table.concat(cleaned, " ")
+  joined = joined:gsub("%s+", " ")
+  return vim.trim(joined)
+end
+
+local function eval_or_set(expr)
+  expr = flatten_expr(expr)
+  if expr == "" then return end
+
+  local session = dap.session()
+  if not session or not session.stopped_thread_id then
+    vim.notify("Debugger must be stopped to eval/set expression", vim.log.levels.INFO)
+    return
+  end
+
+  local caps = session_capabilities(session)
+  local lhs, rhs = expr:match("^([%w_%.$%[%]%(%)]+)%s*=%s*(.+)$")
+
+  if lhs and rhs and caps.supportsSetExpression then
+    run_dap_request(session, "setExpression", {
+      expression = vim.trim(lhs),
+      value = vim.trim(rhs),
+      frameId = current_frame_id(session),
+    })
+  else
+    eval_in_repl(session, expr)
+  end
+  M.open_repl_view()
+end
+
+-- Floating scratch buffer for multi-line paste / edit (IntelliJ "Evaluate Expression").
+-- Submit joins lines into one DAP expression; bypasses dap.repl.execute line-splitting.
+local function open_eval_floating(initial_lines, ft)
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf].bufhidden = "wipe"
+  vim.bo[buf].buftype   = "nofile"
+  if ft and ft ~= "" then
+    pcall(function() vim.bo[buf].filetype = ft end)
+  end
+  if initial_lines and #initial_lines > 0 then
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, initial_lines)
+  end
+
+  local width  = math.min(100, math.floor(vim.o.columns * 0.8))
+  local height = math.min(15,  math.max(6, math.floor(vim.o.lines * 0.35)))
+  local row    = math.floor((vim.o.lines   - height) / 2) - 1
+  local col    = math.floor((vim.o.columns - width)  / 2)
+
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative  = "editor",
+    row       = row,
+    col       = col,
+    width     = width,
+    height    = height,
+    style     = "minimal",
+    border    = "rounded",
+    title     = " Debug · Evaluate  (<C-CR>/<C-s> submit · q close) ",
+    title_pos = "center",
+  })
+
+  local function close()
+    if vim.api.nvim_win_is_valid(win) then
+      vim.api.nvim_win_close(win, true)
+    end
+  end
+
+  local function submit()
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    close()
+    eval_or_set(table.concat(lines, "\n"))
+  end
+
+  local opts = { buffer = buf, silent = true, nowait = true }
+  vim.keymap.set({ "n", "i" }, "<C-CR>",  submit, opts)
+  vim.keymap.set({ "n", "i" }, "<C-s>",   submit, opts)
+  vim.keymap.set({ "n", "i" }, "<D-CR>",  submit, opts)
+  vim.keymap.set("n",          "q",       close,  opts)
+  vim.keymap.set("n",          "<Esc>",   close,  opts)
+end
+
+M._open_eval_floating = open_eval_floating
+M._flatten_expr       = flatten_expr
+
 function M.eval_expression_prompt()
-  vim.ui.input({ prompt = "Debug eval/set expression: " }, function(expr)
-    if not expr or vim.trim(expr) == "" then return end
-
-    local session = dap.session()
-    if not session or not session.stopped_thread_id then
-      vim.notify("Debugger must be stopped to eval/set expression", vim.log.levels.INFO)
-      return
-    end
-
-    local trimmed = vim.trim(expr)
-    local caps = session_capabilities(session)
-    local lhs, rhs = trimmed:match("^([%w_%.$%[%]%(%)]+)%s*=%s*(.+)$")
-
-    if lhs and rhs and caps.supportsSetExpression then
-      run_dap_request(session, "setExpression", {
-        expression = vim.trim(lhs),
-        value = vim.trim(rhs),
-        frameId = current_frame_id(session),
-      })
-      M.open_repl_view()
-      return
-    end
-
-    eval_in_repl(session, trimmed)
-    M.open_repl_view()
-  end)
+  open_eval_floating(nil, vim.bo.filetype)
 end
 
 function M.set_expression_prompt()
@@ -648,10 +714,16 @@ function M.open_repl_view()
 end
 
 function M.eval_visual_selection_in_repl()
-  local expr = visual_selection_text()
-  if not expr or expr == "" then return end
-  dap.repl.execute(expr, { context = "repl" })
-  M.open_repl_view()
+  local raw = visual_selection_text()
+  if not raw or raw == "" then return end
+
+  -- If selection has newlines, route through floating eval — gives user a chance
+  -- to inspect/edit. If it's already one line, just submit.
+  if raw:find("\n") then
+    open_eval_floating(vim.split(raw, "\n", { plain = true }), vim.bo.filetype)
+  else
+    eval_or_set(raw)
+  end
 end
 
 function M.goto_line_prompt()
