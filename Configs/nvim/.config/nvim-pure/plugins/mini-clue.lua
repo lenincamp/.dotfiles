@@ -43,9 +43,26 @@ clue.setup({
 
     -- ── <leader> groups ────────────────────────────────────────────────────────
 
-    -- AI (Sidekick + CopilotChat)
+    -- AI (Avante + Copilot)
     { mode = "n", keys = "<Leader>a",      desc = "+AI" },
     { mode = "x", keys = "<Leader>a",      desc = "+AI" },
+    { mode = "n", keys = "<Leader>a?",     desc = "Avante: models" },
+    { mode = "n", keys = "<Leader>aa",     desc = "Avante: ask" },
+    { mode = "x", keys = "<Leader>aa",     desc = "Avante: ask selection" },
+    { mode = "n", keys = "<Leader>aB",     desc = "Avante: add open buffers" },
+    { mode = "n", keys = "<Leader>aC",     desc = "Avante: clear" },
+    { mode = "n", keys = "<Leader>ac",     desc = "Avante: add current file" },
+    { mode = "n", keys = "<Leader>ae",     desc = "Avante: edit" },
+    { mode = "x", keys = "<Leader>ae",     desc = "Avante: edit selection" },
+    { mode = "n", keys = "<Leader>af",     desc = "Avante: focus" },
+    { mode = "n", keys = "<Leader>ah",     desc = "Avante: history" },
+    { mode = "n", keys = "<Leader>an",     desc = "Avante: new chat" },
+    { mode = "n", keys = "<Leader>aP",     desc = "Avante: provider" },
+    { mode = "n", keys = "<Leader>aR",     desc = "Avante: repo map" },
+    { mode = "n", keys = "<Leader>ar",     desc = "Avante: refresh" },
+    { mode = "n", keys = "<Leader>aS",     desc = "Avante: stop" },
+    { mode = "n", keys = "<Leader>at",     desc = "Avante: toggle" },
+    { mode = "n", keys = "<Leader>az",     desc = "Avante: zen mode" },
 
     -- Buffers
     { mode = "n", keys = "<Leader>b",      desc = "+Buffers" },
@@ -62,6 +79,8 @@ clue.setup({
     { mode = "n", keys = "<Leader>dbg",    desc = "Breakpoints: Assign group" },
     { mode = "n", keys = "<Leader>dbp",    desc = "Breakpoints: Browse by group" },
     { mode = "n", keys = "<Leader>dL",     desc = "Debug: Logpoint" },
+    { mode = "n", keys = "<Leader>dW",     desc = "Debug: Add Watch" },
+    { mode = "x", keys = "<Leader>dW",     desc = "Debug: Add Watch from selection" },
 
     -- Explorer (separate from Files)
     { mode = "n", keys = "<Leader>e",      desc = "File Explorer (root)" },
@@ -69,7 +88,8 @@ clue.setup({
 
     -- Files + Terminal
     { mode = "n", keys = "<Leader>f",      desc = "+Files/Terminal" },
-    { mode = "n", keys = "<Leader>fj",     desc = "Find Java files" },
+    { mode = "n", keys = "<Leader>fJ",     desc = "Find Java files" },
+    { mode = "n", keys = "<Leader>fj",     desc = "Find JS/TS files" },
     { mode = "n", keys = "<Leader>fx",     desc = "Find React files (JSX/TSX)" },
 
     -- Git
@@ -78,9 +98,6 @@ clue.setup({
 
     -- Java
     { mode = "n", keys = "<Leader>J",      desc = "+Java" },
-    { mode = "n", keys = "<Leader>Ji",     desc = "Java: Organize imports" },
-    { mode = "n", keys = "<Leader>Jv",     desc = "Java: Extract variable" },
-    { mode = "n", keys = "<Leader>Jm",     desc = "Java: Extract method" },
     { mode = "n", keys = "<Leader>JI",     desc = "Java: Invert condition" },
     { mode = "n", keys = "<Leader>Je",     desc = "+Escape/Extract" },
     { mode = "x", keys = "<Leader>Je",     desc = "+Escape/Extract" },
@@ -119,7 +136,13 @@ clue.setup({
     -- Search
     { mode = "n", keys = "<Leader>s",      desc = "+Search" },
     { mode = "x", keys = "<Leader>s",      desc = "+Search" },
-    { mode = "n", keys = "<Leader>sJ",     desc = "Search Java classes/interfaces" },
+    { mode = "n", keys = "<Leader>sg",     desc = "Grep literal (root)" },
+    { mode = "n", keys = "<Leader>sG",     desc = "Grep literal (cwd)" },
+    { mode = "n", keys = "<Leader>s/",     desc = "Grep regex (root)" },
+    { mode = "n", keys = "<Leader>sj",     desc = "Search JS/TS text" },
+    { mode = "n", keys = "<Leader>sx",     desc = "Search JSX/TSX text" },
+    { mode = "n", keys = "<Leader>sJ",     desc = "Search Java text" },
+    { mode = "n", keys = "<Leader>sS",     desc = "LSP Symbols (workspace)" },
     { mode = "n", keys = "<Leader>sX",     desc = "Search React components (JSX/TSX)" },
 
     -- Tests (all languages)

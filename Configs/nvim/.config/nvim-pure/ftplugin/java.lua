@@ -91,7 +91,6 @@ end
 local ext_caps = vim.deepcopy(jdtls.extendedClientCapabilities)
 
 -- ── Config ─────────────────────────────────────────────────────────────────────
-local jdtls_state = { dap_configured = false }
 local config = {
   cmd          = cmd,
   root_dir     = root_dir,
@@ -294,7 +293,6 @@ local config = {
         },
       })
     end
-    jdtls_state.dap_configured = true
   end,
 
   -- Test runner JVM flags
@@ -321,11 +319,6 @@ end)
 local function map(lhs, rhs, desc)
   vim.keymap.set("n", lhs, rhs, { buffer = 0, silent = true, desc = desc })
 end
-
--- Quick shortcuts
-map("<leader>Ji", jdtls.organize_imports, "Java: organize imports")
-map("<leader>Jv", jdtls.extract_variable, "Java: extract variable")
-map("<leader>Jm", jdtls.extract_method,   "Java: extract method")
 
 -- Invert condition / local variable (JDTLS refactor.rewrite code action)
 -- Place cursor on the `if` condition or a boolean variable to invoke.

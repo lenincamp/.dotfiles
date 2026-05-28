@@ -106,12 +106,11 @@ vim.lsp.config("visualforce_ls", {
   init_options = { embeddedLanguages = { css = true, javascript = true } },
 })
 
--- Override only before_init for eslint. Everything else (root_dir, settings,
--- handlers) comes from lspconfig's battle-tested default which already handles
--- monorepos (lockfile root, eslint config ancestry check, Deno exclusion, etc).
+-- nvim 0.12: lspconfig's eslint uses cmd=function(dispatchers,config) which
+-- bypasses cmd_env (env is only passed for table-based cmd). Override cmd back
+-- to a table so cmd_env is honored. Mason adds the binary to PATH already.
 vim.lsp.config("eslint", {
-  -- Force ESLint v9 into legacy (.eslintrc) mode via env var. The server's
-  -- experimental.useFlatConfig setting alone isn't reliable with ESLint v9+.
+  cmd     = { "vscode-eslint-language-server", "--stdio" },
   cmd_env = { ESLINT_USE_FLAT_CONFIG = "false" },
   -- Our before_init replaces lspconfig's (functions can't be deep-merged), so
   -- we must replicate its workspaceFolder + flat-config logic here.

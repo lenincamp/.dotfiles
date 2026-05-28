@@ -35,6 +35,41 @@ vim.api.nvim_create_autocmd("BufEnter", {
   callback = function(args) root_cache[args.buf] = nil end,
 })
 
+local function grep(opts)
+  Snacks.picker.grep(with_layout(vim.tbl_extend("force", {
+    cwd   = root(),
+    regex = false,
+  }, opts or {})))
+end
+
+local function workspace_symbols()
+  local clients = vim.lsp.get_clients
+      and vim.lsp.get_clients({ bufnr = 0 })
+      or vim.lsp.get_active_clients({ bufnr = 0 })
+  local has_workspace_symbols = false
+
+  for _, client in ipairs(clients) do
+    if client.supports_method and client:supports_method("workspace/symbol") then
+      has_workspace_symbols = true
+      break
+    end
+    if client.server_capabilities and client.server_capabilities.workspaceSymbolProvider then
+      has_workspace_symbols = true
+      break
+    end
+  end
+
+  if not has_workspace_symbols then
+    vim.notify("No LSP workspace symbols attached to this buffer", vim.log.levels.WARN)
+    return
+  end
+
+  Snacks.picker.lsp_workspace_symbols({
+    title = " LSP Symbols (workspace)",
+    live = true,
+  })
+end
+
 -- ── Explorer (<leader>e) ─────────────────────────────────────────────────────
 
 map("n", "<leader>e",  function() Snacks.explorer({ cwd = root() }) end, { desc = "File Explorer" })
@@ -52,10 +87,15 @@ map("n", "<leader>fn",      "<cmd>enew<cr>",                                    
 
 -- ── Filetype-specific finders ────────────────────────────────────────────────
 
--- <leader>fj  — find any Java file in the project
-map("n", "<leader>fj", function()
-  Snacks.picker.files({ cwd = root(), ft = "java", title = " Java Files" })
+-- <leader>fJ  — find any Java file in the project
+map("n", "<leader>fJ", function()
+  Snacks.picker.files({ cwd = root(), glob = { "*.java" }, title = " Java Files" })
 end, { desc = "Find Java Files" })
+
+map("n", "<leader>fj", function()
+  Snacks.picker.files({ cwd = root(), glob = { "*.js", "*.ts" }, title = " JavaScript/TypeScript Files" })
+end, { desc = "Find JavaScript/TypeScript Files" })
+
 
 -- <leader>fx  — find JSX/TSX React component files
 map("n", "<leader>fx", function()
@@ -80,22 +120,30 @@ map("n", "<leader>sc", function() Snacks.picker.command_history() end,          
 map("n", "<leader>sC", function() Snacks.picker.commands() end,                            { desc = "Commands" })
 map("n", "<leader>sd", function() Snacks.picker.diagnostics({ filter = { buf = 0 } }) end,{ desc = "Document Diagnostics" })
 map("n", "<leader>sD", function() Snacks.picker.diagnostics() end,                         { desc = "Workspace Diagnostics" })
-map("n", "<leader>sg", function() Snacks.picker.grep(with_layout({ cwd = root() })) end,  { desc = "Grep (root)" })
-map("n", "<leader>sG", function() Snacks.picker.grep(with_layout({})) end,                { desc = "Grep (cwd)" })
+map("n", "<leader>sg", function() grep() end,                                               { desc = "Grep Literal (root)" })
+map("n", "<leader>sG", function() Snacks.picker.grep(with_layout({ regex = false })) end,  { desc = "Grep Literal (cwd)" })
+map("n", "<leader>s/", function() Snacks.picker.grep(with_layout({ cwd = root() })) end,   { desc = "Grep Regex (root)" })
 
--- Java class/interface/enum/record declarations
--- Pattern: matches any top-level type declaration regardless of modifiers
--- e.g. "public class Foo", "abstract class Bar", "public interface IFoo",
---      "public enum Status", "public record Point(..."
+map("n", "<leader>sj", function()
+  grep({
+    glob  = { "*.js", "*.ts" },
+    title = " JS/TS Text",
+  })
+end, { desc = "Search JS/TS text" })
+
+map("n", "<leader>sx", function()
+  grep({
+    glob  = { "*.jsx", "*.tsx" },
+    title = " JSX/TSX Text",
+  })
+end, { desc = "Search JSX/TSX text" })
+
 map("n", "<leader>sJ", function()
-  Snacks.picker.grep(with_layout({
-    cwd    = root(),
-    ft     = "java",
-    search = "(class|interface|enum|record)\\s+\\w+",
-    title  = "󰬷 Java Types",
-    live   = false,
-  }))
-end, { desc = "Search Java classes/interfaces" })
+  grep({
+    glob  = { "*.java" },
+    title = " Java Text",
+  })
+end, { desc = "Search Java text" })
 
 -- React component declarations in JSX/TSX
 -- Pattern covers the two common conventions:
@@ -119,7 +167,7 @@ map("n", "<leader>sn", function() Snacks.picker.notifications() end,            
 map("n", "<leader>sq", function() Snacks.picker.qflist() end,                              { desc = "Quickfix List" })
 map("n", "<leader>sr", function() Snacks.picker.resume() end,                              { desc = "Resume Last Search" })
 map("n", "<leader>ss", function() Snacks.picker.lsp_symbols() end,                        { desc = "LSP Symbols (doc)" })
-map("n", "<leader>sS", function() Snacks.picker.lsp_workspace_symbols() end,              { desc = "LSP Symbols (workspace)" })
+map("n", "<leader>sS", workspace_symbols,                                                  { desc = "LSP Symbols (workspace)" })
 map("n", "<leader>su", function() Snacks.picker.undo() end,                                { desc = "Undo History" })
 map({ "n", "x" }, "<leader>sw", function() Snacks.picker.grep_word(with_layout({ cwd = root() })) end, { desc = "Search Word (root)" })
 map({ "n", "x" }, "<leader>sW", function() Snacks.picker.grep_word(with_layout({})) end,               { desc = "Search Word (cwd)" })

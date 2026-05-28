@@ -26,9 +26,7 @@ vim.cmd("silent! helptags ALL")
 require("pack_manager").setup(packs, pack_dir)
 
 -- ── Mason ─────────────────────────────────────────────────────────────────────
-
-local ok_mason, mason = pcall(require, "mason")
-if ok_mason then mason.setup() end
+-- Config lives in plugins/mason.lua (ensure_installed + setup)
 
 -- Fallback: reuse LSP servers installed in the main nvim instance
 local main_mason_bin = vim.fn.expand("~/.local/share/nvim/mason/bin")
@@ -70,6 +68,7 @@ local sync_configs = {
   "smart-splits",            -- smart navigation between nvim/wezterm
   "mini-clue",               -- keymap hints (before other keymaps are set)
   "search",                  -- <leader>s / <leader>f / <leader>b / <leader>g pickers
+  "mason",                   -- tool installer (ensure_installed)
   "conform",                 -- formatter per filetype (lightweight, needed on BufWritePre)
   "tests",                   -- universal test runner (<leader>tn/tf/tw/tl)
 }
@@ -101,10 +100,10 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- Deferred: heavy / rarely-needed-at-startup
 local deferred_configs = {
-  "copilot-chat",    -- CopilotChat prompts + keymaps
+  "copilot",         -- Copilot + NES via copilot-lsp
+  "avante",          -- Chat / agent UI backed by Copilot provider
   "nvim-dap",        -- DAP adapters + Java/Kotlin configurations
   "nvim-dap-view",   -- DAP UI (auto-registers its own listeners)
-  "sidekick",        -- Sidekick CLI + NES (<Tab> override)
   -- FileType-gated: only meaningful when a relevant buffer is opened
   "ts-comments",     -- commentstring context (activates on FileType)
   "todo-comments",   -- TODO highlight scan (activates on BufRead/BufEnter)

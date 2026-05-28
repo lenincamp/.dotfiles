@@ -18,6 +18,7 @@ M.list = {
   "MunifTanjim/nui.nvim",
   -- LSP + completion
   "neovim/nvim-lspconfig",
+  "saghen/blink.lib",
   "saghen/blink.cmp",
   "fang2hou/blink-copilot",                               -- Copilot source for blink.cmp
   "echasnovski/mini.snippets",
@@ -60,8 +61,8 @@ M.list = {
   "igorlfs/nvim-dap-view",                                -- DAP UI (replaces nvim-dap-ui + nvim-nio)
   -- AI
   "zbirenbaum/copilot.lua",
-  "CopilotC-Nvim/CopilotChat.nvim",
-  "folke/sidekick.nvim",
+  "copilotlsp-nvim/copilot-lsp",
+  "yetone/avante.nvim",
 }
 
 -- Returns the pack directory name for an entry.

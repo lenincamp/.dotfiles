@@ -5,9 +5,35 @@
 
 local M = {}
 
+local on_all_done
+
+local build_commands = {
+  ["avante.nvim"] = { "make" },
+}
+
+local function finish_pack(done, total, errors, label)
+  done.value = done.value + 1
+  on_all_done(done.value, total, errors, label)
+end
+
+local function run_build_if_needed(name, dir, done, total, errors, label)
+  local command = build_commands[name]
+  if not command then
+    finish_pack(done, total, errors, label)
+    return
+  end
+
+  vim.system(command, { cwd = dir, text = true }, function(out)
+    if out.code ~= 0 then
+      table.insert(errors, name .. " build: " .. vim.trim(out.stderr))
+    end
+    finish_pack(done, total, errors, label)
+  end)
+end
+
 -- Shared async completion handler; notifies and regenerates help tags when
 -- all parallel git operations finish.
-local function on_all_done(done, total, errors, label)
+function on_all_done(done, total, errors, label)
   if done ~= total then return end
   vim.schedule(function()
     if #errors == 0 then
@@ -34,7 +60,7 @@ function M.setup(packs, pack_dir)
       return
     end
 
-    local total, done, errors = #missing, 0, {}
+    local total, done, errors = #missing, { value = 0 }, {}
     vim.notify("PackInstall: cloning " .. total .. " missing plugin(s)…", vim.log.levels.INFO)
 
     for _, pack in ipairs(missing) do
@@ -45,11 +71,12 @@ function M.setup(packs, pack_dir)
         { "git", "clone", "--depth", "1", url, pack_dir .. "/" .. name },
         { text = true },
         function(out)
-          done = done + 1
           if out.code ~= 0 then
             table.insert(errors, name .. ": " .. vim.trim(out.stderr))
+            finish_pack(done, total, errors, "PackInstall")
+            return
           end
-          on_all_done(done, total, errors, "PackInstall")
+          run_build_if_needed(name, pack_dir .. "/" .. name, done, total, errors, "PackInstall")
         end
       )
     end
@@ -62,7 +89,7 @@ function M.setup(packs, pack_dir)
       return
     end
 
-    local total, done, errors = #dirs, 0, {}
+    local total, done, errors = #dirs, { value = 0 }, {}
     vim.notify("PackUpdate: updating " .. total .. " plugins…", vim.log.levels.INFO)
 
     for _, dir in ipairs(dirs) do
@@ -75,11 +102,12 @@ function M.setup(packs, pack_dir)
         },
         { text = true },
         function(out)
-          done = done + 1
           if out.code ~= 0 then
             table.insert(errors, name .. ": " .. vim.trim(out.stderr))
+            finish_pack(done, total, errors, "PackUpdate")
+            return
           end
-          on_all_done(done, total, errors, "PackUpdate")
+          run_build_if_needed(name, dir, done, total, errors, "PackUpdate")
         end
       )
     end

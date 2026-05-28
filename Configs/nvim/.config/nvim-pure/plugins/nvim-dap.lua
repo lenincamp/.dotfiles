@@ -173,7 +173,7 @@ dap.configurations.java = {
 
 -- ── Kotlin configurations ─────────────────────────────────────────────────────
 
-if not dap.adapters.kotlin then
+if not dap.adapters.kotlin and vim.fn.executable("kotlin-debug-adapter") == 1 then
   dap.adapters.kotlin = {
     type    = "executable",
     command = "kotlin-debug-adapter",

@@ -63,10 +63,24 @@ Snacks.setup({
 
     -- ── Custom actions ─────────────────────────────────────────────────────────
     actions = {
-      -- Sidekick: send picker context to the CLI with <Alt-a>
-      sidekick_send = function(...)
-        local ok_cli, cli = pcall(require, "sidekick.cli.picker.snacks")
-        if ok_cli then return cli.send(...) end
+      -- Avante: add selected picker files to the chat context with <Alt-a>
+      avante_add_files = function(picker)
+        local ok_avante, avante = pcall(require, "avante")
+        local ok_utils, utils = pcall(require, "avante.utils")
+        if not ok_avante or not ok_utils then return end
+
+        local sidebar = avante.get()
+        if not sidebar:is_open() then
+          require("avante.api").ask()
+          sidebar = avante.get()
+        end
+
+        for _, item in ipairs(picker:selected({ fallback = true })) do
+          local filepath = item.file or item.path
+          if filepath and filepath ~= "" then
+            sidebar.file_selector:add_selected_file(utils.relative_path(filepath))
+          end
+        end
       end,
       -- Toggle between default and IntelliJ grep layout with <Alt-l>
       grep_layout_toggle = function(picker)
@@ -85,12 +99,13 @@ Snacks.setup({
     win = {
       input = {
         keys = {
-          ["<a-a>"] = { "sidekick_send",      mode = { "n", "i" } },
+          ["<a-a>"] = { "avante_add_files",    mode = { "n", "i" } },
           ["<a-l>"] = { "grep_layout_toggle", mode = { "n", "i" } },
         },
       },
       list = {
         keys = {
+          ["<a-a>"] = "avante_add_files",
           ["<a-l>"] = "grep_layout_toggle",
         },
       },
@@ -151,6 +166,9 @@ Snacks.toggle({
     vim.o.showmode = v
   end,
 }):map("<leader>ui")
+
+-- Route vim.ui.select through Snacks picker
+vim.ui.select = Snacks.picker.select
 
 -- Colorscheme picker (<leader>uC — consistent with LazyVim)
 vim.keymap.set("n", "<leader>uC", function() Snacks.picker.colorschemes() end,

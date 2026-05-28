@@ -11,8 +11,8 @@ conform.setup({
     typescript = { "eslint_d", "prettier" },
     html       = { "prettier" },
     css        = { "prettier" },
-    xml        = { "prettier", "lemminx" },
-    apex       = { "prettier", "prettier-plugin-apex" },
+    xml        = { "prettier" },   -- lemminx handles format via LSP, not conform
+    apex       = { "prettier" },   -- prettier uses @prettier/plugin-apex via .prettierrc
     java       = {}, -- no external formatter; handled by JDTLS LSP
   },
 })

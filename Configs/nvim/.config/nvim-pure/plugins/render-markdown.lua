@@ -2,7 +2,7 @@ local ok, rm = pcall(require, "render-markdown")
 if not ok then return end
 
 rm.setup({
-  file_types = { "markdown", "copilot-chat" },
+  file_types = { "markdown", "Avante" },
   code = {
     sign      = false,
     width     = "block",
@@ -13,6 +13,7 @@ rm.setup({
     icons = {},
   },
   checkbox = { enabled = false },
+  latex    = { enabled = false },
 })
 
 -- Toggle: <leader>um (consistent with LazyVim)

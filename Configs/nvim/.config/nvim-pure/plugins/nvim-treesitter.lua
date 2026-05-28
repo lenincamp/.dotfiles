@@ -2,7 +2,31 @@
 -- Highlighting / indent / folding are enabled via Neovim's built-in treesitter API.
 
 -- ── Parser install directory ────────────────────────────────────────────────
-require("nvim-treesitter").setup()
+require("nvim-treesitter").setup({
+  ensure_installed = {
+    -- Shell / config
+    "bash", "zsh", "ssh_config", "tmux",
+    -- Git
+    "diff", "git_config", "git_rebase", "gitattributes", "gitcommit", "gitignore",
+    -- Web
+    "css", "html", "http", "javascript", "jsdoc", "json", "scss", "tsx", "typescript",
+    -- Lua
+    "lua", "luadoc", "luap", "query",
+    -- JVM
+    "java", "javadoc", "kotlin",
+    -- Python
+    "python",
+    -- Data / markup
+    "csv", "graphql", "jq", "markdown", "markdown_inline", "nginx",
+    "properties", "regex", "sql", "toml", "xml", "yaml",
+    -- Misc
+    "comment", "dockerfile", "latex",
+    -- Salesforce
+    "apex", "soql", "sosl",
+    -- Vim
+    "vim", "vimdoc",
+  },
+})
 
 -- The new main-branch nvim-treesitter stores highlight/indent/fold queries
 -- in runtime/queries/ instead of queries/. Add runtime/ to rtp so Neovim
