@@ -1,7 +1,7 @@
 -- Plugin registry.
 -- To add a plugin:
 --   1. Add "user/repo" (or a full URL) to M.list below.
---   2. Run :PackInstall — it clones only what's missing.
+--   2. Run :PackInstall, or restart on Neovim 0.12+ to let vim.pack install it.
 --   3. Restart nvim.
 --
 -- Entry formats:
@@ -32,6 +32,9 @@ M.list = {
   { "catppuccin", "catppuccin/nvim" },                    -- repo name ≠ dir name
   "ellisonleao/gruvbox.nvim",
   "craftzdog/solarized-osaka.nvim",
+  "folke/tokyonight.nvim",
+  { "kanagawa.nvim", "rebelot/kanagawa.nvim" },
+  { "rose-pine", "rose-pine/neovim" },
   -- UI
   "folke/snacks.nvim",
   "echasnovski/mini.icons",                               -- filetype icons (snacks picker)
@@ -76,6 +79,23 @@ end
 -- Returns the clone origin for an entry (full URL or "user/repo" shorthand).
 function M.origin(p)
   return type(p) == "table" and p[2] or p
+end
+
+function M.url(p)
+  local origin = M.origin(p)
+  return origin:match("^https?://") and origin or ("https://github.com/" .. origin)
+end
+
+function M.spec(p)
+  return { name = M.name(p), src = M.url(p) }
+end
+
+function M.specs(list)
+  local specs = {}
+  for _, pack in ipairs(list or M.list) do
+    table.insert(specs, M.spec(pack))
+  end
+  return specs
 end
 
 return M

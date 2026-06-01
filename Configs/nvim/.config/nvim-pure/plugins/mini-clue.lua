@@ -83,14 +83,14 @@ clue.setup({
     { mode = "x", keys = "<Leader>dW",     desc = "Debug: Add Watch from selection" },
 
     -- Explorer (separate from Files)
-    { mode = "n", keys = "<Leader>e",      desc = "File Explorer (root)" },
-    { mode = "n", keys = "<Leader>E",      desc = "File Explorer (cwd)" },
+    { mode = "n", keys = "<Leader>e",      desc = "File Explorer (cwd)" },
+    { mode = "n", keys = "<Leader>E",      desc = "File Explorer (root)" },
 
     -- Files + Terminal
     { mode = "n", keys = "<Leader>f",      desc = "+Files/Terminal" },
-    { mode = "n", keys = "<Leader>fJ",     desc = "Find Java files" },
-    { mode = "n", keys = "<Leader>fj",     desc = "Find JS/TS files" },
-    { mode = "n", keys = "<Leader>fx",     desc = "Find React files (JSX/TSX)" },
+    { mode = "n", keys = "<Leader>fJ",     desc = "Find Java files (root)" },
+    { mode = "n", keys = "<Leader>fj",     desc = "Find JS/TS files (cwd)" },
+    { mode = "n", keys = "<Leader>fx",     desc = "Find React files (JSX/TSX, cwd)" },
 
     -- Git
     { mode = "n", keys = "<Leader>g",      desc = "+Git" },
@@ -136,11 +136,11 @@ clue.setup({
     -- Search
     { mode = "n", keys = "<Leader>s",      desc = "+Search" },
     { mode = "x", keys = "<Leader>s",      desc = "+Search" },
-    { mode = "n", keys = "<Leader>sg",     desc = "Grep literal (root)" },
-    { mode = "n", keys = "<Leader>sG",     desc = "Grep literal (cwd)" },
+    { mode = "n", keys = "<Leader>sg",     desc = "Grep literal (cwd)" },
+    { mode = "n", keys = "<Leader>sG",     desc = "Grep literal (root)" },
     { mode = "n", keys = "<Leader>s/",     desc = "Grep regex (root)" },
     { mode = "n", keys = "<Leader>sj",     desc = "Search JS/TS text" },
-    { mode = "n", keys = "<Leader>sx",     desc = "Search JSX/TSX text" },
+    { mode = "n", keys = "<Leader>sx",     desc = "Search JSX/TSX text (cwd)" },
     { mode = "n", keys = "<Leader>sJ",     desc = "Search Java text" },
     { mode = "n", keys = "<Leader>sS",     desc = "LSP Symbols (workspace)" },
     { mode = "n", keys = "<Leader>sX",     desc = "Search React components (JSX/TSX)" },

@@ -11,11 +11,21 @@ local pack_dir = vim.fn.stdpath("data") .. "/site/pack/core/opt"
 local vm_cfg = vim.fn.stdpath("config") .. "/plugins/vim-visual-multi.lua"
 if vim.fn.filereadable(vm_cfg) == 1 then pcall(dofile, vm_cfg) end
 
-for _, pack in ipairs(packs.list) do
-  local name = packs.name(pack)
-  local ok, err = pcall(vim.cmd.packadd, name)
+local native_pack = vim.pack and (vim.pack.add or vim.pack.install)
+
+if native_pack then
+  local ok, err = pcall(native_pack, packs.specs(), { load = true })
+  if not ok then ok, err = pcall(native_pack, packs.specs()) end
   if not ok then
-    vim.notify("Pack load failed [" .. name .. "]: " .. tostring(err), vim.log.levels.WARN)
+    vim.notify("vim.pack failed: " .. tostring(err), vim.log.levels.WARN)
+  end
+else
+  for _, pack in ipairs(packs.list) do
+    local name = packs.name(pack)
+    local ok, err = pcall(vim.cmd.packadd, name)
+    if not ok then
+      vim.notify("Pack load failed [" .. name .. "]: " .. tostring(err), vim.log.levels.WARN)
+    end
   end
 end
 
@@ -53,6 +63,10 @@ end
 local sync_configs = {
   "catppuccin",              -- colorscheme first — highlights must be set before any UI renders
   "gruvbox",
+  "solarized-osaka",
+  "tokyonight",
+  "kanagawa",
+  "rose-pine",
   "blink-cmp",               -- completion + snippet preset (needed from first keystroke)
   "mini-snippets",           -- snippet engine (friendly-snippets)
   "mini-pairs",              -- auto-close brackets

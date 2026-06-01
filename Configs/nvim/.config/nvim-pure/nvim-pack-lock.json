@@ -53,6 +53,10 @@
       "rev": "154eb5ff5b96d0641307113fa385eaf0d36d9796",
       "src": "https://github.com/ellisonleao/gruvbox.nvim"
     },
+    "kanagawa.nvim": {
+      "rev": "bb85e4bfc8d89b0e62c8fa53ccdd13d12e2f77b3",
+      "src": "https://github.com/rebelot/kanagawa.nvim"
+    },
     "mason.nvim": {
       "rev": "44d1e90e1f66e077268191e3ee9d2ac97cc18e65",
       "src": "https://github.com/mason-org/mason.nvim"
@@ -125,6 +129,10 @@
       "rev": "1641b434bda26e0f4e3610985b3357fc213cf834",
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
+    "rose-pine": {
+      "rev": "ff483051a47e27d84bdef47703538df1ed9f4a47",
+      "src": "https://github.com/rose-pine/neovim"
+    },
     "salesforce.nvim": {
       "rev": "514449f1d2946194e1c44f4aa8588799f23b0d50",
       "src": "https://github.com/jonathanmorris180/salesforce.nvim"
@@ -156,6 +164,10 @@
     "todo-comments.nvim": {
       "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
       "src": "https://github.com/folke/todo-comments.nvim"
+    },
+    "tokyonight.nvim": {
+      "rev": "cdc07ac78467a233fd62c493de29a17e0cf2b2b6",
+      "src": "https://github.com/folke/tokyonight.nvim"
     },
     "ts-comments.nvim": {
       "rev": "123a9fb12e7229342f807ec9e6de478b1102b041",

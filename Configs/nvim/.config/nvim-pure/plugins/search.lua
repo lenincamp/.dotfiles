@@ -72,17 +72,17 @@ end
 
 -- ── Explorer (<leader>e) ─────────────────────────────────────────────────────
 
-map("n", "<leader>e",  function() Snacks.explorer({ cwd = root() }) end, { desc = "File Explorer" })
-map("n", "<leader>E",  function() Snacks.explorer() end,                 { desc = "File Explorer (cwd)" })
+map("n", "<leader>E",  function() Snacks.explorer({ cwd = root() }) end, { desc = "File Explorer" })
+map("n", "<leader>e",  function() Snacks.explorer() end,                 { desc = "File Explorer (cwd)" })
 
 -- ── Files (<leader>f) ─────────────────────────────────────────────────────────
 
 map("n", "<leader><space>", function() Snacks.picker.files({ cwd = root() }) end, { desc = "Find Files (root)" })
-map("n", "<leader>ff",      function() Snacks.picker.files({ cwd = root() }) end, { desc = "Find Files (root)" })
-map("n", "<leader>fF",      function() Snacks.picker.files() end,                 { desc = "Find Files (cwd)" })
+map("n", "<leader>fF",      function() Snacks.picker.files({ cwd = root() }) end, { desc = "Find Files (root)" })
+map("n", "<leader>ff",      function() Snacks.picker.files() end,                 { desc = "Find Files (cwd)" })
 map("n", "<leader>fg",      function() Snacks.picker.git_files() end,             { desc = "Find Git Files" })
-map("n", "<leader>fr",      function() Snacks.picker.recent() end,                { desc = "Recent Files" })
-map("n", "<leader>fR",      function() Snacks.picker.recent({ filter = { cwd = true } }) end, { desc = "Recent Files (cwd)" })
+map("n", "<leader>fR",      function() Snacks.picker.recent() end,                { desc = "Recent Files" })
+map("n", "<leader>fr",      function() Snacks.picker.recent({ filter = { cwd = true } }) end, { desc = "Recent Files (cwd)" })
 map("n", "<leader>fn",      "<cmd>enew<cr>",                                       { desc = "New File" })
 
 -- ── Filetype-specific finders ────────────────────────────────────────────────
@@ -90,11 +90,11 @@ map("n", "<leader>fn",      "<cmd>enew<cr>",                                    
 -- <leader>fJ  — find any Java file in the project
 map("n", "<leader>fJ", function()
   Snacks.picker.files({ cwd = root(), glob = { "*.java" }, title = " Java Files" })
-end, { desc = "Find Java Files" })
+end, { desc = "Find Java Files (root)" })
 
 map("n", "<leader>fj", function()
   Snacks.picker.files({ cwd = root(), glob = { "*.js", "*.ts" }, title = " JavaScript/TypeScript Files" })
-end, { desc = "Find JavaScript/TypeScript Files" })
+end, { desc = "Find JavaScript/TypeScript Files (root)" })
 
 
 -- <leader>fx  — find JSX/TSX React component files
@@ -104,11 +104,11 @@ map("n", "<leader>fx", function()
     glob  = { "*.jsx", "*.tsx" },
     title = " React Components",
   })
-end, { desc = "Find React Files (JSX/TSX)" })
+end, { desc = "Find React Files (JSX/TSX) (root)" })
 
 -- Terminal
-map("n",         "<leader>fT", function() Snacks.terminal() end,                          { desc = "Terminal (cwd)" })
-map("n",         "<leader>ft", function() Snacks.terminal(nil, { cwd = root() }) end,     { desc = "Terminal (root)" })
+map("n",         "<leader>ft", function() Snacks.terminal() end,                          { desc = "Terminal (cwd)" })
+map("n",         "<leader>fT", function() Snacks.terminal(nil, { cwd = root() }) end,     { desc = "Terminal (root)" })
 map({ "n", "t" }, "<C-/>",    function() Snacks.terminal(nil, { cwd = root() }) end,     { desc = "Terminal (root)" })
 map({ "n", "t" }, "<C-_>",    function() Snacks.terminal(nil, { cwd = root() }) end,     { desc = "which_key_ignore" })
 
@@ -120,8 +120,8 @@ map("n", "<leader>sc", function() Snacks.picker.command_history() end,          
 map("n", "<leader>sC", function() Snacks.picker.commands() end,                            { desc = "Commands" })
 map("n", "<leader>sd", function() Snacks.picker.diagnostics({ filter = { buf = 0 } }) end,{ desc = "Document Diagnostics" })
 map("n", "<leader>sD", function() Snacks.picker.diagnostics() end,                         { desc = "Workspace Diagnostics" })
-map("n", "<leader>sg", function() grep() end,                                               { desc = "Grep Literal (root)" })
-map("n", "<leader>sG", function() Snacks.picker.grep(with_layout({ regex = false })) end,  { desc = "Grep Literal (cwd)" })
+map("n", "<leader>sG", function() grep() end,                                               { desc = "Grep Literal (root)" })
+map("n", "<leader>sg", function() Snacks.picker.grep(with_layout({ regex = false })) end,  { desc = "Grep Literal (cwd)" })
 map("n", "<leader>s/", function() Snacks.picker.grep(with_layout({ cwd = root() })) end,   { desc = "Grep Regex (root)" })
 
 map("n", "<leader>sj", function()
@@ -129,36 +129,22 @@ map("n", "<leader>sj", function()
     glob  = { "*.js", "*.ts" },
     title = " JS/TS Text",
   })
-end, { desc = "Search JS/TS text" })
+end, { desc = "Search JS/TS text (cwd)" })
 
 map("n", "<leader>sx", function()
   grep({
     glob  = { "*.jsx", "*.tsx" },
     title = " JSX/TSX Text",
   })
-end, { desc = "Search JSX/TSX text" })
+end, { desc = "Search JSX/TSX text (cwd)" })
 
 map("n", "<leader>sJ", function()
   grep({
     glob  = { "*.java" },
     title = " Java Text",
   })
-end, { desc = "Search Java text" })
+end, { desc = "Search Java text (cwd)" })
 
--- React component declarations in JSX/TSX
--- Pattern covers the two common conventions:
---   function components  → function ComponentName(
---   arrow components     → const ComponentName = / const ComponentName: React.FC
--- Capital first letter = React component convention
-map("n", "<leader>sX", function()
-  Snacks.picker.grep(with_layout({
-    cwd    = root(),
-    glob   = { "*.jsx", "*.tsx" },
-    search = "(^|export\\s+)(default\\s+)?function\\s+[A-Z]\\w*|const\\s+[A-Z]\\w*\\s*[:=]",
-    title  = " React Components",
-    live   = false,
-  }))
-end, { desc = "Search React components (JSX/TSX)" })
 map("n", "<leader>sh", function() Snacks.picker.help() end,                                { desc = "Help" })
 map("n", "<leader>sk", function() Snacks.picker.keymaps() end,                             { desc = "Keymaps" })
 map("n", "<leader>sl", function() Snacks.picker.loclist() end,                             { desc = "Location List" })
@@ -169,8 +155,8 @@ map("n", "<leader>sr", function() Snacks.picker.resume() end,                   
 map("n", "<leader>ss", function() Snacks.picker.lsp_symbols() end,                        { desc = "LSP Symbols (doc)" })
 map("n", "<leader>sS", workspace_symbols,                                                  { desc = "LSP Symbols (workspace)" })
 map("n", "<leader>su", function() Snacks.picker.undo() end,                                { desc = "Undo History" })
-map({ "n", "x" }, "<leader>sw", function() Snacks.picker.grep_word(with_layout({ cwd = root() })) end, { desc = "Search Word (root)" })
-map({ "n", "x" }, "<leader>sW", function() Snacks.picker.grep_word(with_layout({})) end,               { desc = "Search Word (cwd)" })
+map({ "n", "x" }, "<leader>sW", function() Snacks.picker.grep_word(with_layout({ cwd = root() })) end, { desc = "Search Word (root)" })
+map({ "n", "x" }, "<leader>sw", function() Snacks.picker.grep_word(with_layout({})) end,               { desc = "Search Word (cwd)" })
 
 -- ── UI toggle: grep layout (<leader>ug) ──────────────────────────────────────
 
@@ -199,8 +185,8 @@ end, { desc = "Delete Other Buffers" })
 
 -- Lazygit (only if installed)
 if vim.fn.executable("lazygit") == 1 then
-  map("n", "<leader>gg", function() Snacks.lazygit({ cwd = root() }) end, { desc = "Lazygit (root)" })
-  map("n", "<leader>gG", function() Snacks.lazygit() end,                  { desc = "Lazygit (cwd)" })
+  map("n", "<leader>gG", function() Snacks.lazygit({ cwd = root() }) end, { desc = "Lazygit (root)" })
+  map("n", "<leader>gg", function() Snacks.lazygit() end,                  { desc = "Lazygit (cwd)" })
 end
 
 map("n", "<leader>gL", function() Snacks.picker.git_log() end,                         { desc = "Git Log (cwd)" })

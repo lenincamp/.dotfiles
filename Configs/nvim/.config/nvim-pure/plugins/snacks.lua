@@ -133,7 +133,13 @@ Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leade
 Snacks.toggle.diagnostics():map("<leader>ud")
 Snacks.toggle.line_number():map("<leader>ul")
 Snacks.toggle.treesitter():map("<leader>uT")
-Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map("<leader>ub")
+Snacks.toggle({
+  name = "Dark Background",
+  get = function() return require("colorschemes").is_dark_background() end,
+  set = function(v)
+    require("colorschemes").set_background_mode(v and "dark" or "light")
+  end,
+}):map("<leader>ub")
 Snacks.toggle.dim():map("<leader>uD")
 Snacks.toggle.zen():map("<leader>uz")
 Snacks.toggle.zoom():map("<leader>uZ"):map("<leader>wm")
@@ -170,6 +176,6 @@ Snacks.toggle({
 -- Route vim.ui.select through Snacks picker
 vim.ui.select = Snacks.picker.select
 
--- Colorscheme picker (<leader>uC — consistent with LazyVim)
-vim.keymap.set("n", "<leader>uC", function() Snacks.picker.colorschemes() end,
+-- Curated dark colorscheme picker (<leader>uC — consistent with LazyVim)
+vim.keymap.set("n", "<leader>uC", function() require("colorschemes").select() end,
   { desc = "Colorscheme" })
