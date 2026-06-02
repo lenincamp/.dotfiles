@@ -321,6 +321,14 @@ local function disable_diff_mode()
   end
 end
 
+local function toggle_diff_mode()
+  if is_diff_session() then
+    disable_diff_mode()
+  else
+    enable_diff_mode()
+  end
+end
+
 local function replace_diffopt_entry(opts, prefix, value)
   local out, replaced = {}, false
   for _, item in ipairs(opts) do
@@ -498,6 +506,7 @@ return {
   navigate_window = navigate_window,
   enable_diff_mode = enable_diff_mode,
   disable_diff_mode = disable_diff_mode,
+  toggle_diff_mode = toggle_diff_mode,
   toggle_diff_profile = toggle_diff_profile,
   open_quickfix_playbook = open_quickfix_playbook,
   toggle_zen_mode = toggle_zen_mode,

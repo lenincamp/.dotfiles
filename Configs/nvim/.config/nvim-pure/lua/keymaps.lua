@@ -240,8 +240,7 @@ map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
 map("n", "<leader>pH", function() cmd.open_quickfix_playbook() end, { desc = "Open Quickfix Playbook" })
 
 -- Diff mode toggle
-map("n", "<leader>ue", function() cmd.enable_diff_mode() end,  { desc = "Enable diff mode" })
-map("n", "<leader>uE", function() cmd.disable_diff_mode() end, { desc = "Disable diff mode" })
+map("n", "<leader>ue", function() cmd.toggle_diff_mode() end,  { desc = "Toggle diff mode" })
 
 -- ── Line completion (close brackets + semicolon + newline) ──────────────────
 

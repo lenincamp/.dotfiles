@@ -127,8 +127,7 @@ clue.setup({
 
     -- Utility (redraw, diff mode)
     { mode = "n", keys = "<Leader>ur",     desc = "Redraw / clear search" },
-    { mode = "n", keys = "<Leader>ue",     desc = "Enable diff mode" },
-    { mode = "n", keys = "<Leader>uE",     desc = "Disable diff mode" },
+    { mode = "n", keys = "<Leader>ue",     desc = "Toggle diff mode" },
     { mode = "n", keys = "<Leader>gC",     desc = "Git Compare-Load (branch -> worktree)" },
 
     -- Replace / Refactor
@@ -159,7 +158,7 @@ clue.setup({
     { mode = "n", keys = "<Leader>td",     desc = "+Java/Maven debug" },
 
     -- Salesforce (S = Salesforce, like J = Java)
-    { mode = "n", keys = "<Leader>S",      desc = "+Salesforce" },
+    { mode = "n", keys = "<Leader>S",      desc = "+Salesforce options" },
     { mode = "n", keys = "<Leader>Sx",     desc = "SF: Execute anonymous Apex" },
     { mode = "n", keys = "<Leader>Sp",     desc = "SF: Push to org" },
     { mode = "n", keys = "<Leader>Sr",     desc = "SF: Retrieve from org" },
