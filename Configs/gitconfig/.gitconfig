@@ -5,8 +5,19 @@
 [interactive]
   diffFilter = delta --color-only
 [delta]
-  features = catppuccin-mocha side-by-side line-numbers decorations
+	features = kanagawa side-by-side line-numbers decorations
   navigate = true  # use n and N to move between diff sections
+	syntax-theme = none
+	plus-style = "syntax #8992a7"
+	minus-style = "syntax #e82424"
+	plus-emph-style = "bold syntax #8992a7"
+	minus-emph-style = "bold syntax #e82424"
+	hunk-header-style = "syntax #8992a7"
+	file-style = "bold syntax #8992a7"
+	line-numbers-left-style = "syntax #223249"
+	line-numbers-right-style = "syntax #223249"
+	line-numbers-plus-style = "syntax #8992a7"
+	line-numbers-minus-style = "syntax #e82424"
   ; line-numbers-left-format = ""
   ; line-numbers-right-format = "│ "
 [delta "interactive"]
