@@ -222,6 +222,7 @@ map("n", "<leader>uW", function() ui.toggle_winbar() end, { desc = "Toggle winba
 map("n", "<leader>uz", function() cmd.toggle_zen_mode() end, { desc = "Toggle Zen Mode" })
 map("n", "<leader>uzn", function() cmd.cycle_zen_width() end, { desc = "Cycle Zen Width (110/120/130)" })
 map("n", "<leader>uR", function() cmd.toggle_diff_profile() end, { desc = "Toggle diff profile (review/focused)" })
+map("n", "<leader>uL", "<cmd>DiffLspToggle<cr>", { desc = "Toggle LSP in diff buffer" })
 
 map("n", "<leader>ur", function()
   cmd.clear_search_highlights()

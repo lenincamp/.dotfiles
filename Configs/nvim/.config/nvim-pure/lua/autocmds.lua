@@ -35,6 +35,12 @@ local function set_number_options_for_buf(bufnr, number, relativenumber)
   end
 end
 
+local function disable_lsp_for_diff_buffer(bufnr)
+  detach_all_lsp_clients(bufnr)
+  set_buffer_diagnostics(bufnr, false)
+  vim.b[bufnr].diff_lsp_disabled = true
+end
+
 -- Highlight yanked text (fires in all modes: normal, visual, command)
 local highlight_group = augroup("YankHighlight", { clear = true })
 autocmd("TextYankPost", {
@@ -208,6 +214,11 @@ local function setup_current_diff_window()
   vim.wo.scrollbind = true
   vim.wo.cursorbind = true
   if _G.setup_diff_mappings then _G.setup_diff_mappings() end
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  if not vim.b[bufnr].diff_lsp_forced then
+    disable_lsp_for_diff_buffer(bufnr)
+  end
 end
 
 vim.api.nvim_create_autocmd({ "VimEnter", "WinEnter", "BufWinEnter" }, {
@@ -220,6 +231,31 @@ vim.api.nvim_create_autocmd({ "VimEnter", "WinEnter", "BufWinEnter" }, {
     end
   end,
 })
+
+vim.api.nvim_create_user_command("DiffLspEnable", function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  vim.b[bufnr].diff_lsp_forced = true
+  vim.b[bufnr].diff_lsp_disabled = false
+  set_buffer_diagnostics(bufnr, true)
+  pcall(vim.cmd, "LspStart")
+  vim.notify("Diff LSP enabled for current buffer", vim.log.levels.INFO)
+end, { desc = "Enable LSP on demand for current diff buffer" })
+
+vim.api.nvim_create_user_command("DiffLspDisable", function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  vim.b[bufnr].diff_lsp_forced = false
+  disable_lsp_for_diff_buffer(bufnr)
+  vim.notify("Diff LSP disabled for current buffer", vim.log.levels.INFO)
+end, { desc = "Disable LSP for current diff buffer" })
+
+vim.api.nvim_create_user_command("DiffLspToggle", function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if vim.b[bufnr].diff_lsp_forced then
+    vim.cmd("DiffLspDisable")
+  else
+    vim.cmd("DiffLspEnable")
+  end
+end, { desc = "Toggle LSP for current diff buffer" })
 
 -- ── Git: line history viewer (uses delta pager if available) ─────────────────
 

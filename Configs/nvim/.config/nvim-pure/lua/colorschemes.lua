@@ -240,8 +240,21 @@ local function sanitize_key(key)
   return (key or "theme"):gsub("[^a-zA-Z0-9%-_]+", "-")
 end
 
+local function lazygit_base_dir()
+  local candidates = {
+    vim.fn.expand("~/.dotfiles/Configs/lazygit/Library/Application Support/lazygit"),
+    vim.fn.expand("~/Library/Application Support/lazygit"),
+  }
+
+  for _, dir in ipairs(candidates) do
+    if vim.fn.isdirectory(dir) == 1 then return dir end
+  end
+
+  return candidates[1]
+end
+
 local function lazygit_generated_path(theme_key)
-  local base = vim.fn.expand("~/.dotfiles/Configs/lazygit/Library/Application Support/lazygit")
+  local base = lazygit_base_dir()
   return string.format("%s/config-generated-%s.yml", base, sanitize_key(theme_key))
 end
 
@@ -476,7 +489,7 @@ function M.sync_lazygit_theme(theme)
     return
   end
 
-  local base = vim.fn.expand("~/.dotfiles/Configs/lazygit/Library/Application Support/lazygit")
+  local base = lazygit_base_dir()
   local dark_cfg = base .. "/config.yml"
   local light_cfg = base .. "/config-light.yml"
 
@@ -484,6 +497,118 @@ function M.sync_lazygit_theme(theme)
   if vim.fn.filereadable(target) == 1 then
     vim.env.LG_CONFIG_FILE = target
   end
+end
+
+local function copy_text_file_if_changed(src, dst)
+  if vim.fn.filereadable(src) ~= 1 then return false end
+  local ok_read_src, src_lines = pcall(vim.fn.readfile, src)
+  if not ok_read_src or type(src_lines) ~= "table" then return false end
+
+  local src_text = table.concat(src_lines, "\n")
+  local dst_text = ""
+  if vim.fn.filereadable(dst) == 1 then
+    local ok_read_dst, dst_lines = pcall(vim.fn.readfile, dst)
+    if ok_read_dst and type(dst_lines) == "table" then
+      dst_text = table.concat(dst_lines, "\n")
+    end
+  end
+
+  if src_text == dst_text then return false end
+
+  local dir = vim.fn.fnamemodify(dst, ":h")
+  vim.fn.mkdir(dir, "p")
+  vim.fn.writefile(src_lines, dst)
+  return true
+end
+
+local function read_text_file_safe(path)
+  if vim.fn.filereadable(path) ~= 1 then return nil end
+  local ok, lines = pcall(vim.fn.readfile, path)
+  if not ok or type(lines) ~= "table" then return nil end
+  return table.concat(lines, "\n") .. "\n"
+end
+
+local function write_text_file_if_changed_safe(path, text)
+  if type(text) ~= "string" then return false end
+  local current = read_text_file_safe(path)
+  if current == text then return false end
+
+  local dir = vim.fn.fnamemodify(path, ":h")
+  vim.fn.mkdir(dir, "p")
+  vim.fn.writefile(vim.split(text, "\n", { plain = true }), path)
+  return true
+end
+
+function M.sync_lazydocker_theme(theme)
+  local item = M.resolve(theme or vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+  local mode = ((item.opts and item.opts.background) or "dark")
+  local base = vim.fn.expand("~/Library/Application Support/lazydocker")
+  local src = base .. ((mode == "light") and "/config-light.yml" or "/config-dark.yml")
+  local dst = base .. "/config.yml"
+  pcall(copy_text_file_if_changed, src, dst)
+end
+
+function M.sync_btop_theme(theme)
+  local item = M.resolve(theme or vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+  local mode = ((item.opts and item.opts.background) or "dark")
+  local color_theme = (mode == "light") and "catppuccin_latte" or "catppuccin_mocha"
+
+  local path = vim.fn.expand("~/.config/btop/btop.conf")
+  local content = read_text_file_safe(path)
+  if type(content) ~= "string" then return end
+
+  local updated = content:gsub('color_theme%s*=%s*"[^"]+"', 'color_theme = "' .. color_theme .. '"', 1)
+  pcall(write_text_file_if_changed_safe, path, updated)
+end
+
+function M.sync_zellij_theme(theme)
+  local item = M.resolve(theme or vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+  local mode = ((item.opts and item.opts.background) or "dark")
+  local zellij_theme = (mode == "light") and "catppuccin-latte" or "catppuccin-macchiato"
+
+  local path = vim.fn.expand("~/.config/zellij/config.kdl")
+  local content = read_text_file_safe(path)
+  if type(content) ~= "string" then return end
+
+  local updated = content:gsub('theme%s+"[^"]+"', 'theme "' .. zellij_theme .. '"', 1)
+  pcall(write_text_file_if_changed_safe, path, updated)
+end
+
+function M.sync_shell_theme_runtime(theme)
+  local item = M.resolve(theme or vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+  local mode = ((item.opts and item.opts.background) or "dark")
+  local theme_key = item.key
+
+  local bat_theme = (mode == "light") and "Catppuccin Latte" or "Catppuccin Mocha"
+  local zsh_theme_file = (mode == "light")
+      and "$ZSH/custom/themes/catppuccin_latte-zsh-syntax-highlighting.zsh"
+      or "$ZSH/custom/themes/catppuccin_mocha-zsh-syntax-highlighting.zsh"
+
+  local fzf_opts = (mode == "light")
+      and "--layout=reverse --no-height --color=bg+:#e6e9ef,bg:#eff1f5,spinner:#515c7a,hl:#ea76cb --color=fg:#4c4f69,header:#ea76cb,info:#8839ef,pointer:#515c7a --color=marker:#1e66f5,fg+:#4c4f69,prompt:#8839ef,hl+:#ea76cb --color=selected-bg:#ccd0da --color=border:#e6e9ef,label:#4c4f69"
+      or "--layout=reverse --no-height --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc --color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 --color=selected-bg:#45475a --color=border:#313244,label:#cdd6f4"
+
+  local lazygit_base = lazygit_base_dir()
+  local lazygit_generated = lazygit_base .. "/config-generated-" .. sanitize_key(theme_key) .. ".yml"
+  local lazygit_fallback = lazygit_base .. ((mode == "light") and "/config-light.yml" or "/config.yml")
+  local lazygit_cfg = (vim.fn.filereadable(lazygit_generated) == 1) and lazygit_generated or lazygit_fallback
+
+  local lines = {
+    "# Auto-generated by nvim-pure colorschemes.lua",
+    "export PURE_THEME_FROM_NVIM=1",
+    "export PURE_THEME_AUTHORITY=nvim",
+    "export PURE_NVIM_THEME_KEY=\"" .. theme_key .. "\"",
+    "export PURE_THEME_MODE=\"" .. mode .. "\"",
+    "export BAT_THEME=\"" .. bat_theme .. "\"",
+    "export FZF_DEFAULT_OPTS=\"" .. fzf_opts .. "\"",
+    "export LG_CONFIG_FILE=\"" .. lazygit_cfg .. "\"",
+    "if [[ -n \"$ZSH\" && -f \"" .. zsh_theme_file .. "\" ]]; then",
+    "  source \"" .. zsh_theme_file .. "\"",
+    "fi",
+  }
+
+  local path = vim.fn.expand("~/.cache/nvim-pure/theme-sync.zsh")
+  pcall(write_text_file_if_changed_safe, path, table.concat(lines, "\n") .. "\n")
 end
 
 local function write_eza_generated_theme(path, palette)
@@ -893,6 +1018,10 @@ function M.sync_external_tools(theme)
   M.sync_tmux_theme(theme)
   M.sync_git_delta_theme(theme)
   M.sync_lazygit_theme(theme)
+  M.sync_lazydocker_theme(theme)
+  M.sync_btop_theme(theme)
+  M.sync_zellij_theme(theme)
+  M.sync_shell_theme_runtime(theme)
   M.sync_starship_theme(theme)
   M.sync_iterm2_theme(theme)
   M.sync_eza_theme(theme)
@@ -1059,6 +1188,10 @@ function M.setup_autocmd()
       M.sync_tmux_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
       M.sync_git_delta_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
       M.sync_lazygit_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+      M.sync_lazydocker_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+      M.sync_btop_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+      M.sync_zellij_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+      M.sync_shell_theme_runtime(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
       M.sync_starship_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
       M.sync_eza_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
     end,
