@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: git conflict-view [--no-open] [--with-base] [--] [path ...]
+
+Shows LOCAL/MERGED/REMOTE semantics for the current conflict context,
+lists unmerged files, and optionally opens git mergetool.
+
+Options:
+  --no-open    Only print context and conflicted files
+  --with-base  Open 4-way mergetool including BASE (LOCAL|BASE|REMOTE + MERGED)
+  -h, --help   Show this help
+EOF
+}
+
+ensure_git_repo() {
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "error: not inside a git repository" >&2
+    exit 1
+  fi
+}
+
+git_dir() {
+  git rev-parse --git-dir
+}
+
+detect_mode() {
+  local gd
+  gd="$(git_dir)"
+
+  if [[ -f "$gd/rebase-merge/head-name" || -d "$gd/rebase-apply" || -f "$gd/REBASE_HEAD" ]]; then
+    echo "rebase"
+    return
+  fi
+
+  if [[ -f "$gd/CHERRY_PICK_HEAD" ]]; then
+    echo "cherry-pick"
+    return
+  fi
+
+  if [[ -f "$gd/MERGE_HEAD" ]]; then
+    echo "merge"
+    return
+  fi
+
+  echo "unknown"
+}
+
+print_legend() {
+  local mode="$1"
+  echo "Conflict context: $mode"
+  echo
+
+  case "$mode" in
+    merge)
+      cat <<'EOF'
+Legend:
+  LOCAL  = your current branch (ours)
+  MERGED = file where you resolve and save
+  REMOTE = incoming branch/commit (theirs)
+  BASE   = common ancestor (optional context, hidden in this 3-view mode)
+EOF
+      ;;
+    rebase)
+      cat <<'EOF'
+Legend:
+  LOCAL  = upstream/target branch (onto) [ours]
+  MERGED = file where you resolve and save
+  REMOTE = commit being replayed [theirs]
+  BASE   = common ancestor for this step (optional context, hidden in this 3-view mode)
+EOF
+      ;;
+    cherry-pick)
+      cat <<'EOF'
+Legend:
+  LOCAL  = current branch [ours]
+  MERGED = file where you resolve and save
+  REMOTE = picked commit [theirs]
+  BASE   = common ancestor for this pick (optional context, hidden in this 3-view mode)
+EOF
+      ;;
+    *)
+      cat <<'EOF'
+Legend:
+  LOCAL  = ours
+  MERGED = file where you resolve and save
+  REMOTE = theirs
+  BASE   = common ancestor (optional context, hidden in this 3-view mode)
+EOF
+      ;;
+  esac
+}
+
+list_conflicts() {
+  git diff --name-only --diff-filter=U
+}
+
+main() {
+  ensure_git_repo
+
+  local open_tool=1
+  local with_base=0
+  local -a paths=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --no-open)
+        open_tool=0
+        shift
+        ;;
+      --with-base)
+        with_base=1
+        shift
+        ;;
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      --)
+        shift
+        while [[ $# -gt 0 ]]; do
+          paths+=("$1")
+          shift
+        done
+        ;;
+      *)
+        paths+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+  local mode
+  mode="$(detect_mode)"
+
+  print_legend "$mode"
+  echo
+  echo "Conflicted files:"
+
+  local conflicts
+  conflicts="$(list_conflicts || true)"
+
+  if [[ -z "$conflicts" ]]; then
+    echo "  (none)"
+    exit 0
+  fi
+
+  while IFS= read -r file; do
+    [[ -n "$file" ]] && echo "  - $file"
+  done <<< "$conflicts"
+
+  if [[ $open_tool -eq 0 ]]; then
+    exit 0
+  fi
+
+  echo
+  echo "Opening git mergetool..."
+  local -a mergetool_cmd=(git mergetool)
+  if [[ $with_base -eq 1 ]]; then
+    mergetool_cmd+=( -t nvimdiff-base )
+  fi
+
+  if [[ ${#paths[@]} -gt 0 ]]; then
+    mergetool_cmd+=( -- "${paths[@]}" )
+  else
+    mergetool_cmd+=( -- )
+  fi
+
+  "${mergetool_cmd[@]}"
+}
+
+main "$@"
