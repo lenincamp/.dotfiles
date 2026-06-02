@@ -956,6 +956,80 @@ function M.apply_transparency()
   end
 end
 
+local function detect_system_background_mode()
+  -- Fast path on macOS without AppleScript permission overhead.
+  if vim.fn.executable("defaults") == 1 then
+    local out = vim.fn.system({ "defaults", "read", "-g", "AppleInterfaceStyle" })
+    if vim.v.shell_error == 0 then
+      out = vim.trim((out or ""):lower())
+      if out:find("dark", 1, true) then return "dark" end
+      return "light"
+    end
+    -- When key doesn't exist, macOS is in Light mode.
+    return "light"
+  end
+
+  if vim.fn.executable("osascript") ~= 1 then return nil end
+  local script = 'tell application "System Events" to tell appearance preferences to return dark mode'
+  local out = vim.fn.system({ "osascript", "-e", script })
+  if vim.v.shell_error ~= 0 then return nil end
+
+  out = vim.trim((out or ""):lower())
+  if out == "true" then return "dark" end
+  if out == "false" then return "light" end
+  return nil
+end
+
+function M.sync_with_system_background(opts)
+  opts = opts or {}
+  if vim.g._pure_applying_colorscheme then return false end
+
+  local wanted = detect_system_background_mode()
+  if wanted == nil then return false end
+
+  local current = M.resolve(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+  local current_mode = (((current.opts and current.opts.background) or vim.o.background or "dark") == "light") and "light" or "dark"
+
+  if opts.force ~= true and wanted == vim.g._pure_system_mode_last and current_mode == wanted then
+    return false
+  end
+
+  vim.g._pure_system_mode_last = wanted
+  if current_mode == wanted then return false end
+  return M.set_background_mode(wanted)
+end
+
+local function start_system_background_watcher()
+  if M._system_theme_timer then return end
+  if vim.g.pure_system_theme_auto == false then return end
+
+  local uv = vim.uv or vim.loop
+  if not uv or not uv.new_timer then return end
+
+  local interval = tonumber(vim.g.pure_system_theme_poll_ms) or 8000
+  if interval <= 0 then return end
+  if interval < 1000 then interval = 1000 end
+
+  local timer = uv.new_timer()
+  if not timer then return end
+
+  timer:start(interval, interval, vim.schedule_wrap(function()
+    pcall(M.sync_with_system_background)
+  end))
+
+  M._system_theme_timer = timer
+end
+
+local function stop_system_background_watcher()
+  local timer = M._system_theme_timer
+  if not timer then return end
+  pcall(function()
+    timer:stop()
+    timer:close()
+  end)
+  M._system_theme_timer = nil
+end
+
 function M.setup_autocmd()
   if M._autocmd_ready then return end
   M._autocmd_ready = true
@@ -971,9 +1045,17 @@ function M.setup_autocmd()
     end,
   })
 
+  vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, {
+    group = group,
+    callback = function()
+      M.sync_with_system_background()
+    end,
+  })
+
   vim.api.nvim_create_autocmd("VimLeavePre", {
     group = group,
     callback = function()
+      stop_system_background_watcher()
       M.sync_tmux_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
       M.sync_git_delta_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
       M.sync_lazygit_theme(vim.g.pure_colorscheme or vim.g.colors_name or M.default)
@@ -1017,6 +1099,11 @@ function M.setup_autocmd()
     end,
     force = true,
   })
+
+  start_system_background_watcher()
+  vim.schedule(function()
+    M.sync_with_system_background({ force = true })
+  end)
 end
 
 local function set_theme_globals(theme)
