@@ -47,6 +47,10 @@ opt.undofile = true
 opt.winborder = "rounded"
 opt.hlsearch = false
 
+-- Fast grep backend + quickfix-compatible format.
+opt.grepprg = "rg --vimgrep --smart-case --hidden --glob !.git"
+opt.grepformat = "%f:%l:%c:%m"
+
 -- ── Folding (treesitter-based) ──────────────────────────────────────────────
 opt.foldmethod     = "expr"
 opt.foldexpr       = "v:lua.vim.treesitter.foldexpr()"
@@ -107,19 +111,18 @@ opt.lazyredraw = false  -- enable per-buffer when large file detected
 opt.updatetime = 100    -- default (1000ms when large file detected)
 opt.undolevels = 1000   -- default (100 when large file detected)
 
--- ── Diff algorithm ────────────────────────────────────────────────────────────
+-- ── Diff / Merge ergonomics (Neovim 0.12-friendly) ──────────────────────────
 
 local diffopt = {
   "internal",           -- use Neovim's built-in diff
   "filler",             -- keep filler lines for context alignment
   "closeoff",           -- close diff when only one window remains
-  "hiddenoff",          -- disable diff when buffer is hidden
   "foldcolumn:1",       -- fold column in diff mode
-  "context:999999",     -- show all context (don't collapse unchanged lines)
+  "context:8",          -- keep nearby context while collapsing distant unchanged blocks
   "vertical",           -- default to vertical split
-  "algorithm:histogram", -- semantic diff (better than Myers)
+  "algorithm:histogram", -- better block matching than Myers for code
   "indent-heuristic",   -- indentation-aware diff
-  "linematch:60",       -- detect moved lines (Neovim 0.9+)
+  "linematch:120",      -- stronger moved-line detection for large refactors
 }
 opt.diffopt:append(table.concat(diffopt, ","))
 
@@ -130,93 +133,3 @@ if vim.fn.getenv("TERM_PROGRAM") == "ghostty" then
   opt.titlestring = "%{fnamemodify(getcwd(), ':t')}"
 end
 
--- ── Winbar: breadcrumb + filetype icon + line:col ────────────────────────────
---
--- Layout (active):    [ft-icon] … > dir > file.java ●          42:15
--- Layout (inactive):  [ft-icon] … > dir > file.java  (dimmer via WinBarNC)
---
--- Highlight groups (catppuccin.lua):
---   WinBarIcon — filetype icon (blue)
---   WinBarPath — directory parts (dimmed)
---   WinBarSep  — ">" separator (subtle)
---   WinBarFile — filename (bold)
---   WinBarMod  — modified "●" (peach)
---   WinBarLine — line:col (very subtle, right side)
-
--- Filetype icon lookup (nerd fonts v3)
-local ft_icons = {
-  java       = "󰬷", javascript = "󰌞", typescript = "󰛦",
-  javascriptreact = "󰜈", typescriptreact = "󰜈",
-  lua        = "󰢱", python     = "󰌠", html       = "󰌝",
-  css        = "󰌜", scss       = "󰌜", json       = "󰘦",
-  markdown   = "󰍔", xml        = "󰗀", yaml       = "󰈙",
-  toml       = "󰈙", sh         = "󰆍", bash       = "󰆍",
-  vim        = "󰕷", sql        = "󰆼", kotlin     = "󱈙",
-  rust       = "󱘗", go         = "󰟓", c          = "󰙱",
-  cpp        = "󰙲", cs         = "󰌛", ruby       = "󰴭",
-  php        = "󰌟", swift      = "󰛥",
-}
-
-local function ft_icon(buf)
-  local ft  = vim.bo[buf].filetype
-  local ico = ft_icons[ft]
-  if ico then return "%#WinBarIcon#" .. ico .. " " end
-  -- Fallback: try extension from filename
-  local name = vim.api.nvim_buf_get_name(buf)
-  local ext  = name:match("%.(%w+)$")
-  ico = ext and ft_icons[ext:lower()]
-  return ico and ("%#WinBarIcon#" .. ico .. " ") or "%#WinBarIcon#󰈙 "
-end
-
-local function build_winbar_path(buf)
-  local path = vim.api.nvim_buf_get_name(buf)
-  if path == "" then return "" end
-  path = vim.fn.fnamemodify(path, ":~:.")
-
-  local parts = vim.split(path, "/", { plain = true })
-  if #parts == 0 then return "" end
-
-  local max_dirs = 3
-  local truncated = false
-  if #parts > max_dirs + 1 then
-    local kept = {}
-    for i = #parts - max_dirs, #parts do kept[#kept + 1] = parts[i] end
-    parts     = kept
-    truncated = true
-  end
-
-  local sep    = " %#WinBarSep#› %#WinBarPath#"
-  local crumbs = {}
-  if truncated then crumbs[#crumbs + 1] = "%#WinBarSep#…" end
-  for i, part in ipairs(parts) do
-    crumbs[#crumbs + 1] = (i == #parts)
-      and ("%#WinBarFile#" .. part)
-      or  ("%#WinBarPath#" .. part)
-  end
-  return ft_icon(buf) .. table.concat(crumbs, sep)
-end
-
-vim.api.nvim_create_autocmd({ "BufEnter", "BufFilePost", "FileType", "WinEnter" }, {
-  group    = vim.api.nvim_create_augroup("winbar_cache", { clear = true }),
-  callback = function(args)
-    if vim.bo[args.buf].buftype == "" then
-      vim.b[args.buf].winbar_path = build_winbar_path(args.buf)
-    end
-  end,
-})
-
-function _G.WinbarBreadcrumb()
-  local buf = vim.api.nvim_get_current_buf()
-  if vim.bo[buf].buftype ~= "" then return "" end
-  -- Compute lazily if cache is missing (e.g. first render in a new split)
-  local cached = vim.b[buf].winbar_path
-  if cached == nil then
-    cached = build_winbar_path(buf)
-    vim.b[buf].winbar_path = cached
-  end
-  if cached == "" then return "" end
-  local mod = vim.bo[buf].modified and " %#WinBarMod#●%#WinBar# " or " "
-  return " " .. cached .. mod
-end
-
-opt.winbar = "%{%v:lua.WinbarBreadcrumb()%}"

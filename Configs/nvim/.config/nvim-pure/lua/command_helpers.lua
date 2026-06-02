@@ -321,6 +321,165 @@ local function disable_diff_mode()
   end
 end
 
+local function replace_diffopt_entry(opts, prefix, value)
+  local out, replaced = {}, false
+  for _, item in ipairs(opts) do
+    if vim.startswith(item, prefix .. ":") then
+      if not replaced then
+        table.insert(out, prefix .. ":" .. tostring(value))
+        replaced = true
+      end
+    else
+      table.insert(out, item)
+    end
+  end
+  if not replaced then
+    table.insert(out, prefix .. ":" .. tostring(value))
+  end
+  return out
+end
+
+local function current_diff_profile()
+  local context = 8
+  for _, item in ipairs(vim.opt.diffopt:get()) do
+    local val = item:match("^context:(%d+)$")
+    if val then
+      context = tonumber(val) or context
+      break
+    end
+  end
+  if context <= 2 then return "focused" end
+  return "review"
+end
+
+-- Toggle between review-friendly and focused merge profiles.
+local function toggle_diff_profile()
+  local profile = current_diff_profile()
+  local next_profile = (profile == "review") and "focused" or "review"
+
+  local cfg = {
+    review = { context = 8, linematch = 120 },
+    focused = { context = 2, linematch = 60 },
+  }
+
+  local opts = vim.opt.diffopt:get()
+  opts = replace_diffopt_entry(opts, "context", cfg[next_profile].context)
+  opts = replace_diffopt_entry(opts, "linematch", cfg[next_profile].linematch)
+  vim.opt.diffopt = opts
+  vim.g.pure_diff_profile = next_profile
+
+  vim.notify(
+    string.format("Diff profile: %s (context:%d, linematch:%d)", next_profile, cfg[next_profile].context, cfg[next_profile].linematch),
+    vim.log.levels.INFO
+  )
+end
+
+local function open_quickfix_playbook()
+  local path = vim.fn.stdpath("config") .. "/QUICKFIX_REFACTOR_PLAYBOOK.md"
+  if vim.fn.filereadable(path) ~= 1 then
+    vim.notify("Quickfix playbook not found: " .. path, vim.log.levels.WARN)
+    return
+  end
+  vim.cmd("edit " .. vim.fn.fnameescape(path))
+end
+
+local function toggle_zen_mode()
+  local ok, nnp = pcall(require, "no-neck-pain")
+  if not ok then
+    vim.notify("no-neck-pain is not available", vim.log.levels.WARN)
+    return
+  end
+  nnp.toggle()
+end
+
+local ZEN_WIDTHS = { 110, 120, 130 }
+
+local function next_zen_width(current)
+  for idx, width in ipairs(ZEN_WIDTHS) do
+    if width == current then
+      return ZEN_WIDTHS[(idx % #ZEN_WIDTHS) + 1]
+    end
+  end
+  return ZEN_WIDTHS[1]
+end
+
+local function cycle_zen_width()
+  local ok, nnp = pcall(require, "no-neck-pain")
+  if not ok then
+    vim.notify("no-neck-pain is not available", vim.log.levels.WARN)
+    return
+  end
+
+  local cfg = (type(_G.NoNeckPain) == "table" and type(_G.NoNeckPain.config) == "table") and _G.NoNeckPain.config or nil
+  local current = tonumber((cfg and cfg.width) or vim.g.pure_zen_width or 120) or 120
+  local target = next_zen_width(current)
+
+  vim.g.pure_zen_width = target
+
+  if cfg then
+    cfg.width = target
+  end
+
+  local state = (type(_G.NoNeckPain) == "table" and type(_G.NoNeckPain.state) == "table") and _G.NoNeckPain.state or nil
+  if state and state.enabled then
+    local resized = pcall(nnp.resize, target)
+    if not resized then
+      vim.notify("Could not resize Zen layout in place", vim.log.levels.WARN)
+    end
+  end
+
+  vim.notify(string.format("Zen width: %d", target), vim.log.levels.INFO)
+end
+
+local function git_compare_load_prompt()
+  if vim.fn.executable("git") ~= 1 then
+    vim.notify("git is not available", vim.log.levels.ERROR)
+    return
+  end
+
+  vim.ui.input({ prompt = "compare-load branch: " }, function(input)
+    local branch = vim.trim(input or "")
+    if branch == "" then
+      return
+    end
+
+    if vim.fn.executable("git") ~= 1 then
+      vim.notify("git is not available", vim.log.levels.ERROR)
+      return
+    end
+
+    if vim.system then
+      vim.system({ "git", "compare-load", branch }, { text = true }, function(result)
+        vim.schedule(function()
+          if result.code == 0 then
+            vim.notify("Loaded diff from " .. branch .. " into worktree", vim.log.levels.INFO)
+            return
+          end
+
+          local msg = vim.trim((result.stderr or "") ~= "" and result.stderr or (result.stdout or ""))
+          if msg == "" then
+            msg = "git compare-load failed"
+          end
+          vim.notify(msg, vim.log.levels.ERROR)
+        end)
+      end)
+      return
+    end
+
+    local out = vim.fn.system({ "git", "compare-load", branch })
+    if vim.v.shell_error == 0 then
+      vim.notify("Loaded diff from " .. branch .. " into worktree", vim.log.levels.INFO)
+      return
+    end
+
+    local msg = vim.trim(out)
+    if msg == "" then
+      msg = "git compare-load failed"
+    end
+    vim.notify(msg, vim.log.levels.ERROR)
+  end)
+end
+
 return {
   copy_path = copy_path,
   rename_file = rename_file,
@@ -339,4 +498,9 @@ return {
   navigate_window = navigate_window,
   enable_diff_mode = enable_diff_mode,
   disable_diff_mode = disable_diff_mode,
+  toggle_diff_profile = toggle_diff_profile,
+  open_quickfix_playbook = open_quickfix_playbook,
+  toggle_zen_mode = toggle_zen_mode,
+  cycle_zen_width = cycle_zen_width,
+  git_compare_load_prompt = git_compare_load_prompt,
 }

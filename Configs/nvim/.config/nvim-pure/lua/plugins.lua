@@ -71,11 +71,13 @@ local sync_configs = {
   "mini-snippets",           -- snippet engine (friendly-snippets)
   "mini-pairs",              -- auto-close brackets
   "mini-indentscope",        -- animated indent scope indicator
+  "lualine",                 -- winbar via lualine (path + filename, split-aware)
   "mini-icons",              -- filetype icons for snacks picker
   "nvim-treesitter",         -- syntax / indent
   "treesitter-textobjects",  -- ]f/[f/]c/[c navigation + af/if text objects
   "treesitter-context",      -- sticky context header (after treesitter)
   "snacks",                  -- notifier, picker, lazygit, UI toggles (includes dashboard)
+  "no-neck-pain",            -- centered writing layout that stays stable with splits
   "flash",                   -- flash.nvim keymaps (s/S jumps, gz surround complement)
   "mini-surround",           -- surround add/delete/replace (gz prefix, no flash conflict)
   "persistence",             -- session save/restore per cwd (<leader>p*)

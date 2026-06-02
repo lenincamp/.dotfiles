@@ -37,10 +37,12 @@ M.list = {
   { "rose-pine", "rose-pine/neovim" },
   -- UI
   "folke/snacks.nvim",
+  "shortcuts/no-neck-pain.nvim",
   "echasnovski/mini.icons",                               -- filetype icons (snacks picker)
   "echasnovski/mini.clue",                                -- keymap hints (replaces which-key)
   "echasnovski/mini.pairs",                               -- auto-close brackets
   "echasnovski/mini.indentscope",                         -- animated indent scope indicator
+  "nvim-lualine/lualine.nvim",                            -- winbar/statusline framework
   -- Git
   "lewis6991/gitsigns.nvim",
   -- Editing

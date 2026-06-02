@@ -119,6 +119,7 @@ clue.setup({
     { mode = "n", keys = "<Leader>pl",     desc = "Session: Load (cwd)" },
     { mode = "n", keys = "<Leader>pS",     desc = "Session: Select" },
     { mode = "n", keys = "<Leader>pd",     desc = "Session: Stop recording" },
+    { mode = "n", keys = "<Leader>pH",     desc = "Open Quickfix Playbook" },
 
     -- Quit
     { mode = "n", keys = "<Leader>q",      desc = "+Quit" },
@@ -128,6 +129,7 @@ clue.setup({
     { mode = "n", keys = "<Leader>ur",     desc = "Redraw / clear search" },
     { mode = "n", keys = "<Leader>ue",     desc = "Enable diff mode" },
     { mode = "n", keys = "<Leader>uE",     desc = "Disable diff mode" },
+    { mode = "n", keys = "<Leader>gC",     desc = "Git Compare-Load (branch -> worktree)" },
 
     -- Replace / Refactor
     { mode = "n", keys = "<Leader>r",      desc = "+Refactor" },
@@ -173,15 +175,22 @@ clue.setup({
     { mode = "n", keys = "<Leader>u",      desc = "+UI" },
     { mode = "n", keys = "<Leader>uh",     desc = "Toggle Inlay Hints" },
     { mode = "n", keys = "<Leader>uz",     desc = "Toggle Zen Mode" },
+    { mode = "n", keys = "<Leader>uzn",    desc = "Cycle Zen Width (110/120/130)" },
     { mode = "n", keys = "<Leader>uZ",     desc = "Toggle Zoom Mode" },
     { mode = "n", keys = "<Leader>uX",     desc = "Toggle Treesitter Context" },
-    { mode = "n", keys = "<Leader>um",     desc = "Toggle Render Markdown" },
+    { mode = "n", keys = "<Leader>um",     desc = "Cycle Tabline Mode" },
+    { mode = "n", keys = "<Leader>uM",     desc = "Toggle Render Markdown" },
+    { mode = "n", keys = "<Leader>us",     desc = "Toggle Statusline" },
+    { mode = "n", keys = "<Leader>ut",     desc = "Toggle Tabline" },
+    { mode = "n", keys = "<Leader>uW",     desc = "Toggle Winbar" },
     { mode = "n", keys = "<Leader>uC",     desc = "Colorscheme Picker" },
     { mode = "n", keys = "<Leader>uS",     desc = "Toggle SonarLint" },
-    { mode = "n", keys = "<Leader>ut",     desc = "Toggle Transparent Background" },
+    { mode = "n", keys = "<Leader>uA",     desc = "Toggle Transparent Background" },
+    { mode = "n", keys = "<Leader>uo",     desc = "Toggle Spelling" },
     { mode = "n", keys = "<Leader>ug",     desc = "Toggle Grep Layout (IntelliJ)" },
     { mode = "n", keys = "<Leader>ui",     desc = "Toggle Cmdline Info (ruler/showcmd)" },
     { mode = "n", keys = "<Leader>uI",     desc = "Toggle IndentScope" },
+    { mode = "n", keys = "<Leader>uR",     desc = "Toggle Diff Profile" },
 
     -- Windows
     { mode = "n", keys = "<Leader>w",      desc = "+Windows" },

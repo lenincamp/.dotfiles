@@ -57,6 +57,10 @@
       "rev": "bb85e4bfc8d89b0e62c8fa53ccdd13d12e2f77b3",
       "src": "https://github.com/rebelot/kanagawa.nvim"
     },
+    "lualine.nvim": {
+      "rev": "221ce6b2d999187044529f49da6554a92f740a96",
+      "src": "https://github.com/nvim-lualine/lualine.nvim"
+    },
     "mason.nvim": {
       "rev": "44d1e90e1f66e077268191e3ee9d2ac97cc18e65",
       "src": "https://github.com/mason-org/mason.nvim"
@@ -111,11 +115,11 @@
     },
     "nvim-treesitter-context": {
       "rev": "b311b30818951d01f7b4bf650521b868b3fece16",
-      "src": "https://github.com/nvim-treesitter/nvim-treesitter-context.git"
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
     },
     "nvim-treesitter-textobjects": {
       "rev": "851e865342e5a4cb1ae23d31caf6e991e1c99f1e",
-      "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects.git"
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects"
     },
     "persistence.nvim": {
       "rev": "b20b2a7887bd39c1a356980b45e03250f3dce49c",
@@ -155,7 +159,7 @@
     },
     "sonarlint.nvim": {
       "rev": "acd09b78969ddc965a7ddf59abb9d9eec5ecd94f",
-      "src": "https://gitlab.com/schrieveslaach/sonarlint.nvim.git"
+      "src": "https://gitlab.com/schrieveslaach/sonarlint.nvim"
     },
     "springboot-nvim": {
       "rev": "105fb2a0b54fbd819200b244e8079c4c9f1a8415",

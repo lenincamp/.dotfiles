@@ -30,3 +30,4 @@
 ## Git
 - Format: `feat|fix|chore(scope): [TICKET] description`
 - One logical change per commit; small focused PRs
+- Never add `Co-Authored-By: Claude` (or any AI co-author trailer) to commit messages or PR bodies — applies to all workflows (SDD, normal agents, direct commits)

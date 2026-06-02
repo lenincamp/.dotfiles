@@ -191,6 +191,7 @@ end
 
 map("n", "<leader>gL", function() Snacks.picker.git_log() end,                         { desc = "Git Log (cwd)" })
 map("n", "<leader>gb", function() Snacks.picker.git_log_line() end,                    { desc = "Git Blame Line" })
+map("n", "<leader>gC", function() require("command_helpers").git_compare_load_prompt() end, { desc = "Git Compare-Load (branch -> worktree)" })
 map("n", "<leader>gf", function() Snacks.picker.git_log_file() end,                    { desc = "Git File History" })
 map("n", "<leader>gl", function() Snacks.picker.git_log({ cwd = root() }) end,         { desc = "Git Log (root)" })
 map({ "n", "x" }, "<leader>gB", function() Snacks.gitbrowse() end,                    { desc = "Git Browse (open)" })

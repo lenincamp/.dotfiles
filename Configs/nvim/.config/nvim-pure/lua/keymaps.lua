@@ -21,6 +21,7 @@ map("x", "N", "'nN'[v:searchforward]",       { expr = true, desc = "Prev Search 
 map("o", "N", "'nN'[v:searchforward]",       { expr = true, desc = "Prev Search Result" })
 
 local cmd = require("command_helpers")
+local ui = require("ui_toggles")
 
 map("n", "*", function() return cmd.enable_search_highlight_and_return("*") end,
   { expr = true, silent = true, desc = "Search word forward (highlight on)" })
@@ -214,6 +215,14 @@ map("n", "<leader><tab>[",    "<cmd>tabprevious<cr>",{ desc = "Prev Tab" })
 
 -- ── UI utilities ──────────────────────────────────────────────────────────────
 
+map("n", "<leader>us", function() ui.toggle_statusline() end, { desc = "Toggle statusline" })
+map("n", "<leader>ut", function() ui.toggle_tabline() end, { desc = "Toggle tabline" })
+map("n", "<leader>um", function() ui.cycle_tabline_mode() end, { desc = "Cycle tabline mode" })
+map("n", "<leader>uW", function() ui.toggle_winbar() end, { desc = "Toggle winbar" })
+map("n", "<leader>uz", function() cmd.toggle_zen_mode() end, { desc = "Toggle Zen Mode" })
+map("n", "<leader>uzn", function() cmd.cycle_zen_width() end, { desc = "Cycle Zen Width (110/120/130)" })
+map("n", "<leader>uR", function() cmd.toggle_diff_profile() end, { desc = "Toggle diff profile (review/focused)" })
+
 map("n", "<leader>ur", function()
   cmd.clear_search_highlights()
   vim.cmd("diffupdate")
@@ -226,6 +235,9 @@ map("n", "<Esc>", function()
 end, { expr = true, silent = true, desc = "Clear search highlights" })
 
 map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
+
+-- Project docs
+map("n", "<leader>pH", function() cmd.open_quickfix_playbook() end, { desc = "Open Quickfix Playbook" })
 
 -- Diff mode toggle
 map("n", "<leader>ue", function() cmd.enable_diff_mode() end,  { desc = "Enable diff mode" })

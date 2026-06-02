@@ -10,7 +10,7 @@ vim.g.snacks_words = false
 Snacks.setup({
   -- ── Dashboard ─────────────────────────────────────────────────────────────
   dashboard = {
-    enabled  = true,
+    enabled  = false,
     sections = {
       { section = "header" },
       { section = "keys", gap = 1, padding = 1 },
@@ -119,7 +119,7 @@ Snacks.setup({
   toggle    = { enabled = true },
   bufdelete = { enabled = true },
   gitbrowse = { enabled = true },
-  zen       = { enabled = true },
+  zen       = { enabled = false },
   dim       = { enabled = true },
   statuscolumn = { enabled = false }, -- using custom statusline
   words        = { enabled = true },   -- highlight + navigate word references ([[/]])
@@ -127,7 +127,7 @@ Snacks.setup({
 
 -- ── UI toggles (LazyVim-compatible Snacks.toggle keymaps) ────────────────────
 
-Snacks.toggle.option("spell",          { name = "Spelling" }):map("<leader>us")
+Snacks.toggle.option("spell",          { name = "Spelling" }):map("<leader>uo")
 Snacks.toggle.option("wrap",           { name = "Wrap" }):map("<leader>uw")
 Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
 Snacks.toggle.diagnostics():map("<leader>ud")
@@ -141,7 +141,6 @@ Snacks.toggle({
   end,
 }):map("<leader>ub")
 Snacks.toggle.dim():map("<leader>uD")
-Snacks.toggle.zen():map("<leader>uz")
 Snacks.toggle.zoom():map("<leader>uZ"):map("<leader>wm")
 
 if vim.lsp.inlay_hint then
