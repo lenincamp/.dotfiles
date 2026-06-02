@@ -13,9 +13,9 @@ gui:
     cherryPickedCommitBgColor:
       - "#223249"
     cherryPickedCommitFgColor:
-      - "#8992a7"
+      - "#76946a"
     unstagedChangesColor:
-      - "#e82424"
+      - "#c34043"
     defaultFgColor:
       - "#c5c9c5"
     searchingActiveBorderColor:
@@ -24,4 +24,4 @@ gui:
     "*": "#8992a7"
 git:
   pagers:
-    - pager: delta --paging=never --line-numbers --config delta.side-by-side=false
+    - pager: delta --paging=never --features="kanagawa side-by-side line-numbers decorations"

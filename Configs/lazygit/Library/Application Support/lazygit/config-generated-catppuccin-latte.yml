@@ -13,7 +13,7 @@ gui:
     cherryPickedCommitBgColor:
       - "#bcc0cc"
     cherryPickedCommitFgColor:
-      - "#8839ef"
+      - "#40a02b"
     unstagedChangesColor:
       - "#d20f39"
     defaultFgColor:
@@ -24,4 +24,4 @@ gui:
     "*": "#8839ef"
 git:
   pagers:
-    - pager: delta --paging=never --line-numbers --config delta.side-by-side=false
+    - pager: delta --paging=never --features="catppuccin-latte side-by-side line-numbers decorations"

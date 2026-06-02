@@ -24,4 +24,4 @@ gui:
     "*": "#fb4934"
 git:
   pagers:
-    - pager: delta --paging=never --line-numbers --config delta.side-by-side=false
+    - pager: delta --paging=never --features="gruvbox-dark side-by-side line-numbers decorations"

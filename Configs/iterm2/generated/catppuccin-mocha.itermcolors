@@ -46,15 +46,15 @@
   </dict>
   <key>Ansi 1 Color</key>
   <dict>
-    <key>Red Component</key><real>0.952941</real>
-    <key>Green Component</key><real>0.545098</real>
-    <key>Blue Component</key><real>0.658824</real>
+    <key>Red Component</key><real>0.878431</real>
+    <key>Green Component</key><real>0.423529</real>
+    <key>Blue Component</key><real>0.458824</real>
   </dict>
   <key>Ansi 2 Color</key>
   <dict>
-    <key>Red Component</key><real>0.796078</real>
-    <key>Green Component</key><real>0.650980</real>
-    <key>Blue Component</key><real>0.968627</real>
+    <key>Red Component</key><real>0.650980</real>
+    <key>Green Component</key><real>0.890196</real>
+    <key>Blue Component</key><real>0.631373</real>
   </dict>
   <key>Ansi 3 Color</key>
   <dict>

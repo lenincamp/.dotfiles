@@ -52,9 +52,9 @@
   </dict>
   <key>Ansi 2 Color</key>
   <dict>
-    <key>Red Component</key><real>0.533333</real>
-    <key>Green Component</key><real>0.223529</real>
-    <key>Blue Component</key><real>0.937255</real>
+    <key>Red Component</key><real>0.250980</real>
+    <key>Green Component</key><real>0.627451</real>
+    <key>Blue Component</key><real>0.168627</real>
   </dict>
   <key>Ansi 3 Color</key>
   <dict>
