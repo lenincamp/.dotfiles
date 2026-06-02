@@ -34,7 +34,13 @@ _resolve_nvim_theme_sync() {
 
 _pure_refresh_theme_runtime() {
     local _latest=""
-    _latest=$(/bin/ls -t "$HOME/.dotfiles/Configs/lazygit/Library/Application Support/lazygit"/config-generated-*.yml "$HOME/Library/Application Support/lazygit"/config-generated-*.yml 2>/dev/null | head -n 1)
+    local _base1="$HOME/.dotfiles/Configs/lazygit/Library/Application Support/lazygit"
+    local _base2="$HOME/Library/Application Support/lazygit"
+    local -a _generated_candidates
+    _generated_candidates=("$_base1"/config-generated-*.yml(N) "$_base2"/config-generated-*.yml(N))
+    if (( ${#_generated_candidates[@]} > 0 )); then
+        _latest=$(/bin/ls -t -- "${_generated_candidates[@]}" 2>/dev/null | head -n 1)
+    fi
     if [[ -n "$_latest" && -f "$_latest" ]]; then
         export LG_CONFIG_FILE="$_latest"
         return 0

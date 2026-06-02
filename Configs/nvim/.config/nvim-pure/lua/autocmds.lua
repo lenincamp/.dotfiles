@@ -35,11 +35,63 @@ local function set_number_options_for_buf(bufnr, number, relativenumber)
   end
 end
 
+local function fast_text_search_current_file(bufnr)
+  local query = vim.fn.input("Search text > ")
+  if query == nil or query == "" then return end
+
+  local file = vim.api.nvim_buf_get_name(bufnr)
+  if file == "" then
+    vim.notify("Buffer has no file on disk", vim.log.levels.WARN)
+    return
+  end
+
+  local lines = vim.fn.systemlist({
+    "rg",
+    "--vimgrep",
+    "--smart-case",
+    "--",
+    query,
+    file,
+  })
+
+  -- If query is not a valid regex, fallback to literal search.
+  if vim.v.shell_error == 2 then
+    lines = vim.fn.systemlist({
+      "rg",
+      "--vimgrep",
+      "--smart-case",
+      "--fixed-strings",
+      "--",
+      query,
+      file,
+    })
+  end
+
+  if vim.v.shell_error ~= 0 and #lines == 0 then
+    vim.notify("No text matches found", vim.log.levels.INFO)
+    return
+  end
+
+  vim.fn.setqflist({}, " ", {
+    title = string.format("Search: %s", query),
+    lines = lines,
+  })
+  vim.cmd("copen")
+end
+
+-- Fast in-file grep for any filetype.
+vim.keymap.set("n", "<leader>/", function()
+  fast_text_search_current_file(vim.api.nvim_get_current_buf())
+end, { silent = true, desc = "Fast search text in current file (rg)" })
+
 local function disable_lsp_for_diff_buffer(bufnr)
   detach_all_lsp_clients(bufnr)
   set_buffer_diagnostics(bufnr, false)
   vim.b[bufnr].diff_lsp_disabled = true
 end
+
+-- Single size control for every huge-file optimization path.
+local HUGE_FILE_THRESHOLD = 2500000 -- 2.5MB
 
 -- Highlight yanked text (fires in all modes: normal, visual, command)
 local highlight_group = augroup("YankHighlight", { clear = true })
@@ -66,10 +118,16 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.bo[ev.buf].softtabstop = 2
     vim.b[ev.buf].autoformat   = false
 
-    -- Para JSON > 5MB: desactivar features pesadas
-    if file_size > 5000000 then
+    -- Para JSON > 2.5MB: desactivar features pesadas
+    if file_size > HUGE_FILE_THRESHOLD then
       -- Disable Treesitter (JSON parser es lento con archivos grandes)
       pcall(vim.treesitter.stop, ev.buf)
+
+      -- Disable expensive folds/highlight passes in very large JSON files.
+      vim.opt_local.foldmethod = "manual"
+      vim.opt_local.foldexpr = "0"
+      vim.opt_local.foldenable = false
+      vim.opt_local.synmaxcol = 120
 
       -- Disable LSP (json-lsp puede quedarse colgado)
       detach_all_lsp_clients(ev.buf)
@@ -89,9 +147,12 @@ vim.api.nvim_create_autocmd("FileType", {
 
       -- No line wrapping
       vim.wo.wrap = false
+      vim.wo.list = false
+      vim.wo.cursorline = false
+      vim.opt_local.wrapscan = false
 
       vim.notify(
-        string.format("JSON grande detectado (%.1fMB) — optimizaciones activadas", file_size / 1000000),
+        string.format("JSON grande detectado (%.1fMB) — fast search activo (<leader>/)", file_size / 1000000),
         vim.log.levels.WARN
       )
     end
@@ -294,50 +355,171 @@ vim.api.nvim_create_autocmd("VimLeave", {
   command  = "silent !zellij action switch-mode normal",
 })
 
--- ── Large file optimizations (37k+ lines) ──────────────────────────────────────
+-- ── Huge non-code file profile (targeted filetypes) ───────────────────────────
 
-local LARGE_FILE_THRESHOLD = 1000000  -- 1MB
+local HUGE_TEXT_FILETYPES = {
+  text = true,
+  txt = true,
+  conf = true,
+  dosini = true,
+  jproperties = true,
+  properties = true,
+  json = true,
+  jsonc = true,
+}
 
-vim.api.nvim_create_autocmd("BufReadPre", {
-  group    = vim.api.nvim_create_augroup("large_file_disable", { clear = true }),
+local function is_target_huge_text_file(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then return false end
+  if vim.bo[bufnr].buftype ~= "" then return false end
+
+  local ft = vim.bo[bufnr].filetype
+  if not HUGE_TEXT_FILETYPES[ft] then return false end
+
+  local path = vim.api.nvim_buf_get_name(bufnr)
+  if path == "" then return false end
+
+  local size = vim.fn.getfsize(path)
+  return size > HUGE_FILE_THRESHOLD
+end
+
+local function apply_huge_text_profile(bufnr)
+  if vim.b[bufnr].huge_text_profile_active then return end
+
+  pcall(vim.treesitter.stop, bufnr)
+  set_buffer_diagnostics(bufnr, false)
+  detach_all_lsp_clients(bufnr)
+
+  set_number_options_for_buf(bufnr, true, true)
+  vim.opt_local.foldmethod = "manual"
+  vim.opt_local.foldexpr = "0"
+  vim.opt_local.foldenable = false
+  vim.opt_local.synmaxcol = 120
+  vim.opt_local.wrap = false
+  vim.opt_local.wrapscan = false
+  vim.opt_local.list = false
+  vim.opt_local.cursorline = false
+
+  vim.bo[bufnr].undolevels = 100
+  vim.bo[bufnr].undofile = false
+
+  vim.opt.lazyredraw = true
+  vim.opt.updatetime = 1000
+
+  vim.b[bufnr].huge_text_profile_active = true
+
+  local size = vim.fn.getfsize(vim.api.nvim_buf_get_name(bufnr))
+  vim.notify(
+    string.format("Huge file profile ON for %s (%.1fMB)", vim.bo[bufnr].filetype, size / 1000000),
+    vim.log.levels.WARN
+  )
+end
+
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufEnter", "FileType" }, {
+  group = vim.api.nvim_create_augroup("huge_text_profile_apply", { clear = true }),
   callback = function(args)
-    local file_size = vim.fn.getfsize(vim.fn.expand("%"))
-    if file_size > LARGE_FILE_THRESHOLD then
-      -- Disable Treesitter
-      pcall(vim.treesitter.stop, args.buf)
-
-      -- Disable LSP & diagnostics
-      set_buffer_diagnostics(args.buf, false)
-      detach_all_lsp_clients(args.buf)
-
-      -- Keep line numbers active for navigation even in large files
-      set_number_options_for_buf(args.buf, true, true)
-
-      -- Optimize rendering
-      vim.opt.lazyredraw = true
-      vim.opt.updatetime = 1000
-
-      -- Limit undo to save memory
-      vim.bo[args.buf].undolevels = 100
-
-      vim.notify(
-        string.format("Large file detected (%.1fMB) — optimizations enabled", file_size / 1000000),
-        vim.log.levels.WARN
-      )
+    if is_target_huge_text_file(args.buf) then
+      apply_huge_text_profile(args.buf)
     end
   end,
 })
 
--- Restore normal settings when switching away from large file
 vim.api.nvim_create_autocmd("BufLeave", {
-  group    = vim.api.nvim_create_augroup("large_file_restore", { clear = true }),
+  group = vim.api.nvim_create_augroup("huge_text_profile_restore", { clear = true }),
   callback = function(args)
-    local file_size = vim.fn.getfsize(vim.fn.expand("%"))
-    if file_size > LARGE_FILE_THRESHOLD then
-      vim.opt.lazyredraw = false
-      vim.opt.updatetime = 100  -- Default
-      set_number_options_for_buf(args.buf, true, true)
+    if not vim.b[args.buf].huge_text_profile_active then return end
+
+    vim.opt.lazyredraw = false
+    vim.opt.updatetime = 100
+    set_number_options_for_buf(args.buf, true, true)
+    vim.b[args.buf].huge_text_profile_active = false
+  end,
+})
+
+-- ── Huge code file profile (keep LSP, reduce heavy rendering) ─────────────────
+
+local HUGE_CODE_FILETYPES = {
+  java = true,
+  javascript = true,
+  javascriptreact = true,
+  typescript = true,
+  typescriptreact = true,
+  xml = true,
+  yaml = true,
+  yml = true,
+  sh = true,
+  bash = true,
+  zsh = true,
+  apex = true,
+  html = true, -- LWC templates
+  sql = true,
+  soql = true,
+}
+
+local function is_target_huge_code_file(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then return false end
+  if vim.bo[bufnr].buftype ~= "" then return false end
+
+  local ft = vim.bo[bufnr].filetype
+  if not HUGE_CODE_FILETYPES[ft] then return false end
+
+  local path = vim.api.nvim_buf_get_name(bufnr)
+  if path == "" then return false end
+
+  local size = vim.fn.getfsize(path)
+  return size > HUGE_FILE_THRESHOLD
+end
+
+local function apply_huge_code_profile(bufnr)
+  if vim.b[bufnr].huge_code_profile_active then return end
+
+  -- Keep LSP/diagnostics attached for coding, but disable heavy syntax engines.
+  pcall(vim.treesitter.stop, bufnr)
+  if vim.lsp.inlay_hint and vim.lsp.inlay_hint.enable then
+    pcall(vim.lsp.inlay_hint.enable, false, { bufnr = bufnr })
+  end
+
+  set_number_options_for_buf(bufnr, true, true)
+  vim.opt_local.foldmethod = "manual"
+  vim.opt_local.foldexpr = "0"
+  vim.opt_local.foldenable = false
+  vim.opt_local.synmaxcol = 120
+  vim.opt_local.wrap = false
+  vim.opt_local.wrapscan = false
+  vim.opt_local.list = false
+  vim.opt_local.cursorline = false
+
+  vim.bo[bufnr].undolevels = 300
+
+  vim.opt.lazyredraw = true
+  vim.opt.updatetime = 800
+
+  vim.b[bufnr].huge_code_profile_active = true
+
+  local size = vim.fn.getfsize(vim.api.nvim_buf_get_name(bufnr))
+  vim.notify(
+    string.format("Huge code profile ON for %s (%.1fMB) — LSP kept active", vim.bo[bufnr].filetype, size / 1000000),
+    vim.log.levels.WARN
+  )
+end
+
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufEnter", "FileType" }, {
+  group = vim.api.nvim_create_augroup("huge_code_profile_apply", { clear = true }),
+  callback = function(args)
+    if is_target_huge_code_file(args.buf) then
+      apply_huge_code_profile(args.buf)
     end
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufLeave", {
+  group = vim.api.nvim_create_augroup("huge_code_profile_restore", { clear = true }),
+  callback = function(args)
+    if not vim.b[args.buf].huge_code_profile_active then return end
+
+    vim.opt.lazyredraw = false
+    vim.opt.updatetime = 100
+    set_number_options_for_buf(args.buf, true, true)
+    vim.b[args.buf].huge_code_profile_active = false
   end,
 })
 
@@ -349,7 +531,7 @@ vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter" }, {
     if vim.bo.filetype == "json" and vim.wo.diff then
       local file_size = vim.fn.getfsize(vim.fn.expand("%"))
 
-      if file_size > 5000000 then
+      if file_size > HUGE_FILE_THRESHOLD then
         -- En diff mode, JSON grande = read-only mode
         vim.bo.modifiable = false
         vim.bo.readonly = true
