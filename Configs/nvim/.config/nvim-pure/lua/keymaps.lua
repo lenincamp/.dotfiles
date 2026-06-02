@@ -46,6 +46,7 @@ map("x", "<", "<gv", { desc = "Indent left" })
 map("x", ">", ">gv", { desc = "Indent right" })
 
 map("n", "<A-d>", function() cmd.duplicate_line_or_selection() end, { desc = "Duplicate line" })
+map("i", "<A-d>", function() cmd.duplicate_line_or_selection() end, { desc = "Duplicate line" })
 map("x", "<A-d>", function() cmd.duplicate_line_or_selection(true) end, { desc = "Duplicate selection" })
 
 -- Undo break-points on common punctuation (smaller undo chunks)
@@ -58,15 +59,6 @@ map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Commen
 map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
 
 -- ── LSP ───────────────────────────────────────────────────────────────────────
-
-map("n", "gd",  vim.lsp.buf.definition,      { desc = "Go to Definition" })
-map("n", "gD",  vim.lsp.buf.declaration,      { desc = "Go to Declaration" })
-map("n", "gy",  vim.lsp.buf.type_definition,  { desc = "Go to Type Definition" })
-map("n", "K",   vim.lsp.buf.hover,            { desc = "Hover Documentation" })
-
--- Vertical split + goto definition
-map("n", "gV", ":vsplit<CR><cmd>lua vim.lsp.buf.definition()<CR>",
-  { silent = true, desc = "Vsplit & goto definition" })
 
 -- ── Peek preview (floating window, chainable definitions) ─────────────────────
 
@@ -89,9 +81,6 @@ map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
 map({ "n", "x" }, "<leader>cf", function() cmd.format() end, { desc = "Format" })
 
 -- Code actions / rename / signature
-map("n", "<leader>ca", vim.lsp.buf.code_action,    { desc = "Code Action" })
-map("x", "<leader>ca", vim.lsp.buf.code_action,    { desc = "Code Action" })
-map("n", "<leader>cr", vim.lsp.buf.rename,         { desc = "Rename Symbol" })
 
 -- ── References & symbols (via Snacks picker) ──────────────────────────────────
 
@@ -102,14 +91,27 @@ local function snacks_pick(method)
   end
 end
 
-map("n", "<leader>cR", snacks_pick("lsp_references"),        { desc = "References (picker)" })
+-- ── LSP navigation/actions (standard g-prefix, no duplicates) ───────────────
+
+map("n", "gd", vim.lsp.buf.definition,                { desc = "Go to Definition" })
+map("n", "gD", vim.lsp.buf.declaration,               { desc = "Go to Declaration" })
+map("n", "gy", vim.lsp.buf.type_definition,           { desc = "Go to Type Definition" })
+map("n", "gri", vim.lsp.buf.implementation,           { desc = "Go to Implementation" })
+map("n", "grr", snacks_pick("lsp_references"),       { desc = "References (picker)" })
+map("n", "gO", snacks_pick("lsp_symbols"),           { desc = "Document Symbols" })
+map("n", "gW", snacks_pick("lsp_workspace_symbols"), { desc = "Workspace Symbols" })
+map("n", "gra", vim.lsp.buf.code_action,              { desc = "Code Action" })
+map("x", "gra", vim.lsp.buf.code_action,              { desc = "Code Action" })
+map("n", "grn", vim.lsp.buf.rename,                   { desc = "Rename Symbol" })
+map("n", "K", vim.lsp.buf.hover,                      { desc = "Hover Documentation" })
+map("n", "gK", vim.lsp.buf.signature_help,            { desc = "Signature Help" })
+map("n", "gV", ":vsplit<CR><cmd>lua vim.lsp.buf.definition()<CR>",
+  { silent = true, desc = "Vsplit & goto definition" })
+
 map("n", "]]",         function() cmd.jump_word_reference(vim.v.count1) end,  { desc = "Next Reference" })
 map("n", "[[",         function() cmd.jump_word_reference(-vim.v.count1) end, { desc = "Prev Reference" })
-map("n", "<leader>cs", snacks_pick("lsp_symbols"),            { desc = "LSP Symbols" })
-map("n", "<leader>cS", snacks_pick("lsp_workspace_symbols"), { desc = "Workspace Symbols" })
 
 map("i", "<C-k>", vim.lsp.buf.signature_help, { desc = "Signature Help" })
-map("n", "gK",    vim.lsp.buf.signature_help, { desc = "Signature Help" })
 map("n", "<leader>cm", "<cmd>Mason<cr>",      { desc = "Mason" })
 map("n", "<leader>K",  "<cmd>norm! K<cr>",    { desc = "Keywordprg" })
 
@@ -156,7 +158,6 @@ map("n", "]b",      "<cmd>bn<CR>", { desc = "Next buffer" })
 map("n", "<leader>w",  "<C-W>",  { desc = "Windows", remap = true })
 map("n", "<leader>ww", "<C-W>w", { desc = "Other Window",        remap = true })
 map("n", "<leader>wd", "<C-W>c", { desc = "Delete Window",       remap = true })
-map("n", "<leader>wq", "<C-W>c", { desc = "Close Window",        remap = true })
 map("n", "<leader>ws", "<C-W>s", { desc = "Split Below",         remap = true })
 map("n", "<leader>wv", "<C-W>v", { desc = "Split Right",         remap = true })
 map("n", "<leader>wh", "<C-W>h", { desc = "Go to Left Window",   remap = true })

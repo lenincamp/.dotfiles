@@ -77,7 +77,6 @@ map("n", "<leader>e",  function() Snacks.explorer() end,                 { desc 
 
 -- ── Files (<leader>f) ─────────────────────────────────────────────────────────
 
-map("n", "<leader><space>", function() Snacks.picker.files({ cwd = root() }) end, { desc = "Find Files (root)" })
 map("n", "<leader>fF",      function() Snacks.picker.files({ cwd = root() }) end, { desc = "Find Files (root)" })
 map("n", "<leader>ff",      function() Snacks.picker.files() end,                 { desc = "Find Files (cwd)" })
 map("n", "<leader>fg",      function() Snacks.picker.git_files() end,             { desc = "Find Git Files" })
@@ -169,7 +168,6 @@ Snacks.toggle({
 -- ── Buffers (<leader>b) ───────────────────────────────────────────────────────
 
 map("n", "<leader>bb", "<cmd>e #<cr>",                          { desc = "Switch to Other Buffer" })
-map("n", "<leader>`",  "<cmd>e #<cr>",                          { desc = "Switch to Other Buffer" })
 map("n", "<leader>bD", "<cmd>bd<cr>",                           { desc = "Delete Buffer and Window" })
 map("n", "<leader>bd", function()
   if Snacks.bufdelete then Snacks.bufdelete() else vim.cmd("bdelete") end

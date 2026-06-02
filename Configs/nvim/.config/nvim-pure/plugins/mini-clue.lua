@@ -27,9 +27,10 @@ clue.setup({
     { mode = "x", keys = "gc" },
     -- Peek preview stack
     { mode = "n", keys = "gp" },
-    -- Surround (mini.surround, gz prefix)
-    { mode = "n", keys = "gz" },
-    { mode = "x", keys = "gz" },
+    -- s-prefix motions (surround + flash)
+    { mode = "n", keys = "s" },
+    { mode = "x", keys = "s" },
+    { mode = "o", keys = "s" },
   },
 
   clues = {
@@ -71,8 +72,9 @@ clue.setup({
     { mode = "n", keys = "<Leader>c",      desc = "+Code" },
     { mode = "x", keys = "<Leader>c",      desc = "+Code" },
 
-    -- Debug (DAP)  —  description changes to "+Diff" in diff buffers via buffer clue
+    -- Debug (DAP)
     { mode = "n", keys = "<Leader>d",      desc = "+Debug" },
+    { mode = "x", keys = "<Leader>d",      desc = "+Debug" },
     { mode = "n", keys = "<Leader>db",     desc = "+Breakpoints" },
     { mode = "n", keys = "<Leader>dbs",    desc = "Breakpoints: Save" },
     { mode = "n", keys = "<Leader>dbL",    desc = "Breakpoints: Load" },
@@ -211,9 +213,12 @@ clue.setup({
     -- Tabs
     { mode = "n", keys = "<Leader><Tab>",  desc = "+Tabs" },
 
-    -- Comment subgroup
+    -- Comment subgroup (gc is the group prefix for comment keymaps)
     { mode = "n", keys = "gc",             desc = "+Comment" },
-    { mode = "x", keys = "gc",             desc = "+Comment" },
+    { mode = "n", keys = "gcc",            desc = "Toggle line comment" },
+    { mode = "x", keys = "gc",             desc = "Toggle selection comment" },
+    { mode = "n", keys = "gco",            desc = "Add comment below" },
+    { mode = "n", keys = "gcO",            desc = "Add comment above" },
 
     -- [ / ] navigation clues
     { mode = "n", keys = "[X",             desc = "Jump to context start" },
@@ -237,29 +242,48 @@ clue.setup({
     { mode = "n", keys = "[a",             desc = "Prev parameter" },
     { mode = "n", keys = "]a",             desc = "Next parameter" },
 
-    -- gp Peek preview
-    { mode = "n", keys = "gp",             desc = "+Peek" },
-    { mode = "n", keys = "gpd",            desc = "Peek definition" },
-    { mode = "n", keys = "gpt",            desc = "Peek type definition" },
-    { mode = "n", keys = "gpi",            desc = "Peek implementation" },
-    { mode = "n", keys = "gpD",            desc = "Peek declaration" },
-    { mode = "n", keys = "gpr",            desc = "Peek references (picker)" },
-    { mode = "n", keys = "gpc",            desc = "Peek: close all" },
+    -- gp Quick Preview subgroup
+    { mode = "n", keys = "gp",             desc = "+Quick Preview" },
+    { mode = "n", keys = "gpd",            desc = "Quick Preview: definition" },
+    { mode = "n", keys = "gpt",            desc = "Quick Preview: type definition" },
+    { mode = "n", keys = "gpi",            desc = "Quick Preview: implementation" },
+    { mode = "n", keys = "gpD",            desc = "Quick Preview: declaration" },
+    { mode = "n", keys = "gpr",            desc = "Quick Preview: references (picker)" },
+    { mode = "n", keys = "gpc",            desc = "Quick Preview: close all" },
 
-    -- gK — signature help (companion to K=hover)
+    -- g LSP navigation/actions (standard)
+    { mode = "n", keys = "gd",             desc = "Go to definition" },
+    { mode = "n", keys = "gD",             desc = "Go to declaration" },
+    { mode = "n", keys = "gy",             desc = "Go to type definition" },
+    { mode = "n", keys = "gV",             desc = "Vsplit and go to definition" },
+    { mode = "n", keys = "gr",             desc = "+LSP actions" },
+    { mode = "x", keys = "gr",             desc = "+LSP actions" },
+    { mode = "n", keys = "gra",            desc = "Code action" },
+    { mode = "x", keys = "gra",            desc = "Code action" },
+    { mode = "n", keys = "grn",            desc = "Rename symbol" },
+    { mode = "n", keys = "grr",            desc = "References (picker)" },
+    { mode = "n", keys = "gri",            desc = "Go to implementation" },
+    { mode = "n", keys = "gO",             desc = "Document symbols" },
+    { mode = "n", keys = "gW",             desc = "Workspace symbols" },
     { mode = "n", keys = "gK",             desc = "Signature help" },
 
-    -- gz Surround (mini.surround, gz prefix avoids clash with flash s/S)
-    { mode = "n", keys = "gz",             desc = "+Surround" },
-    { mode = "x", keys = "gz",             desc = "+Surround" },
-    { mode = "n", keys = "gza",            desc = "Surround: add" },
-    { mode = "x", keys = "gza",            desc = "Surround: add (selection)" },
-    { mode = "n", keys = "gzd",            desc = "Surround: delete" },
-    { mode = "n", keys = "gzr",            desc = "Surround: replace" },
-    { mode = "n", keys = "gzf",            desc = "Surround: find →" },
-    { mode = "n", keys = "gzF",            desc = "Surround: find ←" },
-    { mode = "n", keys = "gzh",            desc = "Surround: highlight" },
-    { mode = "n", keys = "gzn",            desc = "Surround: update n_lines" },
+    -- s Surround (standard) + Flash
+    { mode = "n", keys = "s",              desc = "+Surround/Flash" },
+    { mode = "x", keys = "s",              desc = "+Surround/Flash" },
+    { mode = "o", keys = "s",              desc = "+Surround/Flash" },
+    { mode = "n", keys = "sa",             desc = "Surround: add" },
+    { mode = "x", keys = "sa",             desc = "Surround: add (selection)" },
+    { mode = "n", keys = "sd",             desc = "Surround: delete" },
+    { mode = "n", keys = "sr",             desc = "Surround: replace" },
+    { mode = "n", keys = "sf",             desc = "Surround: find →" },
+    { mode = "n", keys = "sF",             desc = "Surround: find ←" },
+    { mode = "n", keys = "sh",             desc = "Surround: highlight" },
+    { mode = "n", keys = "sn",             desc = "Surround: update n_lines" },
+    { mode = "n", keys = "ss",             desc = "Flash jump" },
+    { mode = "x", keys = "ss",             desc = "Flash jump" },
+    { mode = "o", keys = "ss",             desc = "Flash jump" },
+    { mode = "n", keys = "sS",             desc = "Flash Treesitter" },
+    { mode = "o", keys = "sS",             desc = "Flash Treesitter" },
 
     -- [ / ] reference navigation (Snacks.words)
     { mode = "n", keys = "]]",             desc = "Next reference" },

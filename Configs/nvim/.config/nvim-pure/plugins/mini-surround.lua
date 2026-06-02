@@ -1,12 +1,12 @@
 -- mini.surround: add / delete / replace surrounding pairs.
--- Uses gz prefix (not s) to avoid collision with flash.nvim's s/S jump keys.
+-- Standard s-prefix mappings:
 --
--- gza{motion}  add surround          e.g. gzaiw"  → "word"
--- gzd{sr}      delete surround       e.g. gzd"    → remove quotes
--- gzr{old}{new} replace surround     e.g. gzr"'   → swap " for '
--- gzf          find surrounding →
--- gzF          find surrounding ←
--- gzh          highlight surrounding
+-- sa{motion}   add surround          e.g. saiw"  -> "word"
+-- sd{sr}       delete surround       e.g. sd"    -> remove quotes
+-- sr{old}{new} replace surround      e.g. sr"'   -> swap " for '
+-- sf           find surrounding ->
+-- sF           find surrounding <-
+-- sh           highlight surrounding
 --
 -- Supported pairs: () [] {} <> "" '' `` and tags t
 
@@ -20,15 +20,15 @@ surround.setup({
   -- Highlight duration (ms)
   highlight_duration = 500,
 
-  -- gz prefix — no conflict with flash (s) or treesitter-textobjects (gs)
+  -- Standard surround mappings
   mappings = {
-    add            = "gza",
-    delete         = "gzd",
-    replace        = "gzr",
-    find           = "gzf",
-    find_left      = "gzF",
-    highlight      = "gzh",
-    update_n_lines = "gzn",
+    add            = "sa",
+    delete         = "sd",
+    replace        = "sr",
+    find           = "sf",
+    find_left      = "sF",
+    highlight      = "sh",
+    update_n_lines = "sn",
   },
 
   -- Surrounding spec: custom pairs beyond the built-in defaults

@@ -239,33 +239,6 @@ local function diff_jump_prev()
   vim.cmd("normal! [czz")
 end
 
-local function diff_refresh()
-  vim.cmd("diffupdate")
-end
-
-local function diff_quit()
-  vim.cmd("diffoff!")
-end
-
-local function diff_goto_window(index)
-  if type(index) ~= "number" then return end
-  vim.cmd(index .. "wincmd w")
-end
-
-local function diffget_from_window(index)
-  if not is_diff_session() then return end
-  if type(index) ~= "number" then return end
-
-  local diff_windows = get_diff_windows()
-
-  local target_win = diff_windows[index]
-  if not target_win then return end
-
-  local target_buf = vim.api.nvim_win_get_buf(target_win)
-  vim.cmd("diffget " .. target_buf)
-  vim.cmd("diffupdate")
-end
-
 local function set_diff_cursorbind(enabled)
   local states = {}
   for _, win in ipairs(get_diff_windows()) do
@@ -499,10 +472,6 @@ return {
   line_completion = line_completion,
   diff_jump_next = with_diff_window(diff_jump_next),
   diff_jump_prev = with_diff_window(diff_jump_prev),
-  diff_refresh = with_diff_window(diff_refresh),
-  diff_quit = with_diff_window(diff_quit),
-  diffget_from_window = with_diff_window(diffget_from_window),
-  diff_goto_window = with_diff_window(diff_goto_window),
   navigate_window = navigate_window,
   enable_diff_mode = enable_diff_mode,
   disable_diff_mode = disable_diff_mode,

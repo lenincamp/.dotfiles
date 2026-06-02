@@ -1,6 +1,6 @@
 -- flash.nvim: fast jump / search with labels.
--- s  → jump to label        (normal, visual, op-pending)
--- S  → treesitter node jump (normal, op-pending)
+-- ss → jump to label        (normal, visual, op-pending)
+-- sS → treesitter node jump (normal, op-pending)
 -- r  → remote flash         (op-pending: e.g. yr<flash> yanks remote word)
 -- R  → treesitter search    (op-pending, visual)
 -- <C-s> in search/cmdline → toggle flash on current search
@@ -82,12 +82,12 @@ flash.setup({
 
 local map = vim.keymap.set
 
--- s — jump forward/backward with labels (replaces the useless `cl`)
-map({ "n", "x", "o" }, "s", function() flash.jump() end,
+-- ss — jump forward/backward with labels
+map({ "n", "x", "o" }, "ss", function() flash.jump() end,
   { desc = "Flash jump" })
 
--- S — treesitter-aware jump (select by node type)
-map({ "n", "o" }, "S", function() flash.treesitter() end,
+-- sS — treesitter-aware jump (select by node type)
+map({ "n", "o" }, "sS", function() flash.treesitter() end,
   { desc = "Flash Treesitter" })
 
 -- r — remote flash: select target, execute operator there, return (op-pending only)

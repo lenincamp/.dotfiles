@@ -210,7 +210,57 @@ vim.filetype.add({
 
 -- ── Diff mode: buffer-local keymaps ──────────────────────────────────────────
 
-local DIFF_KEYMAPS = { "]c", "[c", "<leader>dh", "<leader>dl", "<leader>dr", "<leader>dq", "<leader>d1", "<leader>d2", "<leader>d3" }
+local DIFF_KEYMAPS = { "]c", "[c", "do", "dp", "dO", "dP" }
+
+local DIFF_MINICLUE_CONFIG = {
+  triggers = {
+    { mode = "n", keys = "d" },
+    { mode = "n", keys = "[" },
+    { mode = "n", keys = "]" },
+  },
+  clues = {
+    { mode = "n", keys = "d",  desc = "+Diff" },
+    { mode = "n", keys = "do", desc = "Diff: get change" },
+    { mode = "n", keys = "dp", desc = "Diff: put/get remote change" },
+    { mode = "n", keys = "dO", desc = "Diff: get all LOCAL" },
+    { mode = "n", keys = "dP", desc = "Diff: get all REMOTE" },
+    { mode = "n", keys = "]c", desc = "Diff: next change" },
+    { mode = "n", keys = "[c", desc = "Diff: prev change" },
+  },
+}
+
+local function apply_diff_miniclue(bufnr)
+  if vim.b[bufnr].diff_miniclue_active then return end
+
+  vim.b[bufnr].diff_prev_miniclue_config = vim.b[bufnr].miniclue_config
+  vim.b[bufnr].miniclue_config = DIFF_MINICLUE_CONFIG
+  vim.b[bufnr].diff_miniclue_active = true
+end
+
+local function cleanup_diff_miniclue(bufnr)
+  if not vim.b[bufnr].diff_miniclue_active then return end
+
+  vim.b[bufnr].miniclue_config = vim.b[bufnr].diff_prev_miniclue_config
+  vim.b[bufnr].diff_prev_miniclue_config = nil
+  vim.b[bufnr].diff_miniclue_active = false
+end
+
+local function is_merge_diff_mode()
+  if not vim.wo.diff then return false end
+  local labels = { LOCAL = false, REMOTE = false, BASE = false, MERGED = false }
+
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.api.nvim_win_is_valid(win) and vim.wo[win].diff then
+      local buf = vim.api.nvim_win_get_buf(win)
+      local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":t")
+      if labels[name] ~= nil then
+        labels[name] = true
+      end
+    end
+  end
+
+  return labels.LOCAL and labels.REMOTE
+end
 
 function _G.setup_diff_mappings()
   if not vim.wo.diff then return end
@@ -224,13 +274,42 @@ function _G.setup_diff_mappings()
 
   bmap("]c",           helpers.diff_jump_next,                  "Next change")
   bmap("[c",           helpers.diff_jump_prev,                  "Prev change")
-  bmap("<leader>dh",   function() helpers.diffget_from_window(1) end, "Get from window 1")
-  bmap("<leader>dl",   function() helpers.diffget_from_window(2) end, "Get from window 2")
-  bmap("<leader>dr",   helpers.diff_refresh,                    "Refresh diff")
-  bmap("<leader>dq",   helpers.diff_quit,                       "Quit diff")
-  bmap("<leader>d1",   function() helpers.diff_goto_window(1) end, "Go to window 1")
-  bmap("<leader>d2",   function() helpers.diff_goto_window(2) end, "Go to window 2")
-  bmap("<leader>d3",   function() helpers.diff_goto_window(3) end, "Go to window 3")
+  bmap("do",           function()
+    if is_merge_diff_mode() then
+      local ok = pcall(vim.cmd, "DiffGetLocal")
+      if not ok then vim.cmd("diffget") end
+    else
+      vim.cmd("diffget")
+    end
+    vim.cmd("diffupdate")
+  end, "Obtain change (diffget)")
+  bmap("dp",           function()
+    if is_merge_diff_mode() then
+      local ok = pcall(vim.cmd, "DiffGetRemote")
+      if not ok then vim.cmd("diffput") end
+    else
+      vim.cmd("diffput")
+    end
+    vim.cmd("diffupdate")
+  end, "Put change (diffput)")
+  bmap("dO",           function()
+    if is_merge_diff_mode() then
+      local ok = pcall(vim.cmd, "DiffGetLocalAll")
+      if not ok then vim.cmd("%diffget") end
+    else
+      vim.cmd("%diffget")
+    end
+    vim.cmd("diffupdate")
+  end, "Obtain all changes")
+  bmap("dP",           function()
+    if is_merge_diff_mode() then
+      local ok = pcall(vim.cmd, "DiffGetRemoteAll")
+      if not ok then vim.cmd("%diffput") end
+    else
+      vim.cmd("%diffput")
+    end
+    vim.cmd("diffupdate")
+  end, "Put all changes")
 
   vim.b[bufnr].diff_keymaps_active = true
   vim.w.diff_prev_listchars = vim.opt_local.listchars:get()
@@ -255,6 +334,8 @@ function _G.cleanup_diff_mappings(bufnr)
     vim.b[target_buf].diff_keymaps_active = false
   end
 
+  cleanup_diff_miniclue(target_buf)
+
   vim.opt.scrollbind    = false
   vim.opt.cursorbind    = false
   -- Only restore relativenumber for normal file buffers; skip special buftype
@@ -277,6 +358,7 @@ local function setup_current_diff_window()
   if _G.setup_diff_mappings then _G.setup_diff_mappings() end
 
   local bufnr = vim.api.nvim_get_current_buf()
+  apply_diff_miniclue(bufnr)
   if not vim.b[bufnr].diff_lsp_forced then
     disable_lsp_for_diff_buffer(bufnr)
   end
@@ -317,6 +399,27 @@ vim.api.nvim_create_user_command("DiffLspToggle", function()
     vim.cmd("DiffLspEnable")
   end
 end, { desc = "Toggle LSP for current diff buffer" })
+
+-- Standard merge sources in 3-way diffs (LOCAL/BASE/REMOTE labels).
+vim.api.nvim_create_user_command("DiffGetLocal", function()
+  vim.cmd("diffget LOCAL")
+  vim.cmd("diffupdate")
+end, { desc = "Diff: get LOCAL changes into current buffer" })
+
+vim.api.nvim_create_user_command("DiffGetRemote", function()
+  vim.cmd("diffget REMOTE")
+  vim.cmd("diffupdate")
+end, { desc = "Diff: get REMOTE changes into current buffer" })
+
+vim.api.nvim_create_user_command("DiffGetLocalAll", function()
+  vim.cmd("%diffget LOCAL")
+  vim.cmd("diffupdate")
+end, { desc = "Diff: get ALL LOCAL changes into current buffer" })
+
+vim.api.nvim_create_user_command("DiffGetRemoteAll", function()
+  vim.cmd("%diffget REMOTE")
+  vim.cmd("diffupdate")
+end, { desc = "Diff: get ALL REMOTE changes into current buffer" })
 
 -- ── Git: line history viewer (uses delta pager if available) ─────────────────
 
