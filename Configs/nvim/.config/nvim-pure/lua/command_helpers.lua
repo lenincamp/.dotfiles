@@ -239,44 +239,7 @@ local function diff_jump_prev()
   vim.cmd("normal! [czz")
 end
 
-local function set_diff_cursorbind(enabled)
-  local states = {}
-  for _, win in ipairs(get_diff_windows()) do
-    if vim.api.nvim_win_is_valid(win) then
-      states[win] = vim.wo[win].cursorbind
-      vim.wo[win].cursorbind = enabled
-    end
-  end
-  return states
-end
 
-local function restore_diff_cursorbind(states)
-  for win, was_enabled in pairs(states) do
-    if vim.api.nvim_win_is_valid(win) then
-      vim.wo[win].cursorbind = was_enabled
-    end
-  end
-end
-
-local function navigate_window(dir_cmd, wezterm_dir)
-  local in_diff_session = is_diff_session()
-  local saved_states = in_diff_session and set_diff_cursorbind(false) or {}
-  local win_before = vim.fn.winnr()
-  local allow_wezterm_in_diff = vim.g.diffmode_wezterm_fallback ~= false
-
-  vim.cmd(dir_cmd)
-
-  if vim.fn.winnr() == win_before and wezterm_dir and ((not in_diff_session) or allow_wezterm_in_diff) then
-    local dir_map = { h = "Left", j = "Down", k = "Up", l = "Right" }
-    pcall(function()
-      vim.fn.system("wezterm cli activate-pane-direction " .. dir_map[wezterm_dir])
-    end)
-  end
-
-  if next(saved_states) ~= nil then
-    restore_diff_cursorbind(saved_states)
-  end
-end
 
 local function enable_diff_mode()
   vim.cmd("diffthis")
@@ -472,7 +435,6 @@ return {
   line_completion = line_completion,
   diff_jump_next = with_diff_window(diff_jump_next),
   diff_jump_prev = with_diff_window(diff_jump_prev),
-  navigate_window = navigate_window,
   enable_diff_mode = enable_diff_mode,
   disable_diff_mode = disable_diff_mode,
   toggle_diff_mode = toggle_diff_mode,

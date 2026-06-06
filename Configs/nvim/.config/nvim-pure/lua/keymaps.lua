@@ -11,6 +11,12 @@ map("n", "H", "^", { desc = "Start of line" })
 map("n", "dw", "vb_d", { desc = "Delete word backward" })
 map("n", "<C-i>", "<C-I>", { noremap = true, desc = "Jump forward" })
 
+-- ── Folding: quick fold-level switching ──────────────────────────────────────
+
+map("n", "z1", "<cmd>set foldlevel=1<CR>", { desc = "Fold level 1" })
+map("n", "z2", "<cmd>set foldlevel=2<CR>", { desc = "Fold level 2" })
+map("n", "z3", "<cmd>set foldlevel=3<CR>", { desc = "Fold level 3" })
+
 -- ── Search: saner n/N (open folds, keep direction consistent) ────────────────
 
 map("n", "n", "'Nn'[v:searchforward].'zv'", { expr = true, desc = "Next Search Result" })

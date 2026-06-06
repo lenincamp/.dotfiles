@@ -109,7 +109,7 @@ local sync_profile_by_key = {
     lualine = { provider = "builtin", name = "gruvbox" },
   },
   ["gruvbox-light"] = {
-    tmux = "gruvbox",
+    tmux = "latte",
     delta = "gruvbox-light",
     iterm2 = "Gruvbox Light",
     lualine = { provider = "builtin", name = "gruvbox" },
@@ -121,7 +121,7 @@ local sync_profile_by_key = {
     lualine = { provider = "builtin", name = "tokyonight" },
   },
   ["tokyonight-day"] = {
-    tmux = "tokyo-night",
+    tmux = "latte",
     delta = "tokyonight-day",
     iterm2 = "TokyoNight Day",
     lualine = { provider = "builtin", name = "tokyonight" },
@@ -236,6 +236,18 @@ local function hex_to_rgb(hex)
   return tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)
 end
 
+--- Blend a foreground color toward a base at a given alpha (0.0–1.0).
+--- Used to create subtle background tints from saturated foreground colors.
+local function blend_hex(fg_hex, bg_hex, alpha)
+  local fr, fg, fb = hex_to_rgb(fg_hex)
+  local br, bg_r, bb = hex_to_rgb(bg_hex)
+  if not fr or not br then return fg_hex end
+  local r = math.floor(fr * alpha + br * (1 - alpha) + 0.5)
+  local g = math.floor(fg * alpha + bg_r * (1 - alpha) + 0.5)
+  local b = math.floor(fb * alpha + bb * (1 - alpha) + 0.5)
+  return string.format("#%02x%02x%02x", r, g, b)
+end
+
 local function is_legible_diff_green(hex)
   local r, g, b = hex_to_rgb(hex)
   if not r then return false end
@@ -280,15 +292,30 @@ local function build_palette(mode)
     or first_hl_bg({ "CursorLine", "DiffChange" })
     or (dark and "#313244" or "#ccd0da")
 
+  local bg_color = first_hex(normal.bg) or (dark and "#1e1e2e" or "#eff1f5")
+
+  -- Background tints for diff views (delta, lazygit):
+  -- Blend the add/delete foreground toward bg at low opacity so text remains readable.
+  local add_bg = first_hl_bg({ "DiffAdd", "GitSignsAddLn" })
+    or blend_hex(add_fg, bg_color, dark and 0.12 or 0.10)
+  local del_bg = first_hl_bg({ "DiffDelete", "GitSignsDeleteLn" })
+    or blend_hex(del_fg, bg_color, dark and 0.12 or 0.10)
+  local add_emph_bg = blend_hex(add_fg, bg_color, dark and 0.25 or 0.20)
+  local del_emph_bg = blend_hex(del_fg, bg_color, dark and 0.25 or 0.20)
+
   return {
     fg = first_hex(normal.fg) or (dark and "#cdd6f4" or "#4c4f69"),
-    bg = first_hex(normal.bg) or (dark and "#1e1e2e" or "#eff1f5"),
+    bg = bg_color,
     border = first_hex(border.fg, title.fg, keyword.fg) or (dark and "#89b4fa" or "#1e66f5"),
     accent = first_hex(keyword.fg, identifier.fg, title.fg) or (dark and "#89b4fa" or "#1e66f5"),
     selection = selection_bg,
     ok = add_fg,
+    ok_bg = add_bg,
+    ok_emph_bg = add_emph_bg,
     warn = first_hex(diag_warn.fg, title.fg) or (dark and "#f9e2af" or "#df8e1d"),
     error = del_fg,
+    error_bg = del_bg,
+    error_emph_bg = del_emph_bg,
   }
 end
 
@@ -375,16 +402,21 @@ local function write_delta_generated_config(theme_key, palette)
     "# Theme key: " .. sanitize_key(theme_key),
     "[delta]",
     "\tsyntax-theme = none",
-    "\tplus-style = syntax " .. palette.ok,
-    "\tminus-style = syntax " .. palette.error,
-    "\tplus-emph-style = bold syntax " .. palette.ok,
-    "\tminus-emph-style = bold syntax " .. palette.error,
-    "\thunk-header-style = syntax " .. palette.accent,
-    "\tfile-style = bold syntax " .. palette.accent,
-    "\tline-numbers-left-style = syntax " .. palette.selection,
-    "\tline-numbers-right-style = syntax " .. palette.selection,
-    "\tline-numbers-plus-style = syntax " .. palette.ok,
-    "\tline-numbers-minus-style = syntax " .. palette.error,
+    "\tplus-style = syntax \"" .. palette.ok_bg .. "\"",
+    "\tminus-style = syntax \"" .. palette.error_bg .. "\"",
+    "\tplus-emph-style = bold syntax \"" .. palette.ok_emph_bg .. "\"",
+    "\tminus-emph-style = bold syntax \"" .. palette.error_emph_bg .. "\"",
+    "\thunk-header-style = syntax \"" .. palette.selection .. "\"",
+    "\thunk-header-decoration-style = \"" .. palette.accent .. "\" box",
+    "\tfile-style = bold \"" .. palette.accent .. "\"",
+    "\tfile-decoration-style = \"" .. palette.accent .. "\" ul",
+    "\tline-numbers-left-style = \"" .. palette.error .. "\"",
+    "\tline-numbers-right-style = \"" .. palette.ok .. "\"",
+    "\tline-numbers-left-format = \"{nm:>3}│\"",
+    "\tline-numbers-right-format = \"{np:>3}│\"",
+    "\tline-numbers-plus-style = \"" .. palette.ok .. "\"",
+    "\tline-numbers-minus-style = \"" .. palette.error .. "\"",
+    "\tline-numbers-zero-style = \"" .. palette.selection .. "\"",
   }
 
   local dir = vim.fn.fnamemodify(path, ":h")
@@ -395,16 +427,19 @@ end
 local function apply_delta_generated_palette(theme_key, palette)
   pcall(write_delta_generated_config, theme_key, palette)
   git_set_global("delta.syntax-theme", "none")
-  git_set_global("delta.plus-style", "syntax " .. palette.ok)
-  git_set_global("delta.minus-style", "syntax " .. palette.error)
-  git_set_global("delta.plus-emph-style", "bold syntax " .. palette.ok)
-  git_set_global("delta.minus-emph-style", "bold syntax " .. palette.error)
-  git_set_global("delta.hunk-header-style", "syntax " .. palette.accent)
-  git_set_global("delta.file-style", "bold syntax " .. palette.accent)
-  git_set_global("delta.line-numbers-left-style", "syntax " .. palette.selection)
-  git_set_global("delta.line-numbers-right-style", "syntax " .. palette.selection)
-  git_set_global("delta.line-numbers-plus-style", "syntax " .. palette.ok)
-  git_set_global("delta.line-numbers-minus-style", "syntax " .. palette.error)
+  git_set_global("delta.plus-style", "syntax \"" .. palette.ok_bg .. "\"")
+  git_set_global("delta.minus-style", "syntax \"" .. palette.error_bg .. "\"")
+  git_set_global("delta.plus-emph-style", "bold syntax \"" .. palette.ok_emph_bg .. "\"")
+  git_set_global("delta.minus-emph-style", "bold syntax \"" .. palette.error_emph_bg .. "\"")
+  git_set_global("delta.hunk-header-style", "syntax \"" .. palette.selection .. "\"")
+  git_set_global("delta.hunk-header-decoration-style", "\"" .. palette.accent .. "\" box")
+  git_set_global("delta.file-style", "bold \"" .. palette.accent .. "\"")
+  git_set_global("delta.file-decoration-style", "\"" .. palette.accent .. "\" ul")
+  git_set_global("delta.line-numbers-left-style", "\"" .. palette.error .. "\"")
+  git_set_global("delta.line-numbers-right-style", "\"" .. palette.ok .. "\"")
+  git_set_global("delta.line-numbers-plus-style", "\"" .. palette.ok .. "\"")
+  git_set_global("delta.line-numbers-minus-style", "\"" .. palette.error .. "\"")
+  git_set_global("delta.line-numbers-zero-style", "\"" .. palette.selection .. "\"")
 end
 
 local function hex_to_rgb_components(hex)

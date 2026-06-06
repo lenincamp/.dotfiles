@@ -54,8 +54,8 @@ opt.grepformat = "%f:%l:%c:%m"
 -- ── Folding (treesitter-based) ──────────────────────────────────────────────
 opt.foldmethod     = "expr"
 opt.foldexpr       = "v:lua.vim.treesitter.foldexpr()"
-opt.foldlevel      = 99        -- start with all folds open
-opt.foldlevelstart = 99
+opt.foldlevel      = 1         -- start with top-level folds open
+opt.foldlevelstart = 1
 opt.foldenable     = true
 opt.foldminlines   = 1
 
@@ -82,8 +82,6 @@ opt.foldtext = "v:lua.FoldText()"
 opt.clipboard = "unnamedplus"  -- yank/paste uses system clipboard
 
 vim.cmd.filetype("plugin indent on")
-vim.g.copilot_no_tab_map = true
--- netrw disabled in init.lua (before plugins load)
 
 -- ── Display ───────────────────────────────────────────────────────────────────
 
