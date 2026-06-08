@@ -6,6 +6,21 @@
   diffFilter = delta --color-only
 [delta]
 	navigate = true  # use n and N to move between diff sections
+	features = Solarized (dark) side-by-side line-numbers decorations
+	syntax-theme = none
+	plus-style = "syntax \"#103a3c\""
+	minus-style = "syntax \"#380605\""
+	plus-emph-style = "bold syntax \"#383d23\""
+	minus-emph-style = "bold syntax \"#4d232e\""
+	hunk-header-style = "syntax \"#063540\""
+	hunk-header-decoration-style = "\"#849900\" box"
+	file-style = "bold \"#849900\""
+	file-decoration-style = "\"#849900\" ul"
+	line-numbers-left-style = "\"#db302d\""
+	line-numbers-right-style = "\"#849900\""
+	line-numbers-plus-style = "\"#849900\""
+	line-numbers-minus-style = "\"#db302d\""
+	line-numbers-zero-style = "\"#063540\""
   ; line-numbers-left-format = ""
   ; line-numbers-right-format = "│ "
 [delta "interactive"]
@@ -32,10 +47,10 @@
   keepBackup = false
   prompt = false
 [mergetool "nvimdiff"]
-  cmd = "NVIM_APPNAME=nvim-pure nvim -f -d \"$LOCAL\" \"$MERGED\" \"$REMOTE\""
+  cmd = "nvim -f -d \"$LOCAL\" \"$MERGED\" \"$REMOTE\""
   trustExitCode = true
 [mergetool "nvimdiff-base"]
-  cmd = "NVIM_APPNAME=nvim-pure nvim -f -d \"$LOCAL\" \"$BASE\" \"$REMOTE\" \"$MERGED\" -c 'wincmd J'"
+  cmd = "nvim -f -d \"$LOCAL\" \"$BASE\" \"$REMOTE\" \"$MERGED\" -c 'wincmd J'"
   trustExitCode = true
 [diff]
   tool = nvimdiff
@@ -44,7 +59,7 @@
   prompt = false
   trustExitCode = true
 [difftool "nvimdiff"]
-  cmd = "NVIM_APPNAME=nvim-pure nvim -f -d \"$LOCAL\" \"$REMOTE\""
+  cmd = "nvim -f -d \"$LOCAL\" \"$REMOTE\""
 [credential]
 	helper = osxkeychain
 [alias]

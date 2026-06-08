@@ -1,7 +1,15 @@
 {
-    "runtime.unicodeName": true,
-    "diagnostics.disable": [
-        "need-check-nil",
-        "undefined-global"
-    ]
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "runtime": {
+    "version": "LuaJIT"
+  },
+  "workspace": {
+    "library": {
+      "${3rd}/luv/library": true
+    },
+    "checkThirdParty": false
+  },
+  "diagnostics": {
+    "globals": ["vim"]
+  }
 }
