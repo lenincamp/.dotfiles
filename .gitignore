@@ -10,3 +10,13 @@ Configs/agents/.agents/.skill-lock.json
 
 # mcp — node_modules excluded, code is tracked
 Configs/agents/.agents/mcp/**/node_modules/
+
+# theme-generated files (existing files use --skip-worktree, this prevents new ones)
+Configs/iterm2/generated/*.itermcolors
+Configs/gitconfig/delta-generated.gitconfig
+Configs/gemini/.gemini/settings.json
+Configs/lazygit/Library/Application Support/lazygit/config-generated-*.yml
+Configs/starship/.config/starship.toml
+
+# system-settings exports (review before committing)
+system-settings/defaults/*.plist
