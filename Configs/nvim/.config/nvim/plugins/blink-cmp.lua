@@ -42,6 +42,10 @@ require("blink.cmp").setup({
   -- ── Completion behaviour ──────────────────────────────────────────────────
 
   completion = {
+    keyword = {
+      -- Replace full token around cursor, not only prefix before cursor.
+      range = "full",
+    },
     accept = {
       auto_brackets = { enabled = true },
     },

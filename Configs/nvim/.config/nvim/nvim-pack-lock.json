@@ -105,6 +105,10 @@
       "rev": "2e034869cee524df5c61d54429c797f4f2f016d7",
       "src": "https://github.com/igorlfs/nvim-dap-view"
     },
+    "nvim-dap-virtual-text": {
+      "rev": "fbdb48c2ed45f4a8293d0d483f7730d24467ccb6",
+      "src": "https://github.com/theHamsta/nvim-dap-virtual-text"
+    },
     "nvim-jdtls": {
       "rev": "f73731b543f5971e0da9665eb1d7ceffe1fde71f",
       "src": "https://github.com/mfussenegger/nvim-jdtls"

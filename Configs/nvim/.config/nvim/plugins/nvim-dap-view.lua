@@ -114,6 +114,7 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = "dap-view",
   callback = function(args)
     local opt = vim.opt_local
+    opt.statusline     = " "
     opt.number         = false
     opt.relativenumber = false
     opt.cursorline     = true   -- track active row (IntelliJ-style)

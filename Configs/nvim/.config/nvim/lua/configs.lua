@@ -54,8 +54,8 @@ opt.grepformat = "%f:%l:%c:%m"
 -- ── Folding (treesitter-based) ──────────────────────────────────────────────
 opt.foldmethod     = "expr"
 opt.foldexpr       = "v:lua.vim.treesitter.foldexpr()"
-opt.foldlevel      = 1         -- start with top-level folds open
-opt.foldlevelstart = 1
+opt.foldlevel      = 99        -- keep folds open by default
+opt.foldlevelstart = 99
 opt.foldenable     = true
 opt.foldminlines   = 1
 
