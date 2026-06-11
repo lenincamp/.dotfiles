@@ -180,6 +180,7 @@ end
 
 local function apply_lualine()
   lualine.setup(build_config())
+  ui.apply_bars_state()
   if not ui.winbar_enabled() then
     vim.o.winbar = ""
   end

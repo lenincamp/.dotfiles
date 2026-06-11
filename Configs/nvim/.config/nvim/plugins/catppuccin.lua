@@ -106,16 +106,6 @@ catppuccin.setup({
   },
 })
 
-local ok_s, Snacks = pcall(require, "snacks")
-if ok_s and Snacks.toggle and not vim.g._pure_transparency_toggle_registered then
-  vim.g._pure_transparency_toggle_registered = true
-  Snacks.toggle({
-    name = "Transparent Background",
-    get = function() return colorschemes.is_transparent() end,
-    set = function(state) colorschemes.set_transparency(state) end,
-  }):map("<leader>uA")
-end
-
 if not vim.g._pure_applying_colorscheme then
   colorschemes.apply(vim.g.pure_colorscheme or colorschemes.default, { notify = false })
 end

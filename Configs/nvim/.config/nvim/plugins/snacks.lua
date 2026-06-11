@@ -140,6 +140,11 @@ Snacks.toggle({
     require("colorschemes").set_background_mode(v and "dark" or "light")
   end,
 }):map("<leader>ub")
+Snacks.toggle({
+  name = "Transparent Background",
+  get = function() return require("colorschemes").is_transparent() end,
+  set = function(v) require("colorschemes").set_transparency(v) end,
+}):map("<leader>uA")
 Snacks.toggle.dim():map("<leader>uD")
 Snacks.toggle.zoom():map("<leader>uZ"):map("<leader>wm")
 
@@ -176,5 +181,7 @@ Snacks.toggle({
 vim.ui.select = Snacks.picker.select
 
 -- Curated dark colorscheme picker (<leader>uC — consistent with LazyVim)
-vim.keymap.set("n", "<leader>uC", function() require("colorschemes").select() end,
+vim.keymap.set("n", "<leader>uC", function()
+  require("colorschemes").select()
+end,
   { desc = "Colorscheme" })
