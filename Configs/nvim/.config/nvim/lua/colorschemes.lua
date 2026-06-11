@@ -1,5 +1,8 @@
 local M = {}
 
+local ok_cyberdream_custom, cyberdream_custom = pcall(require, "custom.cyberdream")
+if not ok_cyberdream_custom then cyberdream_custom = nil end
+
 M.default = "catppuccin-mocha"
 
 local state_file = vim.fn.stdpath("state") .. "/colorscheme.json"
@@ -24,6 +27,10 @@ M.themes = {
   { key = "rose-pine-dawn", label = "Rose Pine Dawn", scheme = "rose-pine", plugin = "rose-pine", opts = { variant = "dawn", background = "light" } },
 }
 
+if cyberdream_custom and type(cyberdream_custom.themes) == "table" then
+  vim.list_extend(M.themes, cyberdream_custom.themes)
+end
+
 local aliases = {
   catppuccin = "catppuccin-mocha",
   gruvbox = "gruvbox-hard",
@@ -32,6 +39,12 @@ local aliases = {
   kanagawa = "kanagawa-dragon",
   ["rose-pine"] = "rose-pine-moon",
 }
+
+if cyberdream_custom and type(cyberdream_custom.aliases) == "table" then
+  for key, value in pairs(cyberdream_custom.aliases) do
+    aliases[key] = value
+  end
+end
 
 local transparent_groups = {
   "Normal", "NormalNC", "NormalFloat", "FloatBorder", "FloatTitle",
@@ -164,6 +177,12 @@ local sync_profile_by_key = {
   },
 }
 
+if cyberdream_custom and type(cyberdream_custom.sync_profile_by_key) == "table" then
+  for key, value in pairs(cyberdream_custom.sync_profile_by_key) do
+    sync_profile_by_key[key] = value
+  end
+end
+
 local tmux_theme_by_scheme = {
   catppuccin = "mocha",
   gruvbox = "gruvbox",
@@ -172,6 +191,12 @@ local tmux_theme_by_scheme = {
   ["kanagawa"] = "nord",
   ["rose-pine"] = "dracula",
 }
+
+if cyberdream_custom and type(cyberdream_custom.tmux_theme_by_scheme) == "table" then
+  for key, value in pairs(cyberdream_custom.tmux_theme_by_scheme) do
+    tmux_theme_by_scheme[key] = value
+  end
+end
 
 local function sync_profile(item)
   return sync_profile_by_key[item.key] or {}
@@ -1389,6 +1414,9 @@ local function set_theme_globals(theme)
   vim.g.pure_solarized_osaka_style = opts.style or "night"
   vim.g.pure_kanagawa_theme = opts.theme or "wave"
   vim.g.pure_rose_pine_variant = opts.variant or "moon"
+  if cyberdream_custom and type(cyberdream_custom.apply_theme_globals) == "function" then
+    cyberdream_custom.apply_theme_globals(opts)
+  end
 end
 
 local function reload_theme_plugin(plugin)
@@ -1400,6 +1428,7 @@ end
 function M.options()
   local dark_items = {}
   local light_items = {}
+  local picker_priority = (cyberdream_custom and cyberdream_custom.picker_priority) or {}
 
   for _, theme in ipairs(M.themes) do
     local item = vim.tbl_extend("force", {}, theme, { source = "favorite" })
@@ -1410,13 +1439,15 @@ function M.options()
     end
   end
 
-  table.sort(dark_items, function(a, b)
+  local function by_priority_then_label(a, b)
+    local pa = picker_priority[a.key] or 999
+    local pb = picker_priority[b.key] or 999
+    if pa ~= pb then return pa < pb end
     return a.label < b.label
-  end)
+  end
 
-  table.sort(light_items, function(a, b)
-    return a.label < b.label
-  end)
+  table.sort(dark_items, by_priority_then_label)
+  table.sort(light_items, by_priority_then_label)
 
   local items = {}
   table.insert(items, { key = "_header_dark", label = "──────── High Contrast Dark ────────", source = "header" })

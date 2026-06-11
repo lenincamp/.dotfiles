@@ -67,6 +67,7 @@ local sync_configs = {
   "tokyonight",
   "kanagawa",
   "rose-pine",
+  "cyberdream",
   "blink-cmp",               -- completion + snippet preset (needed from first keystroke)
   "mini-snippets",           -- snippet engine (friendly-snippets)
   "mini-pairs",              -- auto-close brackets

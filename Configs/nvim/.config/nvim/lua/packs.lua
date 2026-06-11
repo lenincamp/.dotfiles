@@ -35,6 +35,7 @@ M.list = {
   "folke/tokyonight.nvim",
   { "kanagawa.nvim", "rebelot/kanagawa.nvim" },
   { "rose-pine", "rose-pine/neovim" },
+  "scottmckendry/cyberdream.nvim",
   -- UI
   "folke/snacks.nvim",
   "shortcuts/no-neck-pain.nvim",
