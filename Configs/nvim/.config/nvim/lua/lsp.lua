@@ -166,6 +166,11 @@ vim.lsp.config("lua_ls", {
   },
 })
 
+vim.lsp.config("marksman", {
+  filetypes = { "markdown", "markdown.mdx" },
+  root_markers = { ".git" },
+})
+
 -- ── Enable all servers ────────────────────────────────────────────────────────
 -- lua_ls: enabled on-demand when a Lua file is detected (see plugins.lua)
 
@@ -177,6 +182,7 @@ if not vim.opt.diff:get() then
   "lemminx",
   "apex_ls",
   "lwc_ls",
+  "marksman",
   "visualforce_ls",
   "vimls",
   "eslint",

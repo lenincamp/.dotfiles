@@ -14,6 +14,7 @@ mason.setup({
     "llm-ls",
     "lua-language-server",
     "lwc-language-server",
+    "marksman",
     "sonarlint-language-server",
     "tailwindcss-language-server",
     "taplo",
