@@ -1243,15 +1243,29 @@ function M.is_transparency_effective()
 end
 
 function M.apply_transparency()
-  if not M.is_transparent() then return end
-
-  for _, group in ipairs(transparent_groups) do
-    local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = group, link = false })
-    if ok then
-      hl.bg = nil
-      hl.ctermbg = nil
-      vim.api.nvim_set_hl(0, group, hl)
+  if M.is_transparent() then
+    for _, group in ipairs(transparent_groups) do
+      local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = group, link = false })
+      if ok then
+        hl.bg = nil
+        hl.ctermbg = nil
+        vim.api.nvim_set_hl(0, group, hl)
+      end
     end
+  end
+
+  local ok_blink, blink_sel = pcall(vim.api.nvim_get_hl, 0, { name = "BlinkCmpMenuSelection", link = false })
+  if ok_blink and next(blink_sel) ~= nil then return end
+
+  local ok_pmenu, pmenu_sel = pcall(vim.api.nvim_get_hl, 0, { name = "PmenuSel", link = false })
+  if ok_pmenu and next(pmenu_sel) ~= nil then
+    vim.api.nvim_set_hl(0, "BlinkCmpMenuSelection", { link = "PmenuSel" })
+    return
+  end
+
+  local ok_cursor, cursor_line = pcall(vim.api.nvim_get_hl, 0, { name = "CursorLine", link = false })
+  if ok_cursor and next(cursor_line) ~= nil then
+    vim.api.nvim_set_hl(0, "BlinkCmpMenuSelection", { link = "CursorLine" })
   end
 end
 

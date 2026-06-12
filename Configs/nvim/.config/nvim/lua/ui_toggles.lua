@@ -13,6 +13,20 @@ local function lualine_refresh()
   end
 end
 
+local function lualine_set_statusline_visible(enable)
+  local ok, lualine = pcall(require, "lualine")
+  if ok and type(lualine.hide) == "function" then
+    pcall(lualine.hide, { place = { "statusline" }, unhide = enable })
+  end
+end
+
+local function lualine_set_tabline_visible(enable)
+  local ok, lualine = pcall(require, "lualine")
+  if ok and type(lualine.hide) == "function" then
+    pcall(lualine.hide, { place = { "tabline" }, unhide = enable })
+  end
+end
+
 local function statusline_enabled_target()
   if vim.g.pure_ui_statusline_enabled == nil then
     vim.g.pure_ui_statusline_enabled = (vim.o.laststatus ~= 0)
@@ -31,6 +45,42 @@ local function each_win(fn)
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_is_valid(win) then fn(win) end
   end
+end
+
+local function enforce_statusline_off()
+  if M.statusline_enabled() then return end
+
+  -- Keep global statusline hard-disabled even if plugin UIs try to re-enable it.
+  vim.o.laststatus = 0
+  vim.o.statusline = " "
+
+  -- Some plugin windows set a local statusline; blank them as well.
+  each_win(function(win)
+    vim.wo[win].statusline = " "
+  end)
+end
+
+local function enforce_tabline_off()
+  if M.tabline_enabled() then return end
+  vim.o.showtabline = 0
+end
+
+local statusline_guard_busy = false
+
+local function enforce_statusline_off_for_laststatus_change()
+  if statusline_guard_busy then return end
+  if M.statusline_enabled() then return end
+
+  statusline_guard_busy = true
+  if vim.o.laststatus ~= 0 then
+    vim.o.laststatus = 0
+  end
+
+  if vim.o.statusline ~= " " then
+    vim.o.statusline = " "
+  end
+
+  statusline_guard_busy = false
 end
 
 function M.statusline_enabled()
@@ -90,7 +140,7 @@ function M.toggle_statusline()
     _G.PureLualineApply()
   else
     M.apply_bars_state()
-    vim.o.statusline = " "
+    enforce_statusline_off()
   end
 
   notify("Statusline " .. (vim.o.laststatus == 0 and "OFF" or "ON"))
@@ -115,8 +165,20 @@ function M.cycle_tabline_mode()
 end
 
 function M.apply_bars_state()
-  vim.o.laststatus = M.statusline_enabled() and 3 or 0
+  local statusline_on = M.statusline_enabled()
+  vim.o.laststatus = statusline_on and 3 or 0
   vim.o.showtabline = M.tabline_enabled() and 2 or 0
+  lualine_set_statusline_visible(statusline_on)
+  lualine_set_tabline_visible(M.tabline_enabled())
+
+  if not statusline_on then
+    enforce_statusline_off_for_laststatus_change()
+    enforce_statusline_off()
+  end
+
+  if not M.tabline_enabled() then
+    enforce_tabline_off()
+  end
 end
 
 function M.toggle_winbar()
@@ -142,6 +204,7 @@ function M.apply()
   end
 
   M.apply_bars_state()
+  enforce_statusline_off()
   M.apply_winbar_state()
 
   -- Enforce desired startup state after late plugin/session hooks.
@@ -150,6 +213,15 @@ function M.apply()
     callback = function()
       M.apply_bars_state()
       M.apply_winbar_state()
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("OptionSet", {
+    group = vim.api.nvim_create_augroup("pure_ui_bars_guard", { clear = true }),
+    pattern = { "laststatus", "statusline", "showtabline" },
+    callback = function()
+      enforce_statusline_off_for_laststatus_change()
+      enforce_tabline_off()
     end,
   })
 

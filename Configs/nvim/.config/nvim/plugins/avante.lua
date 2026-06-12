@@ -2,6 +2,88 @@
 -- Providers: copilot (default, enterprise), claude (proxy-llm→bedrock), gemini (direct API)
 -- ACP agents: claude-code (terminal), gemini-cli
 
+local function ensure_avante_built()
+  local plugin_dir = vim.fn.stdpath("data") .. "/site/pack/core/opt/avante.nvim"
+  local lua_dir = plugin_dir .. "/lua"
+  local templates_lib = lua_dir .. "/avante_templates.so"
+
+  if vim.fn.isdirectory(plugin_dir) == 0 then return false end
+  if package.loaded.avante_templates or package.searchpath("avante_templates", package.cpath) then
+    return true
+  end
+
+  local function run(command)
+    local result = vim.system(command, { cwd = plugin_dir, text = true }):wait()
+    return result.code == 0, result
+  end
+
+  -- Avante's Makefile currently has known macOS artifact issues on some tags
+  -- (release asset missing for luajit and .dylib/.so mismatch). Build from
+  -- source and copy artifacts to .so as a reliable fallback.
+  local function build_from_source_on_macos()
+    if vim.fn.executable("cargo") ~= 1 then return false, "cargo not available" end
+
+    local ok, result = run({
+      "sh",
+      "-c",
+      table.concat({
+        "cargo build --release --features=luajit -p avante-tokenizers -p avante-templates -p avante-repo-map -p avante-html2md",
+        "cp target/release/libavante_tokenizers.dylib lua/avante_tokenizers.so",
+        "cp target/release/libavante_templates.dylib lua/avante_templates.so",
+        "cp target/release/libavante_repo_map.dylib lua/avante_repo_map.so",
+        "cp target/release/libavante_html2md.dylib lua/avante_html2md.so",
+      }, " && "),
+    })
+
+    if ok and vim.fn.filereadable(templates_lib) == 1 then return true end
+
+    local stderr = result and vim.trim(result.stderr or "") or ""
+    if stderr == "" then stderr = "build failed" end
+    return false, stderr
+  end
+
+  if vim.fn.executable("make") ~= 1 then
+    if vim.uv.os_uname().sysname == "Darwin" then
+      local ok, err = build_from_source_on_macos()
+      if ok then return true end
+      vim.schedule(function()
+        vim.notify("avante.nvim build fallo: " .. tostring(err), vim.log.levels.ERROR)
+      end)
+      return false
+    end
+
+    vim.schedule(function()
+      vim.notify("avante.nvim requiere build, pero 'make' no esta disponible en PATH", vim.log.levels.ERROR)
+    end)
+    return false
+  end
+
+  local ok_make, result_make = run({ "make" })
+  if not ok_make and vim.uv.os_uname().sysname == "Darwin" then
+    local ok_macos, err = build_from_source_on_macos()
+    if ok_macos then return true end
+    vim.schedule(function()
+      local stderr = tostring(err)
+      if stderr == "" then stderr = "build failed" end
+      vim.notify("avante.nvim build fallo: " .. stderr, vim.log.levels.ERROR)
+    end)
+    return false
+  end
+
+  if not ok_make then
+    vim.schedule(function()
+      local stderr = vim.trim(result_make.stderr or "")
+      if stderr == "" then stderr = "build failed" end
+      vim.notify("avante.nvim build fallo: " .. stderr, vim.log.levels.ERROR)
+    end)
+    return false
+  end
+
+  return package.searchpath("avante_templates", package.cpath) ~= nil
+end
+
+if not ensure_avante_built() then return end
+
 local ok, avante = pcall(require, "avante")
 if not ok then return end
 

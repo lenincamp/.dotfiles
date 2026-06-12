@@ -1,6 +1,6 @@
 -- Minimal statusline: winbar handles file path, statusline stays hidden.
--- laststatus=0 hides statusline when there's one window; on split Neovim shows
--- a per-window statusline as separator. We blank its content and nuke the gray bg.
+-- In Neovim 0.12, laststatus=0 means statusline is never shown.
+-- Keep statusline content/highlights neutral in case a plugin mutates it.
 
 vim.o.laststatus = 0
 vim.o.statusline = " "
