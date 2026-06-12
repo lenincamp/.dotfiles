@@ -116,21 +116,6 @@ function M.java_keymaps(bufnr)
   -- JDTLS helpers
   map("n", "<leader>Ju", "<Cmd>JdtUpdateConfig<CR>", "[J]ava [U]pdate Config")
 
-  -- Snacks: decompiled JAR exploration
-  map("n", "<leader>Jd", function()
-    require("snacks").explorer.open({ cwd = vim.fn.expand("$HOME/.cache/java-decompiled/") })
-  end, "Java: Explore decompiled Jars")
-
-  map("n", "<leader>Jg", function()
-    require("snacks").picker.grep({ dirs = { vim.fn.expand("$HOME/.cache/java-decompiled/") } })
-  end, "Java: Grep decompiled Jars")
-
-  map("n", "<leader>JG", function()
-    require("snacks").picker.grep({
-      dirs = { vim.fn.getcwd(), vim.fn.expand("$HOME/.cache/java-decompiled/") },
-    })
-  end, "Java: Grep project + Jars")
-
   -- DAP keymaps unique to Java buffers (log point, clear breaks)
   -- <leader>dd and <leader>dt are global (nvim-dap.lua) — not duplicated here
   if vim.api.nvim_buf_is_valid(bufnr) then

@@ -1,5 +1,5 @@
 -- mini.indentscope: animated vertical line showing the current indent scope.
--- Activates on cursor move; draws a `╎` column from the scope's top to bottom.
+-- Activates on cursor move; draws a vertical column from the scope's top to bottom.
 --
 -- Disabled globally by default; enabled only for normal file buffers (buftype == "").
 -- This is opt-in rather than a blocklist — any plugin UI is excluded automatically.
@@ -9,7 +9,7 @@ if not ok then return end
 
 indentscope.setup({
   -- Symbol drawn for the scope indicator
-  symbol = "⎸",
+  symbol = "│",
 
   draw = {
     -- Delay (ms) before the indicator appears after cursor stops

@@ -122,7 +122,7 @@ local sync_profile_by_key = {
     lualine = { provider = "builtin", name = "gruvbox" },
   },
   ["gruvbox-light"] = {
-    tmux = "latte",
+    tmux = "gruvbox",
     delta = "gruvbox-light",
     iterm2 = "Gruvbox Light",
     lualine = { provider = "builtin", name = "gruvbox" },
@@ -134,7 +134,7 @@ local sync_profile_by_key = {
     lualine = { provider = "builtin", name = "tokyonight" },
   },
   ["tokyonight-day"] = {
-    tmux = "latte",
+    tmux = "tokyo-night",
     delta = "tokyonight-day",
     iterm2 = "TokyoNight Day",
     lualine = { provider = "builtin", name = "tokyonight" },
@@ -146,7 +146,7 @@ local sync_profile_by_key = {
     lualine = { provider = "auto" },
   },
   ["solarized-osaka-day"] = {
-    tmux = "latte",
+    tmux = "nord",
     delta = "Solarized (light)",
     iterm2 = "Solarized Light",
     lualine = { provider = "auto" },
@@ -158,7 +158,7 @@ local sync_profile_by_key = {
     lualine = { provider = "auto" },
   },
   ["kanagawa-lotus"] = {
-    tmux = "latte",
+    tmux = "nord",
     delta = "kanagawa-lotus",
     iterm2 = "Kanagawa Lotus",
     lualine = { provider = "auto" },
@@ -170,7 +170,7 @@ local sync_profile_by_key = {
     lualine = { provider = "builtin", name = "rose-pine" },
   },
   ["rose-pine-dawn"] = {
-    tmux = "latte",
+    tmux = "dracula",
     delta = "rose-pine-dawn",
     iterm2 = "Rose Pine Dawn",
     lualine = { provider = "builtin", name = "rose-pine" },
@@ -215,6 +215,24 @@ function M.theme_profile(theme)
     lazygit = profile.lazygit,
     iterm2 = profile.iterm2,
   }
+end
+
+local function resolve_theme_for_external_sync(theme)
+  local item = M.resolve(theme or vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+  local item_mode = ((item.opts and item.opts.background) or vim.o.background or "dark")
+  local current_mode = vim.o.background or item_mode
+
+  -- If current UI mode differs from persisted key, trust the active colorscheme
+  -- name (set by :colorscheme) to avoid stale tmux sync.
+  if item_mode ~= current_mode and type(vim.g.colors_name) == "string" and vim.g.colors_name ~= "" then
+    local active_item = M.resolve(vim.g.colors_name)
+    local active_mode = ((active_item.opts and active_item.opts.background) or current_mode)
+    if active_mode == current_mode then
+      return active_item
+    end
+  end
+
+  return item
 end
 
 local function num_to_hex(color)
@@ -562,7 +580,7 @@ local function tmux_set_theme(theme_name, cache_key)
 end
 
 function M.sync_tmux_theme(theme)
-  local item = M.resolve(theme or vim.g.pure_colorscheme or vim.g.colors_name or M.default)
+  local item = resolve_theme_for_external_sync(theme)
   local profile = sync_profile(item)
   local tmux_theme = profile.tmux
     or tmux_theme_by_scheme[item.scheme]

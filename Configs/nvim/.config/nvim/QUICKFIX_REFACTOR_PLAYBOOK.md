@@ -19,54 +19,104 @@ Advanced search, refactor, and merge-safe workflows using `grep`, `vimgrep`, qui
 :set grepformat=%f:%l:%c:%m
 ```
 
-## High-Value Flows
+## Top 10 Recipes (Priority Order)
 
-### 1) Fast project-wide rename (safe-ish)
+Ordered by practical value for day-to-day programming: safest/highest ROI first, riskier or more advanced workflows later.
 
-```vim
-:grep '\<OldName\>' .
-:copen
-:cfdo %s/\<OldName\>/NewName/ge | update
-```
-
-Use `:cdo ...gc` for interactive confirmation.
-
-### 2) Incremental query accumulation before one refactor pass
+### 1) Safe symbol rename across project (review first)
 
 ```vim
-:grep '\<legacyFn\>' src
-:grepadd '\<legacyUtil\>' src
-:grepadd 'TODO.*migrate' src
+:grep '\<AuthService\>' src/
 :copen
-:cfdo %s/\<legacyFn\>/newFn/ge | %s/\<legacyUtil\>/newUtil/ge | update
+:cdo s/\<AuthService\>/IdentityService/gc | update
 ```
 
-### 3) Window-scoped searches for parallel tasks
+Use when you need human confirmation on each hit.
 
-Window A:
+### 2) Fast batch rename per file (large codebases)
+
+```vim
+:grep '\<legacyFn\>' src/
+:copen
+:cfdo %s/\<legacyFn\>/newFn/ge | update
+```
+
+Use when pattern quality is high and you want speed.
+
+### 3) Multi-pattern migration in one pass
+
+```vim
+:grep '\<legacyFn\>' src/
+:grepadd '\<legacyUtil\>' src/
+:grepadd '\<LegacyDTO\>' src/
+:copen
+:cfdo %s/\<legacyFn\>/newFn/ge | %s/\<legacyUtil\>/newUtil/ge | %s/\<LegacyDTO\>/ModernDTO/ge | update
+```
+
+Use for coordinated API migrations.
+
+### 4) Refactor by module with window-local lists
+
+Window A (auth):
 
 ```vim
 :lgrep '\<AuthService\>' src/auth
 :lopen
+:lfdo %s/\<AuthService\>/IdentityService/ge | update
 ```
 
-Window B:
+Window B (payments):
 
 ```vim
 :lgrep '\<PaymentService\>' src/payments
 :lopen
 ```
 
-Apply only to the current window list:
+Use when handling parallel tracks without polluting global quickfix.
+
+### 5) Remove debug logs safely
 
 ```vim
-:lfdo %s/\<AuthService\>/IdentityService/ge | update
+:grep 'console\.log\|print\s*(' src/
+:copen
+:cdo s/^\s*\(console\.log\|print\s*(\).*$//gc | update
 ```
 
-### 4) Macro-driven structural refactor from quickfix
+Use interactive mode to avoid deleting valid runtime logging.
 
-1. Record macro in register `q`.
-2. Run over each quickfix entry:
+### 6) Update import paths after package move (TS/JS)
+
+```vim
+:grep "from '@old/core'" src/
+:copen
+:cfdo %s/from '@old\/core'/from '@platform\/core'/ge | update
+```
+
+Use when internal package namespaces change.
+
+### 7) Java package/class migration
+
+```vim
+:grep '^import com\.legacy\.billing\.' src/
+:copen
+:cfdo %s/com\.legacy\.billing/com\.platform\.billing/ge | update
+```
+
+Use for consistent package-prefix migrations.
+
+### 8) Vim regex precision (`vimgrep` + `\zs`/`\ze`)
+
+```vim
+:vimgrep /class\s\+\zs\k\+\ze/j **/*.java
+:copen
+```
+
+Use when you need precise captures with Vim-native regex atoms.
+
+### 9) Macro-driven structural edits from quickfix
+
+1. Record macro in register `q` for the structural change.
+2. Execute over matches:
 
 ```vim
 :cdo normal! @q | update
@@ -78,21 +128,16 @@ Per-file variant:
 :cfdo normal! @q | update
 ```
 
-### 5) No external dependency mode
+Use for edits that are hard to express as a substitution.
+
+### 10) Merge-conflict cleanup sweep
 
 ```vim
-:vimgrep /OldName/j **/*.lua
+:vimgrep /\v^(<<<<<<<|=======|>>>>>>>)/j **/*
 :copen
-:cfdo %s/\<OldName\>/NewName/ge | update
 ```
 
-Window-local:
-
-```vim
-:lvimgrep /OldName/j **/*.lua
-:lopen
-:lfdo %s/\<OldName\>/NewName/ge | update
-```
+Use before commits to prevent conflict markers from slipping in.
 
 ## Quickfix Power Commands
 

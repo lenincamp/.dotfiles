@@ -101,14 +101,9 @@ end
 
 map("n", "gd", vim.lsp.buf.definition,                { desc = "Go to Definition" })
 map("n", "gD", vim.lsp.buf.declaration,               { desc = "Go to Declaration" })
-map("n", "gy", vim.lsp.buf.type_definition,           { desc = "Go to Type Definition" })
-map("n", "gri", vim.lsp.buf.implementation,           { desc = "Go to Implementation" })
 map("n", "grr", snacks_pick("lsp_references"),       { desc = "References (picker)" })
 map("n", "gO", snacks_pick("lsp_symbols"),           { desc = "Document Symbols" })
 map("n", "gW", snacks_pick("lsp_workspace_symbols"), { desc = "Workspace Symbols" })
-map("n", "gra", vim.lsp.buf.code_action,              { desc = "Code Action" })
-map("x", "gra", vim.lsp.buf.code_action,              { desc = "Code Action" })
-map("n", "grn", vim.lsp.buf.rename,                   { desc = "Rename Symbol" })
 map("n", "K", vim.lsp.buf.hover,                      { desc = "Hover Documentation" })
 map("n", "gK", vim.lsp.buf.signature_help,            { desc = "Signature Help" })
 map("n", "gV", ":vsplit<CR><cmd>lua vim.lsp.buf.definition()<CR>",
@@ -156,8 +151,6 @@ map("n", "<leader>cN", function() cmd.rename_file() end, { desc = "Rename file" 
 -- ── Buffers ───────────────────────────────────────────────────────────────────
 
 -- map("n", "<S-TAB>", "<cmd>bp<CR>", { desc = "Prev buffer" })
-map("n", "[b",      "<cmd>bp<CR>", { desc = "Prev buffer" })
-map("n", "]b",      "<cmd>bn<CR>", { desc = "Next buffer" })
 
 -- ── Windows (<leader>w) ──────────────────────────────────────────────────────
 
@@ -206,9 +199,6 @@ map("n", "<leader>xq", function()
   end)
   if not success then vim.notify(tostring(err), vim.log.levels.ERROR) end
 end, { desc = "Quickfix List" })
-
-map("n", "[q", vim.cmd.cprev, { desc = "Prev Quickfix" })
-map("n", "]q", vim.cmd.cnext, { desc = "Next Quickfix" })
 
 -- ── Tabs ──────────────────────────────────────────────────────────────────────
 

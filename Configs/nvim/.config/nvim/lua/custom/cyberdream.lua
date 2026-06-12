@@ -29,7 +29,7 @@ M.sync_profile_by_key = {
     lualine = { provider = "auto" },
   },
   ["cyberdream-light"] = {
-    tmux = "latte",
+    tmux = "tokyo-night",
     delta = "tokyonight-day",
     iterm2 = "Cyberdream Light",
     lualine = { provider = "auto" },

@@ -183,5 +183,27 @@ vim.ui.select = Snacks.picker.select
 -- Curated dark colorscheme picker (<leader>uC — consistent with LazyVim)
 vim.keymap.set("n", "<leader>uC", function()
   require("colorschemes").select()
-end,
-  { desc = "Colorscheme" })
+end, { desc = "Colorscheme" })
+
+-- Snacks: decompiled JAR exploration (global on purpose)
+local java_decompiled_cache = vim.fn.expand("$HOME/.cache/java-decompiled/")
+
+vim.keymap.set("n", "<leader>Jde", function()
+  require("snacks").explorer.open({ cwd = java_decompiled_cache })
+end, { desc = "Java: Explore decompiled Jars" })
+
+vim.keymap.set("n", "<leader>Jdf", function()
+  require("snacks").picker.files({ dirs = { java_decompiled_cache } })
+end, { desc = "Java: Find decompiled Jar files" })
+
+vim.keymap.set("n", "<leader>Jds", function()
+  require("snacks").picker.grep({ dirs = { java_decompiled_cache } })
+end, { desc = "Java: Grep decompiled Jars" })
+
+vim.keymap.set("n", "<leader>JdS", function()
+  require("snacks").picker.grep({
+    dirs = { vim.fn.getcwd(), java_decompiled_cache },
+  })
+end, { desc = "Java: Grep project + Jars" })
+
+

@@ -22,11 +22,8 @@ clue.setup({
     { mode = "n", keys = "z" },
     { mode = "x", keys = "z" },
     { mode = "n", keys = "<C-w>" },
-    -- Comment (built-in Neovim 0.10+)
-    { mode = "n", keys = "gc" },
-    { mode = "x", keys = "gc" },
-    -- Peek preview stack
-    { mode = "n", keys = "gp" },
+    -- `gc` and `gp` are documented in clues below; keep only `g` trigger
+    -- to avoid redundant "query keys after ..." popups.
     -- s-prefix motions (surround + flash)
     { mode = "n", keys = "s" },
     { mode = "x", keys = "s" },
@@ -101,6 +98,11 @@ clue.setup({
     -- Java
     { mode = "n", keys = "<Leader>J",      desc = "+Java" },
     { mode = "n", keys = "<Leader>JI",     desc = "Java: Invert condition" },
+    { mode = "n", keys = "<Leader>Jd",     desc = "+Decompiled Jars" },
+    { mode = "n", keys = "<Leader>Jde",    desc = "Java: Explore decompiled Jars" },
+    { mode = "n", keys = "<Leader>Jdf",    desc = "Java: Find decompiled Jar files" },
+    { mode = "n", keys = "<Leader>Jds",    desc = "Java: Grep decompiled Jars" },
+    { mode = "n", keys = "<Leader>JdS",    desc = "Java: Grep project + Jars" },
     { mode = "n", keys = "<Leader>Je",     desc = "+Escape/Extract" },
     { mode = "x", keys = "<Leader>Je",     desc = "+Escape/Extract" },
     { mode = "n", keys = "<Leader>Jt",     desc = "+Tools/Spring" },
@@ -254,7 +256,7 @@ clue.setup({
     -- g LSP navigation/actions (standard)
     { mode = "n", keys = "gd",             desc = "Go to definition" },
     { mode = "n", keys = "gD",             desc = "Go to declaration" },
-    { mode = "n", keys = "gy",             desc = "Go to type definition" },
+    { mode = "n", keys = "grt",            desc = "Go to type definition" },
     { mode = "n", keys = "gV",             desc = "Vsplit and go to definition" },
     { mode = "n", keys = "gr",             desc = "+LSP actions" },
     { mode = "x", keys = "gr",             desc = "+LSP actions" },
