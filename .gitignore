@@ -17,6 +17,7 @@ Configs/gitconfig/delta-generated.gitconfig
 Configs/gemini/.gemini/settings.json
 Configs/lazygit/Library/Application Support/lazygit/config-generated-*.yml
 Configs/starship/.config/starship.toml
+Configs/nvim/.config/github-copilot/versions.json
 
 # system-settings exports (review before committing)
 system-settings/defaults/*.plist
