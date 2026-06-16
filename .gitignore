@@ -2,6 +2,7 @@
 **/session/
 **/complex_modifications/
 settings.local.json
+Configs/nvim/.config/nvim/.vscode/settings.json
 
 # agents — project-specific / private (not tracked in dotfiles)
 Configs/agents/.agents/projects/
