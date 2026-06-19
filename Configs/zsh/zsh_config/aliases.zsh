@@ -56,5 +56,5 @@ else
 fi
 alias docker=podman
 alias nvcs='rm -rf ~/.local/state/nvim/sessions'
-alias nvpcs='rm -rf ~/.local/state/nvim-pure/sessions'
-alias vv='NVIM_APPNAME=nvim-pure nvim'
+alias nvlcs='rm -rf ~/.local/state/nvim-lazy/sessions'
+alias vvl='NVIM_APPNAME=nvim-lazy nvim'

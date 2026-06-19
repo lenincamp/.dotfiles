@@ -51,9 +51,10 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export ANDROID_HOME=$HOME/workspace/DevTools/Android/sdk # Ruta descrita en “Android SDK Location” en el paso anterior
 export ANDROID_SDK_ROOT=$HOME/workspace/DevTools/Android/sdk # Ruta descrita en “Android SDK Location” en el paso anterior
 # export JAVA_HOME=$HOME/Library/Java/JavaVirtualMachines/azul-17.0.10/Contents/Home
-# export CORDOVA_JAVA_HOME=$HOME/Library/Java/JavaVirtualMachines/azul-17.0.10/Contents/Home
-export JAVA_HOME=/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home
-export CORDOVA_JAVA_HOME=/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home
+# export JAVA_HOME=/opt/homebrew/Cellar/openjdk/25.0.1/libexec/openjdk.jdk/Contents/Home
+# export JAVA_HOME=/opt/homebrew/Cellar/openjdk@21/21.0.10/libexec/openjdk.jdk/Contents/Home
+export CORDOVA_JAVA_HOME=$JAVA_HOME
+export SKIP_FIREBASE_FIRESTORE_SWIFT=1
 
 export PATH=$PATH:$ANDROID_HOME/platform-tools/
 export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin/ # Validar que exista la carpeta latest previamente
@@ -61,3 +62,8 @@ export PATH=$PATH:$ANDROID_HOME/build-tools
 export PATH=$PATH:$ANDROID_HOME/emulator/
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 export XDG_DATA_DIRS="/opt/homebrew/share:$XDG_DATA_DIRS"
+export PATH="/Users/lcampoverde/.gradle/wrapper/dists/gradle-8.7-bin/bhs2wmbdwecv87pi65oeuq5iu/gradle-8.7/bin:$PATH"
+
+_zsh_local_secrets="${${(%):-%x}:A:h}/local-secrets.zsh"
+[[ -r "$_zsh_local_secrets" ]] && source "$_zsh_local_secrets"
+unset _zsh_local_secrets

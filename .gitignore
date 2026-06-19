@@ -20,5 +20,8 @@ Configs/lazygit/Library/Application Support/lazygit/config-generated-*.yml
 Configs/starship/.config/starship.toml
 Configs/nvim/.config/github-copilot/versions.json
 
+# local shell secrets
+Configs/zsh/zsh_config/local-secrets.zsh
+
 # system-settings exports (review before committing)
 system-settings/defaults/*.plist
