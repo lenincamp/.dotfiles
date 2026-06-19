@@ -1,0 +1,333 @@
+{
+  "System.out.println": {
+    "prefix": ["sout", "println"],
+    "body": ["System.out.println($0);"],
+    "description": "System.out.println"
+  },
+  "System.err.println": {
+    "prefix": ["serr"],
+    "body": ["System.err.println($0);"],
+    "description": "System.err.println"
+  },
+  "log.debug": {
+    "prefix": ["logd"],
+    "body": ["log.debug(\"${1:message}\");$0"],
+    "description": "log.debug(message)"
+  },
+  "log.debug with args": {
+    "prefix": ["logda"],
+    "body": ["log.debug(\"${1:message: {}}\", ${2:value});$0"],
+    "description": "log.debug(message, args)"
+  },
+  "log.info": {
+    "prefix": ["logi"],
+    "body": ["log.info(\"${1:message}\");$0"],
+    "description": "log.info(message)"
+  },
+  "log.info with args": {
+    "prefix": ["logia"],
+    "body": ["log.info(\"${1:message: {}}\", ${2:value});$0"],
+    "description": "log.info(message, args)"
+  },
+  "log.warn": {
+    "prefix": ["logw"],
+    "body": ["log.warn(\"${1:message}\");$0"],
+    "description": "log.warn(message)"
+  },
+  "log.warn with args": {
+    "prefix": ["logwa"],
+    "body": ["log.warn(\"${1:message: {}}\", ${2:value});$0"],
+    "description": "log.warn(message, args)"
+  },
+  "log.error": {
+    "prefix": ["loge"],
+    "body": ["log.error(\"${1:message}\");$0"],
+    "description": "log.error(message)"
+  },
+  "log.error with args": {
+    "prefix": ["logea"],
+    "body": ["log.error(\"${1:message: {}}\", ${2:value});$0"],
+    "description": "log.error(message, args)"
+  },
+  "log.error with exception": {
+    "prefix": ["logex"],
+    "body": ["log.error(\"${1:message}\", ${2:e});$0"],
+    "description": "log.error(msg, exception)"
+  },
+  "for index loop": {
+    "prefix": ["fori"],
+    "body": [
+      "for (int ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {",
+      "    $0",
+      "}"
+    ],
+    "description": "for (int i = 0; i < n; i++)"
+  },
+  "for each loop": {
+    "prefix": ["fore", "foreach"],
+    "body": [
+      "for (${1:Object} ${2:item} : ${3:collection}) {",
+      "    $0",
+      "}"
+    ],
+    "description": "for (Type item : collection)"
+  },
+  "for each loop with var": {
+    "prefix": ["forev"],
+    "body": [
+      "for (var ${1:item} : ${2:collection}) {",
+      "    $0",
+      "}"
+    ],
+    "description": "for (var item : collection)"
+  },
+  "if not null": {
+    "prefix": ["ifnn"],
+    "body": [
+      "if (${1:obj} != null) {",
+      "    $0",
+      "}"
+    ],
+    "description": "if (x != null)"
+  },
+  "if null": {
+    "prefix": ["ifnull"],
+    "body": [
+      "if (${1:obj} == null) {",
+      "    $0",
+      "}"
+    ],
+    "description": "if (x == null)"
+  },
+  "Optional.ofNullable": {
+    "prefix": ["opt"],
+    "body": ["Optional.ofNullable(${1:value})$0"],
+    "description": "Optional.ofNullable(value)"
+  },
+  "Optional map-orElse": {
+    "prefix": ["optmap"],
+    "body": [
+      "Optional.ofNullable(${1:value})",
+      "    .map(${2:v} -> ${3:mapper})",
+      "    .orElse(${4:defaultValue})$0"
+    ],
+    "description": "Optional chain with map + orElse"
+  },
+  "Optional ifPresentOrElse": {
+    "prefix": ["optio"],
+    "body": [
+      "Optional.ofNullable(${1:value}).ifPresentOrElse(",
+      "    ${2:v} -> ${3:handle(v)},",
+      "    () -> ${4:handleEmpty()}",
+      ");$0"
+    ],
+    "description": "Optional.ifPresentOrElse"
+  },
+  "try-catch": {
+    "prefix": ["trycatch", "tc"],
+    "body": [
+      "try {",
+      "    $0",
+      "} catch (${1:Exception} ${2:e}) {",
+      "    log.error(\"${3:Error: }\", ${2:e});",
+      "}"
+    ],
+    "description": "try { } catch (Exception e)"
+  },
+  "try-with-resources": {
+    "prefix": ["twr", "tryres"],
+    "body": [
+      "try (${1:var resource} = ${2:resourceFactory()}) {",
+      "    $0",
+      "} catch (${3:Exception} ${4:e}) {",
+      "    log.error(\"${5:Error: }\", ${4:e});",
+      "}"
+    ],
+    "description": "try-with-resources"
+  },
+  "throw new RuntimeException": {
+    "prefix": ["throw"],
+    "body": ["throw new ${1:RuntimeException}(\"${2:message}\");$0"],
+    "description": "throw new RuntimeException"
+  },
+  "@Test method": {
+    "prefix": ["test"],
+    "body": [
+      "@Test",
+      "void ${1:should_doSomething_whenCondition}() {",
+      "    $0",
+      "}"
+    ],
+    "description": "@Test void method"
+  },
+  "@Test method with DisplayName": {
+    "prefix": ["testdn"],
+    "body": [
+      "@Test",
+      "@DisplayName(\"${1:should do something when condition}\")",
+      "void ${2:should_doSomething_whenCondition}() {",
+      "    $0",
+      "}"
+    ],
+    "description": "@Test + @DisplayName"
+  },
+  "assertThrows": {
+    "prefix": ["athrow"],
+    "body": [
+      "var ${1:exception} = assertThrows(${2:Exception.class}, () -> ${3:target.method()});",
+      "$0"
+    ],
+    "description": "JUnit assertThrows"
+  },
+  "main method": {
+    "prefix": ["main", "psvm"],
+    "body": [
+      "public static void main(String[] args) {",
+      "    $0",
+      "}"
+    ],
+    "description": "public static void main"
+  },
+  "public static final": {
+    "prefix": ["psf"],
+    "body": ["public static final ${1:String} ${2:NAME} = ${3:value};$0"],
+    "description": "public static final"
+  },
+  "private final field": {
+    "prefix": ["pf"],
+    "body": ["private final ${1:Type} ${2:field};$0"],
+    "description": "private final field"
+  },
+  "record": {
+    "prefix": ["record", "rec"],
+    "body": [
+      "public record ${1:Name}(${2:String id}) {",
+      "    $0",
+      "}"
+    ],
+    "description": "Java record (Java 16+)"
+  },
+  "sealed interface": {
+    "prefix": ["sealedi"],
+    "body": [
+      "public sealed interface ${1:Name} permits ${2:ImplA}, ${3:ImplB} {",
+      "    $0",
+      "}"
+    ],
+    "description": "sealed interface (Java 17+)"
+  },
+  "sealed class": {
+    "prefix": ["sealedc"],
+    "body": [
+      "public sealed class ${1:Name} permits ${2:ChildA}, ${3:ChildB} {",
+      "    $0",
+      "}"
+    ],
+    "description": "sealed class (Java 17+)"
+  },
+  "non-sealed class": {
+    "prefix": ["nonsealed"],
+    "body": [
+      "public non-sealed class ${1:Name} extends ${2:Parent} {",
+      "    $0",
+      "}"
+    ],
+    "description": "non-sealed subclass (Java 17+)"
+  },
+  "var (local variable)": {
+    "prefix": ["var"],
+    "body": ["var ${1:name} = ${2:value};$0"],
+    "description": "var name = value (Java 10+)"
+  },
+  "stream().filter().toList": {
+    "prefix": ["stream"],
+    "body": [
+      "${1:list}.stream()",
+      "    .filter(${2:x} -> $3)",
+      "    .toList()$0"
+    ],
+    "description": "stream().filter().toList() (Java 16+)"
+  },
+  "stream().map().toList": {
+    "prefix": ["streammap", "stmap"],
+    "body": [
+      "${1:list}.stream()",
+      "    .map(${2:x} -> ${3:mapper})",
+      "    .toList()$0"
+    ],
+    "description": "stream().map().toList()"
+  },
+  "switch expression": {
+    "prefix": ["swexp", "switchx"],
+    "body": [
+      "var ${1:result} = switch (${2:value}) {",
+      "    case ${3:ONE} -> ${4:resultOne};",
+      "    case ${5:TWO} -> ${6:resultTwo};",
+      "    default -> ${7:defaultResult};",
+      "};",
+      "$0"
+    ],
+    "description": "switch expression (Java 14+)"
+  },
+  "pattern matching instanceof": {
+    "prefix": ["instanceofp", "ifinst"],
+    "body": [
+      "if (${1:obj} instanceof ${2:Type} ${3:value}) {",
+      "    $0",
+      "}"
+    ],
+    "description": "instanceof pattern matching (Java 16+)"
+  },
+  "switch pattern matching": {
+    "prefix": ["swpattern", "switchp"],
+    "body": [
+      "return switch (${1:value}) {",
+      "    case ${2:String} ${3:s} -> ${4:s.length()};",
+      "    case ${5:Integer} ${6:i} -> ${7:i};",
+      "    case null -> ${8:0};",
+      "    default -> ${9:throw new IllegalArgumentException(\"Unsupported: \" + ${1:value})};",
+      "};",
+      "$0"
+    ],
+    "description": "switch pattern matching (Java 21+)"
+  },
+  "text block": {
+    "prefix": ["txtblk", "textblock"],
+    "body": [
+      "String ${1:text} = \"\"\"",
+      "    ${0}",
+      "    \"\"\";"
+    ],
+    "description": "text block string literal (Java 15+)"
+  },
+  "List.of": {
+    "prefix": ["listof"],
+    "body": ["var ${1:list} = List.of(${2:items});$0"],
+    "description": "immutable list with List.of"
+  },
+  "Set.of": {
+    "prefix": ["setof"],
+    "body": ["var ${1:set} = Set.of(${2:items});$0"],
+    "description": "immutable set with Set.of"
+  },
+  "Map.of": {
+    "prefix": ["mapof"],
+    "body": ["var ${1:map} = Map.of(${2:key1}, ${3:value1});$0"],
+    "description": "immutable map with Map.of"
+  },
+  "Objects.requireNonNull": {
+    "prefix": ["requirenn", "rnn"],
+    "body": ["Objects.requireNonNull(${1:value}, \"${2:field} must not be null\");$0"],
+    "description": "Objects.requireNonNull"
+  },
+  "Objects.requireNonNullElse": {
+    "prefix": ["rnnelse"],
+    "body": ["Objects.requireNonNullElse(${1:value}, ${2:defaultValue})$0"],
+    "description": "Objects.requireNonNullElse"
+  },
+  "String.formatted": {
+    "prefix": ["formatted", "strf"],
+    "body": ["\"${1:%s}\".formatted(${2:value})$0"],
+    "description": "String.formatted (Java 15+)"
+  }
+}

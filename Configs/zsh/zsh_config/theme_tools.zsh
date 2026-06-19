@@ -15,20 +15,16 @@ _resolve_lazygit_base() {
 }
 
 _resolve_nvim_theme_state() {
-    local c1="$HOME/.local/state/nvim-pure/colorscheme.json"
-    local c2="$HOME/.local/state/nvim/colorscheme.json"
+    local c1="$HOME/.local/state/nvim/colorscheme.json"
 
     [[ -r "$c1" ]] && { echo "$c1"; return 0; }
-    [[ -r "$c2" ]] && { echo "$c2"; return 0; }
     return 1
 }
 
 _resolve_nvim_theme_sync() {
-    local c1="$HOME/.cache/nvim-pure/theme-sync.zsh"
-    local c2="$HOME/.cache/nvim/theme-sync.zsh"
+    local c1="$HOME/.cache/nvim/theme-sync.zsh"
 
     [[ -f "$c1" ]] && { echo "$c1"; return 0; }
-    [[ -f "$c2" ]] && { echo "$c2"; return 0; }
     return 1
 }
 

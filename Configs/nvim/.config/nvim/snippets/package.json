@@ -1,0 +1,12 @@
+{
+  "name": "pure-nvim-snippets",
+  "contributes": {
+    "snippets": [
+      { "language": "java", "path": "./java.json" },
+      { "language": ["apex", "apex-anon"], "path": "./salesforce/apex.json" },
+      { "language": "html", "path": "./salesforce/lwc-html.json" },
+      { "language": "javascript", "path": "./salesforce/lwc-js.json" },
+      { "language": "xml", "path": "./salesforce/lwc-xml.json" }
+    ]
+  }
+}

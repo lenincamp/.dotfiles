@@ -1,0 +1,107 @@
+local M = {}
+
+local function lsp_clients_for(method)
+  local clients = {}
+  for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+    local ok, supported = pcall(function()
+      return client:supports_method(method)
+    end)
+    if ok and supported then
+      clients[#clients + 1] = client
+    end
+  end
+  return clients
+end
+
+local function notify_will_rename(from, to)
+  local changes = { files = { { oldUri = vim.uri_from_fname(from), newUri = vim.uri_from_fname(to) } } }
+
+  for _, client in ipairs(lsp_clients_for("workspace/willRenameFiles")) do
+    local response = client.request_sync("workspace/willRenameFiles", changes, 1000, 0)
+    if response and response.result ~= nil then
+      vim.lsp.util.apply_workspace_edit(response.result, client.offset_encoding)
+    end
+  end
+
+  return changes
+end
+
+local function notify_did_rename(changes)
+  for _, client in ipairs(lsp_clients_for("workspace/didRenameFiles")) do
+    client.notify("workspace/didRenameFiles", changes)
+  end
+end
+
+function M.copy_path()
+  local cwd  = vim.fn.getcwd()
+  local full = vim.fn.expand("%:p")
+  local name = vim.fn.expand("%:t")
+  if full:sub(1, #cwd) ~= cwd then
+    vim.notify("File is outside the working directory.", vim.log.levels.WARN)
+    return
+  end
+
+  vim.ui.select({ "Relative path", "File name only" }, { prompt = "Copy to clipboard:" }, function(choice)
+    if choice == "Relative path" then
+      local rel = full:sub(#cwd + 2)
+      vim.fn.setreg("+", rel)
+      vim.notify("Copied: " .. rel)
+    elseif choice == "File name only" then
+      vim.fn.setreg("+", name)
+      vim.notify("Copied: " .. name)
+    end
+  end)
+end
+
+function M.rename_file()
+  local old_path = vim.fn.expand("%:p")
+  if old_path == "" then
+    vim.notify("Current buffer has no file name", vim.log.levels.WARN)
+    return
+  end
+
+  vim.ui.input({ prompt = "New name: ", default = vim.fn.expand("%:t"), scope = "buffer" }, function(new_name)
+    if not new_name or new_name == "" then
+      return
+    end
+
+    local new_path = new_name:sub(1, 1) == "/" and new_name or (vim.fn.expand("%:p:h") .. "/" .. new_name)
+    new_path = vim.fs.normalize(new_path)
+
+    if new_path == old_path then
+      return
+    end
+
+    if vim.fn.filereadable(new_path) == 1 then
+      vim.notify("Target already exists: " .. new_path, vim.log.levels.WARN)
+      return
+    end
+
+    local changes = notify_will_rename(old_path, new_path)
+    local ok, error_message = vim.uv.fs_rename(old_path, new_path)
+    if not ok then
+      vim.notify("Rename failed: " .. tostring(error_message), vim.log.levels.ERROR)
+      return
+    end
+
+    vim.cmd("file " .. vim.fn.fnameescape(new_path))
+    notify_did_rename(changes)
+    vim.notify("Renamed: " .. vim.fn.fnamemodify(new_path, ":~:."), vim.log.levels.INFO)
+  end)
+end
+
+function M.format()
+  require("modules.editor.format").format({ notify = true })
+end
+
+function M.open_quickfix_playbook()
+  local path = vim.fn.stdpath("config") .. "/QUICKFIX_REFACTOR_PLAYBOOK.md"
+  if vim.fn.filereadable(path) ~= 1 then
+    vim.notify("Quickfix playbook not found: " .. path, vim.log.levels.WARN)
+    return
+  end
+
+  vim.cmd("edit " .. vim.fn.fnameescape(path))
+end
+
+return M

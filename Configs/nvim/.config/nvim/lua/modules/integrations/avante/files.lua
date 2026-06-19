@@ -1,0 +1,57 @@
+local M = {}
+
+local function get_avante_module()
+  local ok, mod = pcall(require, "avante")
+  if not ok or type(mod) ~= "table" then
+    return nil
+  end
+
+  return mod
+end
+
+local function avante_sidebar()
+  local avante = get_avante_module()
+  if not avante then
+    return nil
+  end
+
+  local sidebar = avante.get()
+  if sidebar:is_open() then
+    return sidebar
+  end
+
+  require("avante.api").ask()
+  return avante.get()
+end
+
+function M.add_file(filepath)
+  if not filepath or filepath == "" then
+    return
+  end
+
+  local ok_utils, utils = pcall(require, "avante.utils")
+  if not ok_utils then
+    return
+  end
+
+  local sidebar = avante_sidebar()
+  if not sidebar then
+    return
+  end
+
+  sidebar.file_selector:add_selected_file(utils.relative_path(filepath))
+end
+
+function M.add_current_buffer()
+  M.add_file(vim.api.nvim_buf_get_name(0))
+end
+
+function M.add_open_buffers()
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.bo[bufnr].buflisted then
+      M.add_file(vim.api.nvim_buf_get_name(bufnr))
+    end
+  end
+end
+
+return M

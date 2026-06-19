@@ -69,8 +69,7 @@ Ver: `scripts/theme-tools/skip-theme-tracking.sh`
 
 ### Editors
 - **Neovim**: Configuraciones en `Configs/nvim/`
-  - `nvim/`: Config Pure (default) - Sin frameworks, configuración manual
-  - `nvim-lazy/`: Config con LazyVim (alternativa: `NVIM_APPNAME=nvim-lazy nvim`)
+   - `nvim/`: Config minimalista nativa - Sin frameworks, configuración manual
 - **VS Code**: Settings sincronizadas vía Settings Sync
 
 ## 📊 System Monitoring

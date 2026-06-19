@@ -36,8 +36,7 @@ tuckr status
 .dotfiles/
 ├── Configs/           # Configuraciones organizadas por herramienta
 │   ├── nvim/         # Neovim Pure (config principal)
-│   │   ├── nvim/     # Config Pure (default)
-│   │   └── nvim-lazy/# Config LazyVim (alternativa: NVIM_APPNAME=nvim-lazy nvim)
+│   │   └── nvim/     # Config principal minimalista
 │   ├── tmux/         # Tmux + Tmuxinator
 │   ├── zsh/          # Zsh configs, aliases, completions
 │   ├── gitconfig/    # Git config + Delta themes
@@ -86,11 +85,8 @@ Este dotfiles incluye sincronización automática de temas entre herramientas:
 - **z:** Jump to directories by frecency
 - **tmux + tmuxinator:** Terminal multiplexer + project manager
 - **starship:** Fast, customizable prompt
-con config Pure (default en `nvim`)
-  - Config alternativa LazyVim disponible: `NVIM_APPNAME=nvim-lazy nvim`
-  - Alias: `vvl` para LazyVim
 ### Development
-- **Neovim:** Editor principal (2 configs: LazyVim + Pure)
+- **Neovim:** Editor principal con configuración minimalista nativa
 - **jdtls:** Java LSP server
 - **fnm:** Fast Node Manager
 - **pyenv:** Python version manager
