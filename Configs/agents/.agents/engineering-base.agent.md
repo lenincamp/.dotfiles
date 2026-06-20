@@ -100,3 +100,4 @@ description: "Universal engineering principles for all projects and all AI tools
 - Conventional commits: `feat|fix|chore|refactor|docs|test(scope): [PROJECT_CODE-NUMERIC_ID] description`
 - Focused commits: one logical change per commit
 - Small PRs: one feature or fix per PR — easier to review, easier to revert
+- No AI co-author trailers in commit messages or PR bodies

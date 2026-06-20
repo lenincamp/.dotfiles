@@ -1,8 +1,15 @@
 local M = {}
-local picker_display = require("modules.editor.picker.display")
 local picker_filter = require("modules.editor.picker.filter")
+local picker_filter_state = require("modules.editor.picker.filter_state")
+local picker_keymaps = require("modules.editor.picker.keymaps")
+local picker_layout_mod = require("modules.editor.picker.layout")
+local picker_navigation = require("modules.editor.picker.navigation")
+local picker_preview = require("modules.editor.picker.preview")
+local picker_preview_window = require("modules.editor.picker.preview_window")
 local picker_quickfix = require("modules.editor.picker.quickfix")
-local preview = require("modules.editor.preview")
+local picker_render = require("modules.editor.picker.render")
+local picker_selection = require("modules.editor.picker.selection")
+local picker_windows = require("modules.editor.picker.windows")
 
 local intellij_grep = true
 local last_qf_title = nil
@@ -14,16 +21,19 @@ local function notify(message, level)
 end
 
 function M.select_items(items, opts, on_choice)
-  if #items == 0 then
+  opts = opts or {}
+  if #items == 0 and not opts.input_only then
     notify((opts and opts.prompt or "Select") .. ": no results", vim.log.levels.WARN)
     return
   end
 
-  opts = opts or {}
   local prompt = opts.prompt or "Select"
   local threshold = opts.search_threshold or 25
   local max_results = opts.max_results or 40
   local supports_filter = #items > threshold and opts.search ~= false
+  if opts.input_mode then
+    supports_filter = true
+  end
   local has_initial_query = opts.query and opts.query ~= ""
   local candidates_win = nil
   local candidates_buf = nil
@@ -31,276 +41,89 @@ function M.select_items(items, opts, on_choice)
   local preview_buf = nil
 
   local function close_candidates_window()
-    if preview_win and vim.api.nvim_win_is_valid(preview_win) then
-      pcall(vim.api.nvim_win_close, preview_win, true)
-    end
-    if preview_buf and vim.api.nvim_buf_is_valid(preview_buf) then
-      pcall(vim.api.nvim_buf_delete, preview_buf, { force = true })
-    end
-    if candidates_win and vim.api.nvim_win_is_valid(candidates_win) then
-      pcall(vim.api.nvim_win_close, candidates_win, true)
-    end
-    if candidates_buf and vim.api.nvim_buf_is_valid(candidates_buf) then
-      pcall(vim.api.nvim_buf_delete, candidates_buf, { force = true })
-    end
-    candidates_win = nil
-    candidates_buf = nil
-    preview_win = nil
-    preview_buf = nil
-  end
-
-  local function preview_path(item)
-    if type(opts.preview) ~= "function" then return nil end
-    local ok, path = pcall(opts.preview, item)
-    return ok and type(path) == "string" and path or nil
-  end
-
-  local function preview_content(item, render_width)
-    if type(opts.preview_lines) ~= "function" then return nil end
-    local ok, result = pcall(opts.preview_lines, item, render_width)
-    if not ok then return false, { "Preview failed: " .. tostring(result) }, nil end
-
-    if type(result) == "string" then
-      return true, vim.split(result, "\n", { plain = true }), nil
-    end
-
-    if type(result) == "table" and result.lines then
-      return true, result.lines, result.syntax, result.highlights
-    end
-
-    if type(result) == "table" then
-      return true, result, nil
-    end
-
-    return false, { "No preview" }, nil
-  end
-
-  local function preview_target_lnum(item)
-    if type(opts.preview_lnum) ~= "function" then return nil end
-    local ok, lnum = pcall(opts.preview_lnum, item)
-    lnum = ok and tonumber(lnum) or nil
-    return lnum and math.max(1, lnum) or nil
-  end
-
-  local function preview_allowed(path, item)
-    if not path or vim.fn.filereadable(path) ~= 1 then return false, "No preview" end
-    local size = vim.fn.getfsize(path)
-    if size < 0 or size > (opts.preview_max_bytes or 300000) then return false, "Preview skipped: file too large" end
-    local target_lnum = preview_target_lnum(item)
-    local line_limit = math.max(opts.preview_lines or 120, target_lnum and (target_lnum + 60) or 0)
-    local ok, lines = pcall(vim.fn.readfile, path, "", line_limit)
-    if not ok then return false, "Preview failed" end
-    for _, line in ipairs(lines) do
-      if line:find("%z") then return false, "Preview skipped: binary file" end
-    end
-    return true, lines
-  end
-
-  local function preview_match(item, lines)
-    if type(opts.preview_match) ~= "function" then return nil end
-    local ok, match = pcall(opts.preview_match, item, lines)
-    return ok and type(match) == "table" and match or nil
+    local window_state = {
+      candidates_buf = candidates_buf,
+      candidates_win = candidates_win,
+      preview_buf = preview_buf,
+      preview_win = preview_win,
+    }
+    picker_windows.close(window_state)
+    candidates_win = window_state.candidates_win
+    candidates_buf = window_state.candidates_buf
+    preview_win = window_state.preview_win
+    preview_buf = window_state.preview_buf
   end
 
   local function open_candidates_picker(candidates, query)
     close_candidates_window()
 
     local current_query = vim.trim(query or "")
-    local current_candidates = candidates
+    local current_candidates = opts.input_only and {} or candidates
     local current_filter_label = nil
     local current_quick_filter = nil
     local current_regex_pattern = nil
     local choosing_quick_filter = false
+    local selected = {}
     local page_start = 1
-    local columns = math.max(vim.o.columns, 20)
-    local rows = math.max(vim.o.lines - vim.o.cmdheight - 2, 5)
     local has_preview = type(opts.preview) == "function" or type(opts.preview_lines) == "function"
     local preview_enabled = has_preview and opts.preview_open == true
     local preview_maximized = false
     local show_descriptions = false
     local picker_layout = opts.layout or (intellij_grep and "intellij_grep" or "default")
-    local width, height, row, col, preview_width, preview_height, preview_row, preview_col
+    local layout
+    local width, height
 
     local function calculate_layout()
-      columns = math.max(vim.o.columns, 20)
-      rows = math.max(vim.o.lines - vim.o.cmdheight - 2, 5)
-
-      if has_preview and picker_layout == "intellij_grep" then
-        width = math.max(40, columns - 4)
-        height = math.min(max_results + 3, math.max(8, math.floor(rows * 0.34)))
-        row = math.max(1, rows - height)
-        col = 2
-        preview_width = width
-        preview_height = math.max(5, row - 2)
-        preview_row = 1
-        preview_col = col
-        return
-      end
-
-      local total_width = has_preview and math.min(math.max(90, math.floor(columns * 0.9)), columns - 4) or nil
-      width = has_preview and math.min(math.max(50, math.floor(total_width * 0.55)), total_width - 32)
-        or math.min(math.max(60, math.floor(columns * 0.72)), columns - 4)
-      preview_width = has_preview and math.max(30, total_width - width - 2) or 0
-      height = math.min(max_results + 3, rows - 2)
-      row = math.max(1, math.floor((rows - height) / 2))
-      col = math.max(2, math.floor((columns - (has_preview and total_width or width)) / 2))
-      preview_height = height
-      preview_row = row
-      preview_col = col + width + 2
-
-      if opts.position == "top" then
-        row = 1
-        col = 2
-        preview_row = row
-        preview_col = col + width + 2
-      end
+      layout = picker_layout_mod.calculate({
+        has_preview = has_preview,
+        layout = picker_layout,
+        input_mode = opts.input_mode,
+        max_results = max_results,
+        position = opts.position,
+      })
+      width = layout.width
+      height = layout.height
     end
 
     calculate_layout()
 
     local function preview_config()
-      if preview_maximized then
-        return {
-          relative = "editor",
-          row = 1,
-          col = 2,
-          width = math.max(20, columns - 4),
-          height = math.max(5, rows - 2),
-          style = "minimal",
-          border = "single",
-          zindex = 80,
-          focusable = false,
-          noautocmd = true,
-        }
-      end
-
-      return {
-        relative = "editor",
-        row = preview_row,
-        col = preview_col,
-        width = preview_width,
-        height = preview_height,
-        style = "minimal",
-        border = "single",
-        zindex = 60,
-        focusable = false,
-        noautocmd = true,
-      }
+      return picker_layout_mod.preview_config(layout, preview_maximized)
     end
 
-    candidates_buf = vim.api.nvim_create_buf(false, true)
-    vim.bo[candidates_buf].bufhidden = "wipe"
-    local ok, win = pcall(vim.api.nvim_open_win, candidates_buf, true, {
-      relative = "editor",
-      row = row,
-      col = col,
-      width = width,
-      height = height,
-      style = "minimal",
-      border = "single",
-      zindex = 50,
-      focusable = true,
-      noautocmd = true,
-    })
-
-    if not ok then
+    candidates_win, candidates_buf = picker_windows.open_candidates(picker_layout_mod.candidates_config(layout))
+    if not candidates_win then
       close_candidates_window()
       vim.ui.select(candidates, opts, on_choice)
       return
     end
 
-    candidates_win = win
-    vim.wo[candidates_win].wrap = false
-    vim.wo[candidates_win].cursorline = true
-
-    local function status_segments(filters, total, group_help)
-      if choosing_quick_filter then
-        return "FileType " .. picker_filter.quick_filter_menu(filters) .. "  Esc=cancel"
-      end
-
-      local layout_label = has_preview and (picker_layout == "intellij_grep" and "intellij" or "side") or "list"
-      if show_descriptions then
-        local filter_help = picker_filter.has_filters(filters) and "  F=types  C=clear-type  R=regex" or ""
-        return string.format("Enter=open  C-q=qf  /=filter%s  1-9=open  Tab=preview  A-p=focus  A-l=layout:%s  z=zoom  C-u/C-d=page  C-f/C-b=scroll%s  ?=keys  q=close  (%d total)", filter_help, layout_label, group_help, total)
-      end
-
-      local parts = { "Enter", "C-q", "/" }
-      if picker_filter.has_filters(filters) then
-        vim.list_extend(parts, { "F", "C", "R" })
-      end
-      vim.list_extend(parts, { "1-9", "Tab", "A-p", "A-l:" .. layout_label, "z", "C-u/d", "C-f/b" })
-      if opts.group_item then
-        vim.list_extend(parts, { "[g", "]g" })
-      end
-      vim.list_extend(parts, { "?", "q", string.format("%d total", total) })
-      return table.concat(parts, "  ")
-    end
-
-    local function highlight_status_line(line)
-      picker_display.define_highlights()
-      vim.api.nvim_buf_clear_namespace(candidates_buf, picker_namespace, 0, 2)
-      vim.api.nvim_buf_add_highlight(candidates_buf, picker_namespace, "NativePickerTitle", 0, 0, -1)
-      vim.api.nvim_buf_add_highlight(candidates_buf, picker_namespace, "NativePickerStatus", 1, 0, -1)
-      for key in line:gmatch("[%w%-%[%]/?<:]+") do
-        local start = 1
-        while true do
-          local from, to = line:find(vim.pesc(key), start)
-          if not from then
-            break
-          end
-          vim.api.nvim_buf_add_highlight(candidates_buf, picker_namespace, "NativePickerKey", 1, from - 1, to)
-          start = to + 1
-        end
-      end
-    end
-
     local function render()
-      local total = #current_candidates
-      if page_start > total then
-        page_start = math.max(1, total - max_results + 1)
-      end
-      local visible_limit = math.max(1, height - 3)
-      local page_end = math.min(total, page_start + visible_limit - 1)
-      local title = prompt
-        .. (current_query ~= "" and (' /' .. current_query) or "")
-        .. (current_filter_label and (" [" .. current_filter_label .. "]") or "")
-      local group_help = opts.group_item and "  [g/]g=group" or ""
-      local filters = opts.filters or opts.quick_filters
-      local status_line = status_segments(filters, total, group_help)
-      local lines = {
-        picker_display.padded_line(title, width),
-        picker_display.padded_line(status_line, width),
-      }
-
-      for index = page_start, page_end do
-        local visible_index = index - page_start + 1
-        local shortcut = visible_index <= 9 and string.format("[%d]", visible_index) or "   "
-        lines[#lines + 1] = string.format("%4d %s  %s", index, shortcut, picker_filter.item_label(current_candidates[index], opts))
-      end
-
-      if total > visible_limit then
-        lines[#lines + 1] = string.format("... showing %d-%d of %d", page_start, page_end, total)
-      end
+      local rendered = picker_render.lines(opts, {
+        current_candidates = current_candidates,
+        current_filter_label = current_filter_label,
+        current_query = current_query,
+        choosing_quick_filter = choosing_quick_filter,
+        has_preview = has_preview,
+        height = height,
+        max_results = max_results,
+        page_start = page_start,
+        picker_layout = picker_layout,
+        prompt = prompt,
+        selected = selected,
+        show_descriptions = show_descriptions,
+        width = width,
+      })
+      page_start = rendered.page_start
 
       vim.bo[candidates_buf].modifiable = true
-      vim.api.nvim_buf_set_lines(candidates_buf, 0, -1, false, lines)
+      vim.api.nvim_buf_set_lines(candidates_buf, 0, -1, false, rendered.lines)
       vim.bo[candidates_buf].modifiable = false
-      highlight_status_line(status_line)
+      picker_render.highlight(candidates_buf, picker_namespace, rendered)
 
       if vim.api.nvim_win_is_valid(candidates_win) then
-        vim.api.nvim_win_set_cursor(candidates_win, { math.min(3, #lines), 0 })
+        vim.api.nvim_win_set_cursor(candidates_win, { math.min(3, #rendered.lines), 0 })
       end
-    end
-
-    local function active_filter_label()
-      local labels = {}
-      if current_quick_filter then
-        labels[#labels + 1] = current_quick_filter.label or current_quick_filter.key
-      end
-      if current_regex_pattern then
-        labels[#labels + 1] = "regex:" .. current_regex_pattern
-      end
-      return #labels > 0 and table.concat(labels, " ") or nil
     end
 
     local function current_item()
@@ -310,86 +133,17 @@ function M.select_items(items, opts, on_choice)
     end
 
     local function close_preview()
-      if preview_win and vim.api.nvim_win_is_valid(preview_win) then pcall(vim.api.nvim_win_close, preview_win, true) end
-      if preview_buf and vim.api.nvim_buf_is_valid(preview_buf) then
-        pcall(vim.api.nvim_buf_delete, preview_buf, { force = true })
-      end
-      preview_win, preview_buf = nil, nil
+      preview_win, preview_buf = picker_preview_window.close(preview_win, preview_buf)
     end
 
     local function update_preview()
       if not preview_enabled then return end
-      local item = current_item()
-      local path = preview_path(item)
-      local ok_preview, fallback, preview_syntax, preview_highlights
-      local next_preview_config = preview_config()
-      local content_ok, content_lines, content_syntax, content_highlights = preview_content(item, next_preview_config.width)
-      if content_ok ~= nil then
-        ok_preview, fallback, preview_syntax, preview_highlights = content_ok, content_lines, content_syntax, content_highlights
-      else
-        ok_preview, fallback = preview_allowed(path, item)
-      end
-      if preview_buf and vim.api.nvim_buf_is_valid(preview_buf) then
-        pcall(vim.api.nvim_buf_delete, preview_buf, { force = true })
-      end
-      preview_buf = vim.api.nvim_create_buf(false, true)
-      vim.bo[preview_buf].bufhidden = "wipe"
-      vim.bo[preview_buf].buftype = "nofile"
-      vim.bo[preview_buf].swapfile = false
-      vim.bo[preview_buf].modifiable = true
-      if ok_preview then
-        local lines = fallback
-        vim.api.nvim_buf_set_lines(preview_buf, 0, -1, false, lines)
-        if preview_syntax then
-          vim.bo[preview_buf].syntax = preview_syntax
-        elseif path then
-          preview.set_syntax(preview_buf, path)
-        end
-        preview.apply_ansi_highlights(preview_buf, preview_highlights)
-        local match = preview_match(item, lines)
-        if match and match.lnum and match.lnum <= #lines then
-          vim.api.nvim_set_hl(0, "NativePickerPreviewLine", { link = "CursorLine", default = true })
-          vim.api.nvim_set_hl(0, "NativePickerPreviewMatch", { link = "Search", default = true })
-          vim.api.nvim_buf_set_extmark(preview_buf, preview_namespace, match.lnum - 1, 0, {
-            line_hl_group = "NativePickerPreviewLine",
-            hl_eol = true,
-          })
-          if match.col and match.length and match.length > 0 then
-            local preview_line = lines[match.lnum] or ""
-            local start_col = math.min(math.max(match.col - 1, 0), #preview_line)
-            local end_col = math.min(start_col + match.length, #preview_line)
-            if end_col > start_col then
-              vim.api.nvim_buf_set_extmark(preview_buf, preview_namespace, match.lnum - 1, start_col, {
-                end_col = end_col,
-                hl_group = "NativePickerPreviewMatch",
-              })
-            end
-          end
-        end
-      else
-        vim.api.nvim_buf_set_lines(preview_buf, 0, -1, false, { fallback })
-      end
-      vim.bo[preview_buf].modifiable = false
-      if not preview_win or not vim.api.nvim_win_is_valid(preview_win) then
-        local ok_p, win_p = pcall(vim.api.nvim_open_win, preview_buf, false, next_preview_config)
-        if ok_p then
-          preview_win = win_p
-          vim.wo[preview_win].wrap = false
-          vim.wo[preview_win].number = true
-          vim.wo[preview_win].relativenumber = false
-          vim.wo[preview_win].cursorline = true
-        end
-      else
-        vim.api.nvim_win_set_buf(preview_win, preview_buf)
-        pcall(vim.api.nvim_win_set_config, preview_win, next_preview_config)
-      end
-      if ok_preview then
-        local lnum = preview_target_lnum(item)
-        if lnum then
-          pcall(vim.api.nvim_win_set_cursor, preview_win, { math.min(lnum, vim.api.nvim_buf_line_count(preview_buf)), 0 })
-          vim.api.nvim_win_call(preview_win, function() pcall(vim.cmd, "normal! zz") end)
-        end
-      end
+      preview_win, preview_buf = picker_preview_window.update(preview_win, preview_buf, {
+        config = preview_config(),
+        item = current_item(),
+        namespace = preview_namespace,
+        picker_opts = opts,
+      })
     end
 
     local function select_index(index)
@@ -405,13 +159,21 @@ function M.select_items(items, opts, on_choice)
       if not candidates_win or not vim.api.nvim_win_is_valid(candidates_win) then
         return
       end
+      if type(opts.submit_query) == "function" and current_query ~= "" then
+        local query = current_query
+        local filter = current_quick_filter
+        local regex_pattern = current_regex_pattern
+        close_candidates_window()
+        opts.submit_query(query, { filter = filter, regex_pattern = regex_pattern })
+        return
+      end
       local row = vim.api.nvim_win_get_cursor(candidates_win)[1]
       select_index(row - 2)
     end
 
     local function open_split(command)
       local item = current_item()
-      local path = preview_path(item)
+      local path = picker_preview.path(opts, item)
       if path then
         close_candidates_window()
         vim.cmd(command .. " " .. vim.fn.fnameescape(path))
@@ -437,39 +199,28 @@ function M.select_items(items, opts, on_choice)
     end
 
     local function scroll_preview(delta)
-      if preview_win and vim.api.nvim_win_is_valid(preview_win) then
-        vim.api.nvim_win_call(preview_win, function()
-          vim.cmd("normal! " .. math.abs(delta) .. (delta > 0 and "\5" or "\25"))
-        end)
-      end
+      picker_navigation.scroll_preview(preview_win, delta)
     end
 
     local function move_cursor(delta)
-      local cursor = vim.api.nvim_win_get_cursor(candidates_win)
-      local last = math.min(#current_candidates - page_start + 3, math.max(3, height - 1))
-      vim.api.nvim_win_set_cursor(candidates_win, { math.max(3, math.min(cursor[1] + delta, last)), 0 })
-      update_preview()
-    end
-
-    local function filtered_items_from_state()
-      local next_candidates = current_query == "" and items or picker_filter.items(items, opts, current_query)
-      if current_quick_filter then
-        next_candidates = picker_filter.by_predicate(next_candidates, current_quick_filter.predicate)
+      if picker_navigation.move_cursor(candidates_win, current_candidates, page_start, height, delta) then
+        update_preview()
       end
-      if current_regex_pattern then
-        next_candidates = picker_filter.by_regex(next_candidates, opts, current_regex_pattern)
-      end
-      return next_candidates
     end
 
     local function apply_filter_state(empty_message)
-      local next_candidates = filtered_items_from_state()
-      if #next_candidates == 0 then
+      local filter_state = {
+        query = current_query,
+        quick_filter = current_quick_filter,
+        regex_pattern = current_regex_pattern,
+      }
+      local next_candidates = opts.input_only and {} or picker_filter_state.items(items, opts, filter_state)
+      if #next_candidates == 0 and not opts.input_mode then
         notify(empty_message or (prompt .. ": no results"), vim.log.levels.WARN)
         return false
       end
 
-      current_filter_label = active_filter_label()
+      current_filter_label = picker_filter_state.label(filter_state)
       current_candidates = next_candidates
       choosing_quick_filter = false
       page_start = 1
@@ -565,48 +316,31 @@ function M.select_items(items, opts, on_choice)
     end
 
     local function page(delta)
-      local total = #current_candidates
-      local visible_limit = math.max(1, height - 3)
-      if total <= visible_limit then
-        return
+      local next_start, changed = picker_navigation.page(current_candidates, page_start, height, delta)
+      if changed then
+        page_start = next_start
+        render()
+        update_preview()
+        vim.cmd("normal! zz")
       end
-      local max_start = math.floor((total - 1) / visible_limit) * visible_limit + 1
-      page_start = math.max(1, math.min(page_start + delta * visible_limit, max_start))
-      render()
-      update_preview()
-      vim.cmd("normal! zz")
     end
 
     local function page_up_or_top()
-      if not candidates_win or not vim.api.nvim_win_is_valid(candidates_win) then
-        return
-      end
-      local cursor = vim.api.nvim_win_get_cursor(candidates_win)
-      if cursor[1] > 3 then
-        vim.api.nvim_win_set_cursor(candidates_win, { 3, 0 })
+      local next_start, changed = picker_navigation.page_up_or_top(candidates_win, current_candidates, page_start, height)
+      if changed then
+        page_start = next_start
         update_preview()
         vim.cmd("normal! zz")
-        return
       end
-      page(-1)
     end
 
     local function jump_group(delta)
-      if type(opts.group_item) ~= "function" then return end
-      local current_index = page_start + (vim.api.nvim_win_get_cursor(candidates_win)[1] - 3)
-      local current_group = picker_filter.item_group(current_candidates[current_index], opts)
-      local index = current_index
-      while index >= 1 and index <= #current_candidates do
-        index = index + delta
-        local group = picker_filter.item_group(current_candidates[index], opts)
-        if group and group ~= current_group then
-          local visible_limit = math.max(1, height - 3)
-          page_start = math.floor((index - 1) / visible_limit) * visible_limit + 1
-          render()
-          vim.api.nvim_win_set_cursor(candidates_win, { index - page_start + 3, 0 })
-          update_preview()
-          return
-        end
+      local next_start, cursor_row = picker_navigation.jump_group(opts, candidates_win, current_candidates, page_start, height, delta)
+      if cursor_row then
+        page_start = next_start
+        render()
+        vim.api.nvim_win_set_cursor(candidates_win, { cursor_row, 0 })
+        update_preview()
       end
     end
 
@@ -643,7 +377,7 @@ function M.select_items(items, opts, on_choice)
       vim.api.nvim_set_current_win(preview_win)
 
       local preview_map_opts = { buffer = preview_buf, silent = true }
-      vim.keymap.set("n", "<A-p>", function()
+      vim.keymap.set("n", "<C-o>", function()
         if candidates_win and vim.api.nvim_win_is_valid(candidates_win) then
           vim.api.nvim_set_current_win(candidates_win)
         end
@@ -668,18 +402,7 @@ function M.select_items(items, opts, on_choice)
       calculate_layout()
 
       if candidates_win and vim.api.nvim_win_is_valid(candidates_win) then
-        pcall(vim.api.nvim_win_set_config, candidates_win, {
-          relative = "editor",
-          row = row,
-          col = col,
-          width = width,
-          height = height,
-          style = "minimal",
-          border = "single",
-          zindex = 50,
-          focusable = true,
-          noautocmd = true,
-        })
+        pcall(vim.api.nvim_win_set_config, candidates_win, picker_layout_mod.candidates_config(layout))
       end
 
       render()
@@ -710,49 +433,96 @@ function M.select_items(items, opts, on_choice)
       end
     end
 
-    local map_opts = { buffer = candidates_buf, silent = true }
-    vim.keymap.set("n", "<CR>", select_cursor, map_opts)
-    vim.keymap.set("n", "<C-q>", open_quickfix, map_opts)
-    vim.keymap.set("n", "<C-v>", function() open_split("vsplit") end, map_opts)
-    vim.keymap.set("n", "<C-x>", function() open_split("split") end, map_opts)
-    vim.keymap.set("n", "/", run_or_select_quick_filter("/", ask_filter), map_opts)
-    vim.keymap.set("n", "F", ask_quick_filter, map_opts)
-    vim.keymap.set("n", "C", run_or_select_quick_filter("C", clear_active_filters), map_opts)
-    vim.keymap.set("n", "R", run_or_select_quick_filter("R", ask_regex_filter), map_opts)
-    vim.keymap.set("n", "<Tab>", toggle_preview, map_opts)
-    vim.keymap.set("n", "<A-p>", focus_preview, map_opts)
-    vim.keymap.set("n", "<A-l>", toggle_picker_layout, map_opts)
-    vim.keymap.set("n", "?", toggle_descriptions, map_opts)
-    vim.keymap.set("n", "z", toggle_preview_zoom, vim.tbl_extend("force", map_opts, { nowait = true }))
-    vim.keymap.set("n", "j", run_or_select_quick_filter("j", function() move_cursor(1) end), map_opts)
-    vim.keymap.set("n", "k", run_or_select_quick_filter("k", function() move_cursor(-1) end), map_opts)
-    vim.keymap.set("n", "<C-n>", function() move_cursor(1) end, map_opts)
-    vim.keymap.set("n", "<C-p>", function() move_cursor(-1) end, map_opts)
-    vim.keymap.set("n", "<C-u>", page_up_or_top, map_opts)
-    vim.keymap.set("n", "<C-d>", function() page(1) end, map_opts)
-    vim.keymap.set("n", "<C-f>", function() scroll_preview(height) end, map_opts)
-    vim.keymap.set("n", "<C-b>", function() scroll_preview(-height) end, map_opts)
-    vim.keymap.set("n", "]g", function() jump_group(1) end, map_opts)
-    vim.keymap.set("n", "[g", function() jump_group(-1) end, map_opts)
-    vim.keymap.set("n", "q", cancel_or_close, map_opts)
-    vim.keymap.set("n", "<Esc>", cancel_or_close, map_opts)
-    local reserved_filter_keys = { j = true, k = true, q = true, ["/"] = true, R = true, F = true, C = true }
-    for _, filter in ipairs(opts.filters or opts.quick_filters or {}) do
-      if filter.key and not reserved_filter_keys[filter.key] then
-        vim.keymap.set("n", filter.key, function()
-          if choosing_quick_filter then
-            select_quick_filter_key(filter.key)
-            return
-          end
-          apply_quick_filter(filter)
-        end, map_opts)
+    local function update_inline_query(next_query)
+      local previous_query = current_query
+      current_query = next_query or ""
+      if not apply_filter_state(prompt .. ": no results for " .. current_query) then
+        current_query = previous_query
       end
     end
-    for index = 1, 9 do
-      vim.keymap.set("n", tostring(index), function()
-        select_index(index)
-      end, map_opts)
+
+    local function append_query(text)
+      return function()
+        if choosing_quick_filter then
+          select_quick_filter_key(text)
+          return
+        end
+        update_inline_query(current_query .. text)
+      end
     end
+
+    local function backspace_query()
+      if current_query == "" then
+        return
+      end
+      update_inline_query(current_query:sub(1, -2))
+    end
+
+    local function clear_query()
+      update_inline_query("")
+    end
+
+    local function toggle_selected()
+      if not opts.multi_select then
+        return
+      end
+      local item = current_item()
+      if not item then
+        return
+      end
+      local key = picker_selection.item_key(opts, item)
+      selected[key] = not selected[key] or nil
+      render()
+    end
+
+    local function run_action(action)
+      return function()
+        local item = current_item()
+        local chosen = picker_selection.selected_items(items, opts, selected)
+        if #chosen == 0 and item then
+          chosen = { item }
+        end
+        action.fn(chosen, item, {
+          close = close_candidates_window,
+          render = render,
+          selected = selected,
+        })
+      end
+    end
+
+    picker_keymaps.setup({
+      append_query = append_query,
+      apply_quick_filter = apply_quick_filter,
+      ask_filter = ask_filter,
+      ask_quick_filter = ask_quick_filter,
+      ask_regex_filter = ask_regex_filter,
+      backspace_query = backspace_query,
+      buffer = candidates_buf,
+      cancel_or_close = cancel_or_close,
+      clear_active_filters = clear_active_filters,
+      clear_query = clear_query,
+      focus_preview = focus_preview,
+      is_choosing_quick_filter = function() return choosing_quick_filter end,
+      jump_group = jump_group,
+      move_cursor = move_cursor,
+      open_quickfix = open_quickfix,
+      open_split = open_split,
+      opts = opts,
+      page = page,
+      page_up_or_top = page_up_or_top,
+      run_action = run_action,
+      run_or_select_quick_filter = run_or_select_quick_filter,
+      scroll_preview_down = function() scroll_preview(height) end,
+      scroll_preview_up = function() scroll_preview(-height) end,
+      select_cursor = select_cursor,
+      select_index = select_index,
+      select_quick_filter_key = select_quick_filter_key,
+      toggle_descriptions = toggle_descriptions,
+      toggle_picker_layout = toggle_picker_layout,
+      toggle_preview = toggle_preview,
+      toggle_preview_zoom = toggle_preview_zoom,
+      toggle_selected = toggle_selected,
+    })
 
     render()
     update_preview()
@@ -761,6 +531,10 @@ function M.select_items(items, opts, on_choice)
   local function choose(candidates, query)
     query = vim.trim(query or "")
     if #candidates == 0 then
+      if opts.input_only then
+        open_candidates_picker(candidates, query)
+        return
+      end
       notify(prompt .. ": no results", vim.log.levels.WARN)
       return
     end

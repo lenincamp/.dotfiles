@@ -1,5 +1,16 @@
 local M = {}
 
+local function query_tokens(query)
+  local tokens = {}
+  for token in vim.trim(query or ""):lower():gmatch("%S+") do
+    tokens[#tokens + 1] = {
+      glob = token:find("[*?]") ~= nil,
+      text = token,
+    }
+  end
+  return tokens
+end
+
 function M.item_label(item, opts)
   if opts and type(opts.format_item) == "function" then
     return opts.format_item(item)
@@ -42,12 +53,172 @@ function M.item_matches(label, query)
   return true
 end
 
-function M.items(items, opts, query)
-  local filtered = {}
-  for _, item in ipairs(items) do
-    if M.item_matches(M.item_label(item, opts), query) then
-      filtered[#filtered + 1] = item
+local function fuzzy_positions(lower_label, token)
+  local positions = {}
+  local cursor = 1
+
+  for index = 1, #token do
+    local char = token:sub(index, index)
+    local found = lower_label:find(char, cursor, true)
+    if not found then
+      return nil
     end
+    positions[#positions + 1] = found
+    cursor = found + 1
+  end
+
+  return positions
+end
+
+local function fuzzy_token_score(lower_label, token)
+  local cursor = 1
+  local first = nil
+  local previous = nil
+  local score = 0
+
+  for index = 1, #token do
+    local found = lower_label:find(token:sub(index, index), cursor, true)
+    if not found then
+      return nil
+    end
+    first = first or found
+    if previous and found == previous + 1 then
+      score = score + 12
+    end
+    previous = found
+    cursor = found + 1
+  end
+
+  return score + 100 - first
+end
+
+local function fuzzy_score(label, tokens)
+  if #tokens == 0 then
+    return 0
+  end
+
+  local score = 0
+  local lower = label:lower()
+  for _, token in ipairs(tokens) do
+    if token.glob then
+      if not M.item_matches(label, token.text) then
+        return nil
+      end
+      score = score + 20
+    else
+      if lower:find(token.text, 1, true) then
+        score = score + 50
+      end
+      local token_score = fuzzy_token_score(lower, token.text)
+      if not token_score then
+        return nil
+      end
+      score = score + token_score
+    end
+  end
+
+  return score
+end
+
+local function better(a, b)
+  if a.score ~= b.score then
+    return a.score > b.score
+  end
+  return a.label < b.label
+end
+
+local function worse(a, b)
+  return better(b, a)
+end
+
+local function heap_sift_up(heap, index)
+  while index > 1 do
+    local parent = math.floor(index / 2)
+    if not worse(heap[index], heap[parent]) then
+      break
+    end
+    heap[index], heap[parent] = heap[parent], heap[index]
+    index = parent
+  end
+end
+
+local function heap_sift_down(heap, index)
+  local size = #heap
+  while true do
+    local left = index * 2
+    local right = left + 1
+    local smallest = index
+    if left <= size and worse(heap[left], heap[smallest]) then
+      smallest = left
+    end
+    if right <= size and worse(heap[right], heap[smallest]) then
+      smallest = right
+    end
+    if smallest == index then
+      break
+    end
+    heap[index], heap[smallest] = heap[smallest], heap[index]
+    index = smallest
+  end
+end
+
+local function heap_push(heap, entry, limit)
+  if #heap < limit then
+    heap[#heap + 1] = entry
+    heap_sift_up(heap, #heap)
+    return
+  end
+  if better(entry, heap[1]) then
+    heap[1] = entry
+    heap_sift_down(heap, 1)
+  end
+end
+
+function M.match_positions(label, query)
+  local all = {}
+  query = vim.trim(query or "")
+  if query == "" then
+    return all
+  end
+
+  for token in query:gmatch("%S+") do
+    if not token:find("[*?]") then
+      local positions = fuzzy_positions(label:lower(), token:lower())
+      if positions then
+        vim.list_extend(all, positions)
+      end
+    end
+  end
+  return all
+end
+
+function M.items(items, opts, query)
+  opts = opts or {}
+  local tokens = query_tokens(query)
+  local use_limit = #tokens > 0 and opts.filter_limit ~= false
+  local limit = tonumber(opts.filter_limit) or 5000
+  local entries = {}
+
+  for _, item in ipairs(items) do
+    local label = M.item_label(item, opts)
+    local score = fuzzy_score(label, tokens)
+    if score then
+      local entry = { item = item, label = label, score = score }
+      if use_limit then
+        heap_push(entries, entry, limit)
+      else
+        entries[#entries + 1] = entry
+      end
+    end
+  end
+
+  if #tokens > 0 then
+    table.sort(entries, better)
+  end
+
+  local filtered = {}
+  for index, entry in ipairs(entries) do
+    filtered[index] = entry.item
   end
   return filtered
 end

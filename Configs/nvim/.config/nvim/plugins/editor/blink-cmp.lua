@@ -16,6 +16,8 @@ for index, source in ipairs(completion_sources) do
   completion_source_priority[source] = index
 end
 
+completion_source_priority.dadbod = completion_source_priority.snippets + 1
+
 require("blink.cmp").setup({
   -- Force Rust fuzzy matcher and avoid runtime binary downloads/replacements.
   -- The dylib is built locally in blink.cmp/target/release and version-pinned.
@@ -206,9 +208,18 @@ require("blink.cmp").setup({
 
   sources = {
     default = completion_sources,
+    per_filetype = {
+      mysql = { "snippets", "dadbod", "buffer" },
+      plsql = { "snippets", "dadbod", "buffer" },
+      sql = { "snippets", "dadbod", "buffer" },
+    },
     providers = {
       lsp = {
         score_offset = 25,
+      },
+      dadbod = {
+        name = "Dadbod",
+        module = "vim_dadbod_completion.blink",
       },
       minuet = {
         name         = "󰋦",

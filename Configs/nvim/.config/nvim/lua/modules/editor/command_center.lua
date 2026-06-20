@@ -26,6 +26,8 @@ function M.items()
   return {
     action("Find files", "Files", function() search.find_files({ title = "Find Files" }) end),
     action("Find files (root)", "Files", function() search.find_files({ cwd = search.root(), title = "Find Files (root)" }) end),
+    action("Find ignored files", "Files", function() search.find_files({ ignored = true, title = "Find Ignored Files" }) end),
+    action("Find ignored files (root)", "Files", function() search.find_files({ cwd = search.root(), ignored = true, title = "Find Ignored Files (root)" }) end),
     action("Recent files", "Files", function() search.recent_files({ title = "Recent Files" }) end),
     action("Recent files (cwd)", "Files", function() search.recent_files({ cwd = vim.fn.getcwd(), title = "Recent Files (cwd)" }) end),
     action("Git files", "Files", function() search.git_files({ title = "Git Files" }) end),
@@ -33,6 +35,8 @@ function M.items()
 
     action("Grep literal (root)", "Search", function() search.grep({ cwd = search.root(), regex = false, title = "Grep Literal (root)" }) end),
     action("Grep regex (root)", "Search", function() search.grep({ cwd = search.root(), regex = true, title = "Grep Regex (root)" }) end),
+    action("Grep ignored literal", "Search", function() search.grep({ ignored = true, regex = false, title = "Grep Ignored Literal" }) end),
+    action("Grep ignored literal (root)", "Search", function() search.grep({ cwd = search.root(), ignored = true, regex = false, title = "Grep Ignored Literal (root)" }) end),
     action("Search word (root)", "Search", function() search.grep_word({ cwd = search.root() }) end),
     action("Keymaps", "Search", function() require("modules.editor.keymap_docs").select() end),
     action("Commands", "Search", function() search.commands() end),

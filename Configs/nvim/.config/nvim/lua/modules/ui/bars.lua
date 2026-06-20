@@ -1,4 +1,5 @@
 local M = {}
+local highlights = require("modules.ui.highlights")
 
 local mode_names = {
   n = "NORMAL",
@@ -42,6 +43,19 @@ local winbar_apply_events = {
   BufWinEnter = true,
   WinNew = true,
 }
+
+local function should_refresh_for_event(event)
+  if vim.g.pure_ui_statusline_enabled == true then
+    return true
+  end
+  if vim.g.pure_ui_tabline_enabled == true then
+    return true
+  end
+  if vim.g.pure_ui_winbar_enabled ~= false then
+    return event ~= "DiagnosticChanged" and event ~= "DirChanged" and event ~= "TabEnter"
+  end
+  return false
+end
 
 local function esc_status(text)
   return tostring(text or ""):gsub("%%", "%%%%")
@@ -292,10 +306,7 @@ function M.setup()
 
   _G.PureUIBarsApply = M.apply
 
-  vim.api.nvim_create_autocmd("ColorScheme", {
-    group = vim.api.nvim_create_augroup("pure_native_bars_highlights", { clear = true }),
-    callback = setup_highlights,
-  })
+  highlights.register("bars", setup_highlights)
 
   vim.api.nvim_create_autocmd({
     "BufEnter",
@@ -314,7 +325,9 @@ function M.setup()
       if winbar_apply_events[args.event] then
         M.apply_winbar_for_window(vim.api.nvim_get_current_win())
       end
-      M.refresh()
+      if should_refresh_for_event(args.event) then
+        M.refresh()
+      end
     end,
   })
 

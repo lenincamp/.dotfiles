@@ -1,4 +1,5 @@
 local M = {}
+local highlights = require("modules.ui.highlights")
 
 local configured = false
 
@@ -14,13 +15,8 @@ end
 function M.setup()
   if not configured then
     configured = true
-    vim.api.nvim_create_autocmd("ColorScheme", {
-      group = vim.api.nvim_create_augroup("pure_dap_sign_highlights", { clear = true }),
-      callback = setup_highlights,
-    })
+    highlights.register("dap_signs", setup_highlights)
   end
-
-  setup_highlights()
 
   vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
   vim.fn.sign_define("DapBreakpointCondition", { text = "◆", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })

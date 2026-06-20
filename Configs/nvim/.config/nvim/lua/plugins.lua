@@ -48,23 +48,13 @@ local mason_lazy_commands = registry.mason_lazy_commands
 local diff_blocked_configs = registry.diff_blocked_configs
 
 -- During `nvim -d ...`, FileType events can fire before `vim.opt.diff` settles.
--- Keep DAP configs blocked during this startup window to preserve diff-mode policy.
-local startup_diff_pending = false
+-- Keep DAP configs blocked for the whole diff session.
+local diff_startup = false
 for _, arg in ipairs(vim.v.argv or {}) do
   if arg == "-d" then
-    startup_diff_pending = true
+    diff_startup = true
     break
   end
-end
-
-if startup_diff_pending then
-  vim.api.nvim_create_autocmd("VimEnter", {
-    group = vim.api.nvim_create_augroup("PureDiffStartupWindow", { clear = true }),
-    once = true,
-    callback = function()
-      startup_diff_pending = false
-    end,
-  })
 end
 
 local function load_pack(name)
@@ -111,7 +101,7 @@ local function load_packs_for_config(name)
 end
 
 local function is_diff_context_active()
-  return startup_diff_pending or vim.opt.diff:get()
+  return diff_startup or vim.opt.diff:get()
 end
 
 local function should_skip_config(name)

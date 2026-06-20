@@ -12,14 +12,6 @@ function M.setup()
     end,
   })
 
-  vim.api.nvim_create_autocmd("BufWritePost", {
-    pattern = { "*.java" },
-    group = vim.api.nvim_create_augroup("java_codelens_on_save", { clear = true }),
-    callback = function(ev)
-      pcall(vim.lsp.codelens.enable, true, { bufnr = ev.buf })
-    end,
-  })
-
   vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("java_execute_client_command_guard", { clear = true }),
     callback = function(args)

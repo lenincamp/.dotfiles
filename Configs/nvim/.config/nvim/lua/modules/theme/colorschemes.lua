@@ -1,6 +1,7 @@
 local M = {}
 local runtime = require("modules.core.runtime")
 local catalog = require("modules.theme.catalog")
+local commands = require("modules.theme.colorschemes.commands")
 local theme_model = require("modules.theme.colorschemes.model")
 local theme_runtime = require("modules.theme.colorschemes.runtime")
 local state_store = require("modules.theme.colorschemes.state")
@@ -181,56 +182,11 @@ function M.setup_autocmd()
     end,
   })
 
-  local function test_iterm_colors(opts)
-    local theme = vim.trim(opts.args or "")
-    if theme == "" then
-      theme = vim.g.pure_colorscheme or vim.g.colors_name or M.default
-    end
-
-    local previous_force = vim.g.pure_iterm2_sync_always
-    local previous_notify = vim.g.pure_iterm2_sync_notify
-    local previous_cache = vim.g._pure_iterm2_primary_last
-
-    vim.g.pure_iterm2_sync_always = true
-    vim.g.pure_iterm2_sync_notify = true
-    vim.g._pure_iterm2_primary_last = nil
-
-    local ok = tool_sync.sync_iterm2_theme(theme)
-
-    vim.g.pure_iterm2_sync_always = previous_force
-    vim.g.pure_iterm2_sync_notify = previous_notify
-    vim.g._pure_iterm2_primary_last = previous_cache
-
-    vim.notify(
-      string.format("ItermColorTest: theme=%s applied=%s", theme, tostring(ok == true)),
-      ok and vim.log.levels.INFO or vim.log.levels.WARN
-    )
-  end
-
-  vim.api.nvim_create_user_command("ItermColorTest", test_iterm_colors, {
-    nargs = "?",
-    desc = "Test iTerm2 background/foreground sync",
-    complete = function()
-      return vim.tbl_map(function(item)
-        return item.key
-      end, M.themes)
-    end,
-    force = true,
+  commands.setup({
+    default = M.default,
+    themes = M.themes,
+    tool_sync = tool_sync,
   })
-
-  vim.api.nvim_create_user_command("ItermPresetTest", test_iterm_colors, {
-    nargs = "?",
-    desc = "Deprecated alias for ItermColorTest",
-    force = true,
-  })
-
-  vim.api.nvim_create_user_command("TmuxSync", function()
-    vim.g._pure_tmux_theme_last = nil
-    local theme = vim.g.pure_colorscheme or vim.g.colors_name or M.default
-    tool_sync.sync_tmux_theme(theme)
-    local result = vim.fn.system({ "tmux", "show-option", "-gqv", "@tmux_theme" })
-    vim.notify("TmuxSync: theme=" .. theme .. " → tmux @tmux_theme=" .. vim.trim(result), vim.log.levels.INFO)
-  end, { desc = "Force tmux theme sync", force = true })
 
   system_background.start_watcher(M, M.sync_with_system_background)
   vim.schedule(function()

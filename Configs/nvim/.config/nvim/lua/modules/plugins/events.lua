@@ -116,12 +116,7 @@ local function setup_insert_stack(load_cfg_once)
 end
 
 local function setup_formatter(_load_cfg_once)
-  vim.api.nvim_create_autocmd("BufWritePre", {
-    group = vim.api.nvim_create_augroup("PureNativeFormat", { clear = true }),
-    callback = function(args)
-      require("modules.editor.format").format_on_save(args)
-    end,
-  })
+  require("modules.editor.format").refresh_autoformat_autocmd()
 end
 
 local function setup_markdown(load_cfg_once)

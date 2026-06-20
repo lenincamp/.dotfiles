@@ -1,10 +1,11 @@
 local M = {}
 
+local keymaps = require("modules.editor.call_hierarchy.keymaps")
 local lsp_core = require("modules.core.lsp")
+local model = require("modules.editor.call_hierarchy.model")
+local view = require("modules.editor.call_hierarchy.view")
 
 local PREPARE = "textDocument/prepareCallHierarchy"
-local INCOMING = "callHierarchy/incomingCalls"
-local OUTGOING = "callHierarchy/outgoingCalls"
 
 local state = {
   bufnr = nil,
@@ -31,80 +32,15 @@ local function direction_label()
 end
 
 local function call_method()
-  return state.direction == "outgoing" and OUTGOING or INCOMING
+  return model.call_method(state.direction)
 end
 
 local function call_item(call)
-  if state.direction == "outgoing" then
-    return call.to
-  end
-  return call.from
-end
-
-local function item_range(item)
-  return item and (item.selectionRange or item.range) or nil
-end
-
-local function item_line(item)
-  local range = item_range(item)
-  return range and range.start and (range.start.line + 1) or 1
-end
-
-local function item_col(item)
-  local range = item_range(item)
-  return range and range.start and range.start.character or 0
-end
-
-local function item_file(item)
-  if not item or type(item.uri) ~= "string" then
-    return ""
-  end
-
-  local ok, name = pcall(vim.uri_to_fname, item.uri)
-  if not ok or type(name) ~= "string" then
-    return item.uri
-  end
-
-  return vim.fn.fnamemodify(name, ":~:.")
-end
-
-local function item_label(item)
-  if not item then
-    return "<unknown>"
-  end
-
-  local name = item.name or "<anonymous>"
-  local detail = item.detail and vim.trim(item.detail) or ""
-  local file = item_file(item)
-  local file_part = file ~= "" and ("  " .. vim.fn.fnamemodify(file, ":t") .. ":" .. item_line(item)) or ""
-
-  if detail ~= "" and detail ~= name then
-    return name .. "  " .. detail .. file_part
-  end
-  return name .. file_part
-end
-
-local function node_id(item)
-  if not item then
-    return ""
-  end
-
-  local range = item_range(item)
-  local line = range and range.start and range.start.line or 0
-  local col = range and range.start and range.start.character or 0
-  return table.concat({ item.uri or "", item.name or "", tostring(line), tostring(col) }, "|")
+  return model.call_item(state.direction, call)
 end
 
 local function make_node(item, depth, parent)
-  return {
-    id = node_id(item),
-    item = item,
-    depth = depth or 0,
-    parent = parent,
-    expanded = false,
-    loading = false,
-    children = nil,
-  }
+  return model.make_node(item, depth, parent)
 end
 
 local function clients_with_call_hierarchy(bufnr)
@@ -154,7 +90,7 @@ local function select_prepare_item(items, on_choice)
     prompt = "Call hierarchy item:",
     scope = "cursor",
     search_threshold = 0,
-    format_item = item_label,
+    format_item = model.item_label,
   }, on_choice)
 end
 
@@ -192,68 +128,14 @@ local function ensure_window()
   return state.win
 end
 
-local function setup_keymaps(bufnr)
-  if vim.b[bufnr].call_hierarchy_keymaps then
-    return
-  end
-
-  local opts = { buffer = bufnr, silent = true, nowait = true }
-  vim.keymap.set("n", "<CR>", function() M.jump() end, vim.tbl_extend("force", opts, { desc = "Call hierarchy: jump" }))
-  vim.keymap.set("n", "o", function() M.toggle_node() end, vim.tbl_extend("force", opts, { desc = "Call hierarchy: expand" }))
-  vim.keymap.set("n", "<Tab>", function() M.toggle_node() end, vim.tbl_extend("force", opts, { desc = "Call hierarchy: expand" }))
-  vim.keymap.set("n", "za", function() M.toggle_node() end, vim.tbl_extend("force", opts, { desc = "Call hierarchy: expand" }))
-  vim.keymap.set("n", "i", function() M.set_direction("incoming") end, vim.tbl_extend("force", opts, { desc = "Call hierarchy: incoming" }))
-  vim.keymap.set("n", "O", function() M.set_direction("outgoing") end, vim.tbl_extend("force", opts, { desc = "Call hierarchy: outgoing" }))
-  vim.keymap.set("n", "r", function() M.refresh() end, vim.tbl_extend("force", opts, { desc = "Call hierarchy: refresh" }))
-  vim.keymap.set("n", "q", function() M.close() end, vim.tbl_extend("force", opts, { desc = "Call hierarchy: close" }))
-  vim.keymap.set("n", "?", function() M.toggle_help() end, vim.tbl_extend("force", opts, { desc = "Call hierarchy: help" }))
-  vim.keymap.set("n", "Q", function() M.to_quickfix() end, vim.tbl_extend("force", opts, { desc = "Call hierarchy: quickfix" }))
-
-  vim.b[bufnr].call_hierarchy_keymaps = true
-end
-
-local function append_node(lines, node)
-  local indent = string.rep("  ", node.depth)
-  local marker = " "
-  if node.loading then
-    marker = "..."
-  elseif node.children == nil then
-    marker = ">"
-  elseif #node.children > 0 then
-    marker = node.expanded and "v" or ">"
-  end
-
-  lines[#lines + 1] = string.format("%s%s %s", indent, marker, item_label(node.item))
-  state.line_nodes[#lines] = node
-
-  if node.expanded and node.children then
-    for _, child in ipairs(node.children) do
-      append_node(lines, child)
-    end
-  end
-end
-
 local function render()
   if not state.root then
     return
   end
 
   local bufnr = ensure_buffer()
-  state.line_nodes = {}
-
-  local lines = {
-    "Call Hierarchy [" .. direction_label() .. "]",
-    "<CR> jump  o/<Tab> expand  i incoming  O outgoing  r refresh  Q quickfix  q close  ? help",
-    "",
-  }
-
-  if state.help then
-    lines[#lines + 1] = "Native LSP methods: " .. PREPARE .. ", " .. call_method()
-    lines[#lines + 1] = "The tree is resolved lazily; expand a node to request its children."
-    lines[#lines + 1] = ""
-  end
-
-  append_node(lines, state.root)
+  local lines, line_nodes = view.lines(state)
+  state.line_nodes = line_nodes
 
   local win = is_valid_win(state.win) and state.win or nil
   local cursor_line = win and vim.api.nvim_win_get_cursor(win)[1] or 1
@@ -343,7 +225,7 @@ local function jump_to_item(item)
 
   local loc = {
     uri = item.uri,
-    range = item_range(item),
+    range = model.item_range(item),
   }
 
   local ok = false
@@ -362,7 +244,7 @@ local function jump_to_item(item)
   local bufnr = vim.uri_to_bufnr(item.uri)
   vim.fn.bufload(bufnr)
   vim.api.nvim_set_current_buf(bufnr)
-  pcall(vim.api.nvim_win_set_cursor, 0, { item_line(item), item_col(item) })
+  pcall(vim.api.nvim_win_set_cursor, 0, { model.item_line(item), model.item_col(item) })
   return true
 end
 
@@ -436,10 +318,10 @@ function M.to_quickfix()
     local item = node and node.item or nil
     if item and item.uri then
       items[#items + 1] = {
-        filename = item_file(item),
-        lnum = item_line(item),
-        col = item_col(item) + 1,
-        text = string.rep("  ", node.depth) .. item_label(item),
+        filename = model.item_file(item),
+        lnum = model.item_line(item),
+        col = model.item_col(item) + 1,
+        text = string.rep("  ", node.depth) .. model.item_label(item),
       }
     end
   end
@@ -489,7 +371,15 @@ function M.open(direction)
           state.root = make_node(item, 0, nil)
 
           local bufnr = ensure_buffer()
-          setup_keymaps(bufnr)
+          keymaps.setup(bufnr, {
+            close = M.close,
+            jump = M.jump,
+            refresh = M.refresh,
+            set_direction = M.set_direction,
+            to_quickfix = M.to_quickfix,
+            toggle_help = M.toggle_help,
+            toggle_node = M.toggle_node,
+          })
           ensure_window()
           render()
           request_children(state.root)

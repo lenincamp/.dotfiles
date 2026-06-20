@@ -20,6 +20,7 @@ function M.define_highlights()
   vim.api.nvim_set_hl(0, "NativePickerTitle", title_hl)
   vim.api.nvim_set_hl(0, "NativePickerStatus", { link = "StatusLineNC", default = true })
   vim.api.nvim_set_hl(0, "NativePickerKey", { link = "Special", default = true })
+  vim.api.nvim_set_hl(0, "NativePickerMatch", { link = "Search", default = true })
 end
 
 function M.padded_line(line, width)

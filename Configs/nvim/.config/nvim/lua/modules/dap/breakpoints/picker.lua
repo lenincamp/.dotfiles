@@ -1,71 +1,12 @@
 local M = {}
 
+local data = require("modules.dap.breakpoints.picker.data")
 local hooks = require("modules.dap.breakpoints.hooks")
+local keymaps = require("modules.dap.breakpoints.picker.keymaps")
+local layout_mod = require("modules.dap.breakpoints.picker.layout")
 local persistence = require("modules.dap.breakpoints.persistence")
 local state = require("modules.dap.breakpoints.state")
 local storage = require("modules.dap.breakpoints.storage")
-
-local iter_breakpoints = persistence.iter_breakpoints
-
-local function has_saved_project()
-  local dir = storage.storage_dir()
-  return vim.fn.filereadable(dir .. "/" .. storage.project_key() .. ".json") == 1
-end
-
-local function breakpoint_icon(bp)
-  if bp.logMessage and bp.logMessage ~= "" then return "◉" end
-  if bp.condition and bp.condition ~= "" then return "◆" end
-  if bp.hitCondition and bp.hitCondition ~= "" then return "◇" end
-  return "●"
-end
-
-local function collect_breakpoint_items()
-  local all = require("dap.breakpoints").get()
-  local meta = storage.load_meta(state.active_project_key)
-  local items = {}
-
-  for bufnr, list in pairs(all) do
-    if type(bufnr) == "number" and vim.api.nvim_buf_is_valid(bufnr) then
-      local fname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":p")
-      if fname ~= "" then
-        iter_breakpoints(list, function(bp)
-          local key = storage.bp_key(fname, bp.line)
-          items[#items + 1] = {
-            bufnr = bufnr,
-            filename = fname,
-            line = bp.line,
-            group = meta[key] or "Default",
-            condition = bp.condition,
-            log_message = bp.logMessage,
-            hit_condition = bp.hitCondition,
-            key = key,
-            icon = breakpoint_icon(bp),
-          }
-        end)
-      end
-    end
-  end
-
-  table.sort(items, function(a, b)
-    if a.group ~= b.group then return a.group < b.group end
-    if a.filename ~= b.filename then return a.filename < b.filename end
-    return a.line < b.line
-  end)
-
-  return items
-end
-
-local function set_breakpoint_item(item, opts)
-  local bp_mod = require("dap.breakpoints")
-  bp_mod.remove(item.bufnr, item.line)
-  bp_mod.set({
-    condition = opts.condition,
-    log_message = opts.log_message,
-    hit_condition = opts.hit_condition,
-  }, item.bufnr, item.line)
-  persistence.mark_dirty()
-  persistence.save({ force = true })
-end
 
 function M.open()
   local ok_dap, _ = pcall(require, "dap")
@@ -73,10 +14,10 @@ function M.open()
 
   hooks.setup({ load = false })
 
-  local items = collect_breakpoint_items()
-  if #items == 0 and has_saved_project() then
+  local items = data.collect()
+  if #items == 0 and data.has_saved_project() then
     persistence.load()
-    items = collect_breakpoint_items()
+    items = data.collect()
   end
 
   if #items == 0 then
@@ -93,53 +34,18 @@ function M.open()
   local preview_enabled = true
   local show_descriptions = false
   local breakpoint_layout = "intellij"
-  local width, height, row, col, preview_width, preview_height, preview_row, preview_col, list_width, list_height, list_row, list_col
+  local layout
+  local preview_height, list_width
 
   local function calculate_layout()
-    if fullscreen then
-      width = math.max(80, vim.o.columns - 4)
-      height = math.max(14, vim.o.lines - vim.o.cmdheight - 4)
-      row = 1
-      col = 2
-    else
-      width = math.min(130, math.max(88, math.floor(vim.o.columns * 0.86)))
-      height = math.min(math.max(14, #items + 4), math.max(14, math.floor(vim.o.lines * 0.68)))
-      row = math.max(0, math.floor((vim.o.lines - height) / 2) - 1)
-      col = math.max(0, math.floor((vim.o.columns - width) / 2))
-    end
-
-    if not preview_enabled then
-      list_width = width
-      list_height = height
-      list_row = row
-      list_col = col
-      preview_width = 0
-      preview_height = 0
-      preview_row = row
-      preview_col = col
-      return
-    end
-
-    if breakpoint_layout == "intellij" then
-      preview_width = width
-      preview_height = math.max(6, math.floor(height * 0.58))
-      preview_row = row
-      preview_col = col
-      list_width = width
-      list_height = math.max(8, height - preview_height - 1)
-      list_row = row + preview_height + 1
-      list_col = col
-      return
-    end
-
-    preview_width = math.max(36, math.floor(width * 0.44))
-    list_width = width - preview_width - 1
-    preview_height = height
-    preview_row = row
-    preview_col = col + list_width + 1
-    list_height = height
-    list_row = row
-    list_col = col
+    layout = layout_mod.calculate({
+      fullscreen = fullscreen,
+      item_count = #items,
+      layout = breakpoint_layout,
+      preview_enabled = preview_enabled,
+    })
+    preview_height = layout.preview_height
+    list_width = layout.list_width
   end
 
   calculate_layout()
@@ -152,40 +58,11 @@ function M.open()
   vim.bo[preview_buf].buftype = "nofile"
   vim.bo[preview_buf].swapfile = false
 
-  local win = vim.api.nvim_open_win(buf, true, {
-    relative = "editor",
-    row = list_row,
-    col = list_col,
-    width = list_width,
-    height = list_height,
-    style = "minimal",
-    border = "rounded",
-    title = " Breakpoints intellij ",
-    title_pos = "center",
-  })
+  local win = vim.api.nvim_open_win(buf, true, layout_mod.list_config(layout, breakpoint_layout, fullscreen))
+  local preview_win = vim.api.nvim_open_win(preview_buf, false, layout_mod.preview_config(layout))
 
-  local preview_win = vim.api.nvim_open_win(preview_buf, false, {
-    relative = "editor",
-    row = preview_row,
-    col = preview_col,
-    width = preview_width,
-    height = preview_height,
-    style = "minimal",
-    border = "rounded",
-    title = " Preview ",
-    title_pos = "center",
-  })
-
-  vim.wo[win].cursorline = true
-  vim.wo[win].number = false
-  vim.wo[win].relativenumber = false
-  vim.wo[win].signcolumn = "no"
-  vim.wo[win].wrap = false
-  vim.wo[preview_win].cursorline = true
-  vim.wo[preview_win].number = true
-  vim.wo[preview_win].relativenumber = false
-  vim.wo[preview_win].signcolumn = "no"
-  vim.wo[preview_win].wrap = false
+  layout_mod.apply_list_options(win)
+  layout_mod.apply_preview_options(preview_win)
 
   local function ensure_preview_buffer()
     if preview_buf and vim.api.nvim_buf_is_valid(preview_buf) then
@@ -211,22 +88,8 @@ function M.open()
     end
 
     ensure_preview_buffer()
-    preview_win = vim.api.nvim_open_win(preview_buf, false, {
-      relative = "editor",
-      row = preview_row,
-      col = preview_col,
-      width = preview_width,
-      height = preview_height,
-      style = "minimal",
-      border = "rounded",
-      title = " Preview ",
-      title_pos = "center",
-    })
-    vim.wo[preview_win].cursorline = true
-    vim.wo[preview_win].number = true
-    vim.wo[preview_win].relativenumber = false
-    vim.wo[preview_win].signcolumn = "no"
-    vim.wo[preview_win].wrap = false
+    preview_win = vim.api.nvim_open_win(preview_buf, false, layout_mod.preview_config(layout))
+    layout_mod.apply_preview_options(preview_win)
   end
 
   local function close()
@@ -240,17 +103,7 @@ function M.open()
     calculate_layout()
 
     if vim.api.nvim_win_is_valid(win) then
-      pcall(vim.api.nvim_win_set_config, win, {
-        relative = "editor",
-        row = list_row,
-        col = list_col,
-        width = list_width,
-        height = list_height,
-        style = "minimal",
-        border = "rounded",
-        title = string.format(" Breakpoints %s%s ", breakpoint_layout, fullscreen and " fullscreen" or ""),
-        title_pos = "center",
-      })
+      pcall(vim.api.nvim_win_set_config, win, layout_mod.list_config(layout, breakpoint_layout, fullscreen))
     end
 
     if not preview_enabled then
@@ -260,17 +113,7 @@ function M.open()
 
     ensure_preview_window()
     if preview_win and vim.api.nvim_win_is_valid(preview_win) then
-      pcall(vim.api.nvim_win_set_config, preview_win, {
-        relative = "editor",
-        row = preview_row,
-        col = preview_col,
-        width = preview_width,
-        height = preview_height,
-        style = "minimal",
-        border = "rounded",
-        title = " Preview ",
-        title_pos = "center",
-      })
+      pcall(vim.api.nvim_win_set_config, preview_win, layout_mod.preview_config(layout))
     end
   end
 
@@ -326,7 +169,7 @@ function M.open()
   end
 
   local function render(preferred_key)
-    items = collect_breakpoint_items()
+    items = data.collect()
     if #items == 0 then
       close()
       vim.notify("No breakpoints in this project", vim.log.levels.INFO)
@@ -429,7 +272,7 @@ function M.open()
     if not item then return end
     vim.ui.input({ prompt = "Condition: ", default = item.condition or "", scope = "line" }, function(value)
       if value == nil then return end
-      set_breakpoint_item(item, {
+      data.set_breakpoint(item, {
         condition = vim.trim(value) ~= "" and value or nil,
       })
       render(item.key)
@@ -439,7 +282,7 @@ function M.open()
   local function update_normal()
     local item = current_item()
     if not item then return end
-    set_breakpoint_item(item, {})
+    data.set_breakpoint(item, {})
     render(item.key)
   end
 
@@ -448,7 +291,7 @@ function M.open()
     if not item then return end
     vim.ui.input({ prompt = "Log message: ", default = item.log_message or "", scope = "line" }, function(value)
       if value == nil then return end
-      set_breakpoint_item(item, {
+      data.set_breakpoint(item, {
         log_message = vim.trim(value) ~= "" and value or nil,
       })
       render(item.key)
@@ -460,7 +303,7 @@ function M.open()
     if not item then return end
     vim.ui.input({ prompt = "Hit condition: ", default = item.hit_condition or "", scope = "line" }, function(value)
       if value == nil then return end
-      set_breakpoint_item(item, {
+      data.set_breakpoint(item, {
         hit_condition = vim.trim(value) ~= "" and value or nil,
       })
       render(item.key)
@@ -506,31 +349,26 @@ function M.open()
     end)
   end
 
-  local opts = { buffer = buf, silent = true }
-  vim.keymap.set("n", "q", close, opts)
-  vim.keymap.set("n", "<Esc>", close, opts)
-  vim.keymap.set("n", "<CR>", jump, opts)
-  vim.keymap.set("n", "o", jump, opts)
-  vim.keymap.set("n", "j", function() move_cursor(1) end, opts)
-  vim.keymap.set("n", "k", function() move_cursor(-1) end, opts)
-  vim.keymap.set("n", "<Down>", function() move_cursor(1) end, opts)
-  vim.keymap.set("n", "<Up>", function() move_cursor(-1) end, opts)
-  vim.keymap.set("n", "d", remove_current, opts)
-  vim.keymap.set("n", "n", update_normal, opts)
-  vim.keymap.set("n", "c", update_condition, opts)
-  vim.keymap.set("n", "l", update_logpoint, opts)
-  vim.keymap.set("n", "h", update_hit_condition, opts)
-  vim.keymap.set("n", "g", update_group, opts)
-  vim.keymap.set("n", "G", update_group, opts)
-  vim.keymap.set("n", "R", rename_group, opts)
-  vim.keymap.set("n", "s", function()
-    persistence.save({ force = true })
-    vim.notify("Breakpoints saved", vim.log.levels.INFO)
-  end, opts)
-  vim.keymap.set("n", "<Tab>", toggle_preview, opts)
-  vim.keymap.set("n", "<A-f>", toggle_fullscreen, opts)
-  vim.keymap.set("n", "<A-l>", toggle_layout, opts)
-  vim.keymap.set("n", "?", toggle_descriptions, opts)
+  keymaps.setup(buf, {
+    close = close,
+    jump = jump,
+    move_cursor = move_cursor,
+    remove_current = remove_current,
+    rename_group = rename_group,
+    save = function()
+      persistence.save({ force = true })
+      vim.notify("Breakpoints saved", vim.log.levels.INFO)
+    end,
+    toggle_descriptions = toggle_descriptions,
+    toggle_fullscreen = toggle_fullscreen,
+    toggle_layout = toggle_layout,
+    toggle_preview = toggle_preview,
+    update_condition = update_condition,
+    update_group = update_group,
+    update_hit_condition = update_hit_condition,
+    update_logpoint = update_logpoint,
+    update_normal = update_normal,
+  })
 
   render()
 end

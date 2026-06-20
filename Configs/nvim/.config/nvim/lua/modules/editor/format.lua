@@ -60,6 +60,9 @@ local lsp_only_filetypes = {
   xml = true,
 }
 
+local autoformat_group = vim.api.nvim_create_augroup("PureNativeFormat", { clear = true })
+local autoformat_autocmd_active = false
+
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO, { title = "Format" })
 end
@@ -147,10 +150,37 @@ function M.format(opts)
 end
 
 function M.format_on_save(args)
-  if vim.g.autoformat == false or vim.b[args.buf].autoformat == false or vim.opt.diff:get() then
+  local buffer_autoformat = vim.b[args.buf].autoformat
+  local enabled = buffer_autoformat == true or (vim.g.autoformat == true and buffer_autoformat ~= false)
+  if not enabled or vim.opt.diff:get() then
     return
   end
   M.format({ bufnr = args.buf, notify = false })
+end
+
+local function has_buffer_autoformat()
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_valid(bufnr) and vim.b[bufnr].autoformat == true then
+      return true
+    end
+  end
+  return false
+end
+
+function M.refresh_autoformat_autocmd()
+  local should_enable = vim.g.autoformat == true or has_buffer_autoformat()
+  if should_enable and not autoformat_autocmd_active then
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      group = autoformat_group,
+      callback = function(args)
+        M.format_on_save(args)
+      end,
+    })
+    autoformat_autocmd_active = true
+  elseif not should_enable and autoformat_autocmd_active then
+    vim.api.nvim_clear_autocmds({ group = autoformat_group })
+    autoformat_autocmd_active = false
+  end
 end
 
 return M

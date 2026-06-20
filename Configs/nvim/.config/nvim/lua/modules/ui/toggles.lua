@@ -1,4 +1,5 @@
 local M = {}
+local dim = require("modules.ui.toggles.dim")
 local runtime = require("modules.core.runtime")
 
 local function notify(message)
@@ -45,22 +46,6 @@ end
 
 local function bool_text(enabled)
   return enabled and "ON" or "OFF"
-end
-
-local function set_window_dim(enabled)
-  for _, window in ipairs(vim.api.nvim_list_wins()) do
-    if vim.api.nvim_win_is_valid(window) then
-      if enabled and window ~= vim.api.nvim_get_current_win() then
-        if vim.w[window].pure_dim_saved_winhighlight == nil then
-          vim.w[window].pure_dim_saved_winhighlight = vim.wo[window].winhighlight
-        end
-        vim.wo[window].winhighlight = "Normal:Comment,NormalNC:Comment,EndOfBuffer:Comment"
-      elseif vim.w[window].pure_dim_saved_winhighlight ~= nil then
-        vim.wo[window].winhighlight = vim.w[window].pure_dim_saved_winhighlight
-        vim.w[window].pure_dim_saved_winhighlight = nil
-      end
-    end
-  end
 end
 
 function M.statusline_enabled()
@@ -122,6 +107,7 @@ function M.toggle_statusline()
   ensure_defaults()
   vim.g.pure_ui_statusline_enabled = not M.statusline_enabled()
   M.apply_bars_state()
+  require("modules.ui.highlights").apply()
   notify("Statusline " .. (M.statusline_enabled() and "ON" or "OFF"))
 end
 
@@ -215,7 +201,7 @@ end
 
 function M.toggle_dim()
   vim.g.pure_ui_dim_enabled = not vim.g.pure_ui_dim_enabled
-  set_window_dim(vim.g.pure_ui_dim_enabled)
+  dim.apply(vim.g.pure_ui_dim_enabled)
   notify("Dim Inactive Windows " .. bool_text(vim.g.pure_ui_dim_enabled))
 end
 
@@ -245,13 +231,22 @@ function M.toggle_inlay_hints()
 end
 
 function M.toggle_format_global()
-  vim.g.autoformat = vim.g.autoformat == false
-  notify("Format on Save (global) " .. bool_text(vim.g.autoformat ~= false))
+  vim.g.autoformat = vim.g.autoformat ~= true
+  require("modules.editor.format").refresh_autoformat_autocmd()
+  notify("Format on Save (global) " .. bool_text(vim.g.autoformat == true))
 end
 
 function M.toggle_format_buffer()
-  vim.b.autoformat = vim.b.autoformat == false
-  notify("Format on Save (buffer) " .. bool_text(vim.b.autoformat ~= false))
+  if vim.g.autoformat == true then
+    vim.b.autoformat = vim.b.autoformat == false and nil or false
+    require("modules.editor.format").refresh_autoformat_autocmd()
+    notify("Format on Save (buffer) " .. bool_text(vim.b.autoformat ~= false))
+    return
+  end
+
+  vim.b.autoformat = vim.b.autoformat == true and nil or true
+  require("modules.editor.format").refresh_autoformat_autocmd()
+  notify("Format on Save (buffer) " .. bool_text(vim.b.autoformat == true))
 end
 
 function M.toggle_cmdline_info()
@@ -319,14 +314,7 @@ function M.apply()
     callback = M.apply_bars_state,
   })
 
-  vim.api.nvim_create_autocmd("WinEnter", {
-    group = vim.api.nvim_create_augroup("pure_ui_dim_refresh", { clear = true }),
-    callback = function()
-      if vim.g.pure_ui_dim_enabled then
-        set_window_dim(true)
-      end
-    end,
-  })
+  dim.configure_autocmd(vim.g.pure_ui_dim_enabled == true)
 end
 
 return M
