@@ -16,7 +16,7 @@ local function pick_provider(state)
   local ok_cfg, cfg = pcall(require, "avante.config")
   local current = (ok_cfg and cfg.provider) or "?"
 
-  require("modules.editor.picker").select_items(providers.provider_items(state), {
+  require("picker").select_items(providers.provider_items(state), {
     prompt = "Avante provider  (active: " .. current .. ")",
     scope = "global",
     search_threshold = 0,

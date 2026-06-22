@@ -15,15 +15,12 @@
 --   <leader>SL  Toggle log file debug
 --   <leader>Sc  Create LWC component
 --   <leader>Sa  Create Apex class/trigger
--- Tests (also in <leader>t group):
---   <leader>ta  Apex: run test method (nearest)
---   <leader>tA  Apex: run test class
+-- Apex tests: <leader>tn / tf / td / tl (config.test)
 
 -- Only load in Salesforce projects
 local is_sf = vim.fn.findfile("sfdx-project.json", vim.fn.getcwd() .. ";") ~= ""
 if not is_sf then return end
 
-vim.cmd.packadd("salesforce.nvim")
 local ok, salesforce = pcall(require, "salesforce")
 if not ok then return end
 
@@ -60,13 +57,6 @@ map("n", "<leader>Sl", function()
     .. " apex tail log --color 2>&1")
   vim.cmd("norm G")
 end, { desc = "SF: Tail debug log" })
-
--- ── Apex tests (also bound in <leader>t for unified test group) ───────────────
-
-map("n", "<leader>ta", "<Cmd>SalesforceExecuteCurrentMethod<CR>",
-  { desc = "Test: Apex method (nearest)" })
-map("n", "<leader>tA", "<Cmd>SalesforceExecuteCurrentClass<CR>",
-  { desc = "Test: Apex class" })
 
 -- ── Notify that Salesforce mode is active ────────────────────────────────────
 

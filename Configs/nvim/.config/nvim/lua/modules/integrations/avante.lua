@@ -1,5 +1,5 @@
 local M = {}
-local runtime = require("modules.core.runtime")
+local lazy_bootstrap = require("modules.bootstrap.lazy")
 local build = require("modules.integrations.avante.build")
 local keymaps = require("modules.integrations.avante.keymaps")
 local providers = require("modules.integrations.avante.providers")
@@ -29,7 +29,7 @@ function M.setup()
       return
     end
 
-    if runtime.load_config("avante") then
+    if lazy_bootstrap.load("avante.nvim") then
       return
     end
 

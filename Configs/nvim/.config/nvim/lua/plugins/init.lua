@@ -1,37 +1,62 @@
 -- Plugin specs for lazy.nvim.
--- Replaces: packs.lua, pack_manager/, modules/plugins/, lazy_keymaps, warmup.
+-- Personal plugins: GitHub (lenincamp/*) by default; local dev via vim.g.pure_local_plugins in init.lua.
 
 local conf = vim.fn.stdpath("config") .. "/plugins"
+local ps = require("config.plugins_source")
 
 local function cfg(path)
-  return function() dofile(conf .. "/" .. path) end
+  return function()
+    dofile(conf .. "/" .. path)
+  end
 end
 
--- Diff startup detection (block DAP in diff mode)
-local diff_startup = vim.tbl_contains(vim.v.argv or {}, "-d")
-local function not_diff() return not diff_startup and not vim.opt.diff:get() end
+local function p(repo, name, opts)
+  return ps.spec(repo, name, opts)
+end
 
--- Theme specs owned by colorscheme-sync (loaded on demand via require("lazy").load)
-local csync_themes = dofile(vim.fn.expand("~/workspace/plugins/colorscheme-sync.nvim/lua/colorscheme-sync/lazy_themes.lua"))
+local function dap_lazy_keys()
+  local mod = ps.dofile_lua("dap-controls.nvim", "lua/dap-controls/keymaps.lua")
+  if mod and mod.lazy_keys then
+    return mod.lazy_keys()
+  end
+  return {}
+end
+
+local function picker_lazy_keys()
+  local mod = ps.dofile_lua("picker.nvim", "lua/picker/user_keymaps.lua")
+  if mod and mod.lazy_keys then
+    return mod.lazy_keys()
+  end
+  return {}
+end
+
+local diff_startup = vim.tbl_contains(vim.v.argv or {}, "-d")
+local function not_diff()
+  return not diff_startup and not vim.opt.diff:get()
+end
+
+local csync_themes = ps.dofile_lua("colorscheme-sync.nvim", "lua/colorscheme-sync/lazy_themes.lua") or {}
 
 return vim.list_extend(csync_themes, {
-  -- ── Core dependencies ───────────────────────────────────────────────────────
   { "nvim-lua/plenary.nvim", lazy = true },
   { "MunifTanjim/nui.nvim", lazy = true },
-  {
-    dir = "~/workspace/plugins/picker.nvim",
-    name = "picker.nvim",
+  p("lenincamp/picker.nvim", "picker.nvim", {
     lazy = false,
     dependencies = { "preview.nvim" },
+    keys = picker_lazy_keys(),
     config = cfg("editor/picker.lua"),
-  },
-  {
-    dir = "~/workspace/plugins/preview.nvim",
-    name = "preview.nvim",
+  }),
+  p("lenincamp/preview.nvim", "preview.nvim", {
     lazy = false,
-  },
+  }),
+  p("lenincamp/pure-ui.nvim", "pure-ui.nvim", {
+    lazy = false,
+    dependencies = { "colorscheme-sync.nvim" },
+    config = function()
+      require("pure-ui").setup()
+    end,
+  }),
 
-  -- ── Treesitter ──────────────────────────────────────────────────────────────
   {
     "nvim-treesitter/nvim-treesitter",
     event = { "BufReadPost", "BufNewFile" },
@@ -45,21 +70,19 @@ return vim.list_extend(csync_themes, {
     config = cfg("syntax/treesitter-context.lua"),
   },
 
-  -- ── Colorscheme ─────────────────────────────────────────────────────────────
-  {
-    dir = "~/workspace/plugins/colorscheme-sync.nvim",
-    name = "colorscheme-sync.nvim",
+  p("lenincamp/colorscheme-sync.nvim", "colorscheme-sync.nvim", {
     lazy = false,
     priority = 1000,
     config = function()
       local csync = require("colorscheme-sync")
-      if not csync._initialized then csync.setup({ system_sync = true }) end
+      if not csync._initialized then
+        csync.setup({ system_sync = true })
+      end
       local target = csync.current_theme(vim.g.pure_colorscheme)
       csync.apply(target, { notify = false, sync_external = "defer" })
     end,
-  },
+  }),
 
-  -- ── Completion ──────────────────────────────────────────────────────────────
   { "saghen/blink.lib", lazy = true },
   {
     "saghen/blink.cmp",
@@ -76,7 +99,6 @@ return vim.list_extend(csync_themes, {
   },
   { "rafamadriz/friendly-snippets", lazy = true },
 
-  -- ── Database ────────────────────────────────────────────────────────────────
   { "tpope/vim-dadbod", lazy = true },
   { "kristijanhusak/vim-dadbod-completion", lazy = true },
   {
@@ -87,34 +109,38 @@ return vim.list_extend(csync_themes, {
       { "<leader>Da", desc = "Dadbod: add connection" },
       { "<leader>Dr", desc = "Dadbod: rename buffer" },
     },
-    cmd = { "DB", "DBUI", "DBUIToggle", "DBUIAddConnection", "DBUIFindBuffer",
-      "DBUIRenameBuffer", "DBUIDeleteBuffer", "DBUILastQueryInfo" },
+    cmd = {
+      "DB",
+      "DBUI",
+      "DBUIToggle",
+      "DBUIAddConnection",
+      "DBUIFindBuffer",
+      "DBUIRenameBuffer",
+      "DBUIDeleteBuffer",
+      "DBUILastQueryInfo",
+    },
     dependencies = { "tpope/vim-dadbod", "kristijanhusak/vim-dadbod-completion" },
     config = cfg("editor/dadbod.lua"),
   },
 
-  -- ── Markdown rendering ──────────────────────────────────────────────────────
   {
     "MeanderingProgrammer/render-markdown.nvim",
     ft = { "markdown", "Avante" },
     config = cfg("editor/render-markdown.lua"),
   },
 
-  -- ── UI ──────────────────────────────────────────────────────────────────────
   {
     "shortcuts/no-neck-pain.nvim",
     cmd = { "NoNeckPain", "NoNeckPainResize", "NoNeckPainToggleSide" },
     config = cfg("editor/no-neck-pain.lua"),
   },
 
-  -- ── Git ─────────────────────────────────────────────────────────────────────
   {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPre", "BufNewFile" },
     config = cfg("git/gitsigns.lua"),
   },
 
-  -- ── Editing ─────────────────────────────────────────────────────────────────
   {
     "folke/flash.nvim",
     event = { "BufReadPost", "BufNewFile" },
@@ -123,7 +149,7 @@ return vim.list_extend(csync_themes, {
   },
   {
     "echasnovski/mini.clue",
-    event = { "BufReadPost", "BufNewFile" },
+    event = "VeryLazy",
     cond = not_diff,
     config = cfg("editor/mini-clue.lua"),
   },
@@ -137,33 +163,50 @@ return vim.list_extend(csync_themes, {
     "folke/ts-comments.nvim",
     event = { "BufReadPost", "BufNewFile" },
     cond = not_diff,
-    config = function() require("ts-comments").setup() end,
+    config = function()
+      require("ts-comments").setup()
+    end,
   },
 
-  -- ── Tools ───────────────────────────────────────────────────────────────────
   {
     "mason-org/mason.nvim",
     cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUpdate", "MasonLog" },
     config = cfg("lsp/mason.lua"),
   },
-  -- ── LSP Navigation ──────────────────────────────────────────────────────
-  {
-    dir = "~/workspace/plugins/lsp-nav.nvim",
-    name = "lsp-nav.nvim",
+  p("lenincamp/lsp-nav.nvim", "lsp-nav.nvim", {
     event = "LspAttach",
-    config = function() require("lsp-nav").setup({}) end,
-  },
-  -- ── Java ────────────────────────────────────────────────────────────────────
+    config = function()
+      require("lsp-nav").setup({})
+    end,
+  }),
+
   { "mfussenegger/nvim-jdtls", ft = "java" },
-  { dir = "~/workspace/plugins/jdtls.nvim", name = "jdtls.nvim", ft = "java" },
-  {
-    dir = "~/workspace/plugins/mybatis.nvim",
-    name = "mybatis.nvim",
+  p("lenincamp/jdtls.nvim", "jdtls.nvim", { ft = "java" }),
+  p("lenincamp/mybatis.nvim", "mybatis.nvim", {
     ft = { "java", "xml" },
-    config = function() require("mybatis").setup() end,
+    config = function()
+      require("mybatis").setup()
+    end,
+  }),
+
+  {
+    "nvim-neotest/neotest",
+    name = "neotest",
+    lazy = true,
+    cond = not_diff,
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      "nvim-lua/plenary.nvim",
+      "antoinemadec/FixCursorHold.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "marilari88/neotest-vitest",
+      "haydenmeade/neotest-jest",
+    },
+    config = function()
+      require("config.test").setup()
+    end,
   },
 
-  -- ── Salesforce ──────────────────────────────────────────────────────────────
   {
     "jonathanmorris180/salesforce.nvim",
     ft = { "apex", "visualforce", "html", "javascript" },
@@ -173,20 +216,29 @@ return vim.list_extend(csync_themes, {
     config = cfg("language/salesforce.lua"),
   },
 
-  -- ── Debug ───────────────────────────────────────────────────────────────────
-  {
-    dir = "~/workspace/plugins/dap-controls.nvim",
-    name = "dap-controls.nvim",
+  p("lenincamp/dap-controls.nvim", "dap-controls.nvim", {
     lazy = true,
     cond = not_diff,
     dependencies = { "breakpoints.nvim", "picker.nvim" },
-  },
+  }),
   {
     "mfussenegger/nvim-dap",
-    keys = require("dap-controls.keymaps").lazy_keys(),
-    cmd = { "DapContinue", "DapRunToCursor", "DapStepInto", "DapStepOut",
-      "DapStepOver", "DapPause", "DapToggleBreakpoint", "DapSetLogPoint",
-      "DapClearBreakpoints", "DapTerminate", "DapDisconnect", "DapRestartFrame", "DapEval" },
+    keys = dap_lazy_keys(),
+    cmd = {
+      "DapContinue",
+      "DapRunToCursor",
+      "DapStepInto",
+      "DapStepOut",
+      "DapStepOver",
+      "DapPause",
+      "DapToggleBreakpoint",
+      "DapSetLogPoint",
+      "DapClearBreakpoints",
+      "DapTerminate",
+      "DapDisconnect",
+      "DapRestartFrame",
+      "DapEval",
+    },
     cond = not_diff,
     dependencies = { "igorlfs/nvim-dap-view", "breakpoints.nvim", "dap-controls.nvim" },
     config = cfg("debug/nvim-dap.lua"),
@@ -198,25 +250,33 @@ return vim.list_extend(csync_themes, {
     dependencies = { "dap-controls.nvim" },
     config = cfg("debug/nvim-dap-view.lua"),
   },
-  {
-    dir = "~/workspace/plugins/breakpoints.nvim",
-    name = "breakpoints.nvim",
+  p("lenincamp/breakpoints.nvim", "breakpoints.nvim", {
     lazy = true,
     cond = not_diff,
-  },
+  }),
 
-  -- ── AI ──────────────────────────────────────────────────────────────────────
   {
     "yetone/avante.nvim",
     keys = {
-      { "<leader>aa", mode = { "n", "x" } }, { "<leader>at" }, { "<leader>ae", mode = { "n", "x" } },
-      { "<leader>an" }, { "<leader>ah" }, { "<leader>aS" }, { "<leader>ar" },
-      { "<leader>af" }, { "<leader>a?" }, { "<leader>aM" }, { "<leader>aP" },
-      { "<leader>aC" }, { "<leader>aR" }, { "<leader>ac" }, { "<leader>aB" }, { "<leader>az" },
+      { "<leader>aa", mode = { "n", "x" }, desc = "Avante: ask" },
+      { "<leader>at", desc = "Avante: toggle" },
+      { "<leader>ae", mode = { "n", "x" }, desc = "Avante: edit" },
+      { "<leader>an", desc = "Avante: new ask" },
+      { "<leader>ah", desc = "Avante: history" },
+      { "<leader>aS", desc = "Avante: stop" },
+      { "<leader>ar", desc = "Avante: refresh" },
+      { "<leader>af", desc = "Avante: focus" },
+      { "<leader>a?", desc = "Avante: select model" },
+      { "<leader>aM", desc = "Avante: select ACP model" },
+      { "<leader>aP", desc = "Avante: select ACP mode" },
+      { "<leader>aC", desc = "Avante: clear" },
+      { "<leader>aR", desc = "Avante: repo map" },
+      { "<leader>ac", desc = "Avante: add current buffer" },
+      { "<leader>aB", desc = "Avante: add all buffers" },
+      { "<leader>az", desc = "Avante: zen mode" },
     },
     cmd = { "AvanteAsk", "AvanteChat", "AvanteToggle" },
     dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
     config = cfg("ai/avante.lua"),
   },
-
 })

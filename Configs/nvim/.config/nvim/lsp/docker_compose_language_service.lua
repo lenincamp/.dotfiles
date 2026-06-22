@@ -6,6 +6,7 @@ local COMPOSE_FILES = {
 }
 
 return {
+  cmd = { "docker-compose-langserver", "--stdio" },
   filetypes = { "yaml.docker-compose" },
   root_dir = function(bufnr, on_dir)
     local path = vim.api.nvim_buf_get_name(bufnr)

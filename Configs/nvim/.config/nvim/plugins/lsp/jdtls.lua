@@ -8,9 +8,9 @@ require("jdtls-nvim").setup({
   -- Machine-specific JDK paths
   java_runtimes = {
     { name = "JavaSE-1.8", path = "/Library/Java/JavaVirtualMachines/jdk1.8.0_202.jdk/Contents/Home" },
-    { name = "JavaSE-11", path = brew .. "/openjdk@11/11.0.30/libexec/openjdk.jdk/Contents/Home" },
+    { name = "JavaSE-11", path = brew .. "/openjdk@11/11.0.31/libexec/openjdk.jdk/Contents/Home" },
     { name = "JavaSE-17", path = "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home" },
-    { name = "JavaSE-21", path = brew .. "/openjdk@21/21.0.10/libexec/openjdk.jdk/Contents/Home", default = true },
+    { name = "JavaSE-21", path = brew .. "/openjdk@21/21.0.11/libexec/openjdk.jdk/Contents/Home", default = true },
   },
 
   -- Lombok auto-detection (Mason → ~/.m2)

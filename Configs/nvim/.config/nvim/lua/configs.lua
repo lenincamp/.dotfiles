@@ -1,5 +1,4 @@
 local opt = vim.opt
-local gutter = require("modules.ui.gutter")
 opt.guicursor = "n-v-c:block-Cursor," .. "i-ci:ver35-iCursor," .. "r-cr:hor25-rCursor"
 
 vim.api.nvim_set_hl(0, "Cursor", {
@@ -7,8 +6,6 @@ vim.api.nvim_set_hl(0, "Cursor", {
 })
 
 opt.colorcolumn = ""
-opt.signcolumn = gutter.SIGNCOLUMN
-opt.statuscolumn = gutter.STATUSCOLUMN
 opt.termguicolors = true
 opt.ignorecase = true
 opt.smartcase = true
@@ -135,3 +132,11 @@ if vim.fn.getenv("TERM_PROGRAM") == "ghostty" then
   opt.title = true
   opt.titlestring = "%{fnamemodify(getcwd(), ':t')}"
 end
+
+-- ── Statusline baseline (hidden by default, winbar carries file context) ──────
+
+opt.laststatus = 0
+opt.statusline = " "
+opt.fillchars:append({ stl = "─", stlnc = "─" })
+
+require("config.editor")

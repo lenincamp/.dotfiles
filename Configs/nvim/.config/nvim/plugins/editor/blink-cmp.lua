@@ -35,10 +35,6 @@ require("blink.cmp").setup({
       "score",
       "sort_text",
     },
-    prebuilt_binaries = {
-      download = false,
-      ignore_version_mismatch = false,
-    },
   },
 
   -- Signature help while typing function args

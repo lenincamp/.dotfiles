@@ -1,13 +1,13 @@
 local M = {}
 
-local lsp_core = require("modules.core.lsp")
-local runtime = require("modules.core.runtime")
+local lsp_buffer = require("modules.lsp.buffer")
+local registry = require("modules.bootstrap.registry")
 
 local DIFF_KEYMAPS = { "]c", "[c", "do", "dp", "dO", "dP" }
 
 local function disable_lsp_for_diff_buffer(bufnr)
-  lsp_core.detach_all(bufnr)
-  lsp_core.set_diagnostics(bufnr, false)
+  lsp_buffer.detach_all(bufnr)
+  lsp_buffer.set_diagnostics(bufnr, false)
   vim.b[bufnr].diff_lsp_disabled = true
 end
 
@@ -33,7 +33,7 @@ local function setup_diff_mappings()
   local bufnr = vim.api.nvim_get_current_buf()
   if vim.b[bufnr].diff_keymaps_active then return end
 
-  local helpers = require("modules.editor")
+  local helpers = require("modules.editor.diff_mode")
   local bmap = function(lhs, rhs, desc)
     vim.keymap.set("n", lhs, rhs, { buffer = bufnr, silent = true, desc = desc })
   end
@@ -115,7 +115,7 @@ local function setup_current_diff_window()
   if not vim.wo.diff then return end
   vim.wo.scrollbind = true
   vim.wo.cursorbind = true
-  runtime.setup_diff_mappings()
+  registry.setup_diff_mappings()
 
   local bufnr = vim.api.nvim_get_current_buf()
   if not vim.b[bufnr].diff_lsp_forced then
@@ -130,7 +130,7 @@ local function setup_diff_mode()
 
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(bufnr) then
-      lsp_core.detach_all(bufnr)
+      lsp_buffer.detach_all(bufnr)
     end
   end
 
@@ -148,9 +148,9 @@ local function register_diff_lsp_commands()
     local bufnr = vim.api.nvim_get_current_buf()
     vim.b[bufnr].diff_lsp_forced = true
     vim.b[bufnr].diff_lsp_disabled = false
-    lsp_core.set_diagnostics(bufnr, true)
+    lsp_buffer.set_diagnostics(bufnr, true)
 
-    runtime.enable_lsp_for_buffer(bufnr, { force = true })
+    registry.enable_lsp_for_buffer(bufnr, { force = true })
 
     pcall(vim.cmd, "LspStart")
     vim.notify("Diff LSP enabled for current buffer", vim.log.levels.INFO)
@@ -208,7 +208,7 @@ local function register_context_commands()
 end
 
 function M.setup()
-  runtime.set_diff_api({
+  registry.set_diff_api({
     setup = setup_diff_mappings,
     cleanup = cleanup_diff_mappings,
   })
@@ -219,7 +219,7 @@ function M.setup()
       if vim.wo.diff then
         setup_current_diff_window()
       else
-        runtime.cleanup_diff_mappings()
+        registry.cleanup_diff_mappings()
       end
     end,
   })

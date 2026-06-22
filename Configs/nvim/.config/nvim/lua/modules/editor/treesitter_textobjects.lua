@@ -223,4 +223,6 @@ function M.setup()
   map("n", "gsp", function() swap_parameter(-1) end, { desc = "Swap param prev" })
 end
 
+M.setup()
+
 return M

@@ -2,11 +2,8 @@
 
 local keymap_specs = require("modules.editor.keymap_specs")
 
-require("modules.editor.keymap_docs").setup()
-require("modules.editor.keymap_audit").setup()
-require("modules.editor.todos").setup()
-require("modules.editor.treesitter_textobjects").setup()
-require("modules.editor.command_center").setup()
+require("modules.editor.todos")
+require("modules.editor.treesitter_textobjects")
 
 -- ── Spec-driven motion/search/editing ───────────────────────────────────────
 
@@ -23,3 +20,7 @@ keymap_specs.apply(keymap_specs.window_list_tab_specs())
 -- ── Spec-driven UI/project/window utilities ──────────────────────────────────
 
 keymap_specs.apply(keymap_specs.global_specs())
+
+-- ── Explorer / personal git / buffer shortcuts (picker keymaps in picker.setup) ──
+
+keymap_specs.apply(keymap_specs.search_specs())

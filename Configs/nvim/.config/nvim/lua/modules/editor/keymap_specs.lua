@@ -1,23 +1,35 @@
 local M = {}
 
-local function editor_module()
-  return require("modules.editor")
+local function file_actions()
+  return require("modules.editor.file_actions")
+end
+
+local function search_words()
+  return require("modules.editor.search_words")
+end
+
+local function text_actions()
+  return require("modules.editor.text_actions")
+end
+
+local function diff_mode()
+  return require("modules.editor.diff_mode")
+end
+
+local function picker()
+  return require("picker")
+end
+
+local function explorer()
+  return require("modules.editor.explorer")
 end
 
 local function ui_module()
-  return require("modules.ui.toggles")
-end
-
-local function zen_module()
-  return require("modules.ui.zen")
+  return require("config.ui")
 end
 
 local function split_nav_module()
-  return require("modules.ui.split_nav")
-end
-
-local function lsp_lists_module()
-  return require("modules.editor.lsp_lists")
+  return require("pure-ui.split_nav")
 end
 
 local function lsp_buf_call(method, ...)
@@ -40,12 +52,6 @@ local function lsp_buf_call(method, ...)
   end
 end
 
-local function peek(method)
-  return function()
-    require("modules.editor.peek").request("textDocument/" .. method)
-  end
-end
-
 local motion_edit_specs = {
   { mode = { "n", "x" }, lhs = "j", desc = "Down", group = "Motion", rhs = "v:count == 0 ? 'gj' : 'j'", opts = { expr = true, silent = true } },
   { mode = { "n", "x" }, lhs = "k", desc = "Up", group = "Motion", rhs = "v:count == 0 ? 'gk' : 'k'", opts = { expr = true, silent = true } },
@@ -64,37 +70,29 @@ local motion_edit_specs = {
   { mode = "o", lhs = "N", desc = "Prev Search Result", group = "Search", rhs = "'nN'[v:searchforward]", opts = { expr = true } },
   { mode = "n", lhs = "<C-d>", desc = "Scroll half-page down", group = "Motion", rhs = "<C-d>zz" },
   { mode = "n", lhs = "<C-u>", desc = "Scroll half-page up", group = "Motion", rhs = "<C-u>zz" },
-  { mode = "n", lhs = "*", desc = "Search word forward (highlight on)", group = "Search", opts = { expr = true, silent = true }, action = function() return editor_module().enable_search_highlight_and_return("*") end },
-  { mode = "n", lhs = "#", desc = "Search word backward (highlight on)", group = "Search", opts = { expr = true, silent = true }, action = function() return editor_module().enable_search_highlight_and_return("#") end },
+  { mode = "n", lhs = "*", desc = "Search word forward (highlight on)", group = "Search", opts = { expr = true, silent = true }, action = function() return search_words().enable_search_highlight_and_return("*") end },
+  { mode = "n", lhs = "#", desc = "Search word backward (highlight on)", group = "Search", opts = { expr = true, silent = true }, action = function() return search_words().enable_search_highlight_and_return("#") end },
   { mode = "n", lhs = "<A-j>", desc = "Move Line Down", group = "Editing", rhs = "<cmd>execute 'move .+' . v:count1<cr>==" },
   { mode = "n", lhs = "<A-k>", desc = "Move Line Up", group = "Editing", rhs = "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==" },
   { mode = "i", lhs = "<A-j>", desc = "Move Line Down", group = "Editing", rhs = "<esc><cmd>m .+1<cr>==gi" },
   { mode = "i", lhs = "<A-k>", desc = "Move Line Up", group = "Editing", rhs = "<esc><cmd>m .-2<cr>==gi" },
   { mode = "v", lhs = "<A-j>", desc = "Move Selection Down", group = "Editing", rhs = ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv" },
   { mode = "v", lhs = "<A-k>", desc = "Move Selection Up", group = "Editing", rhs = ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv" },
-  { mode = "v", lhs = "J", desc = "Move selection down", group = "Editing", rhs = "<cmd>m '>+1<CR>gv=gv" },
-  { mode = "v", lhs = "K", desc = "Move selection up", group = "Editing", rhs = "<cmd>m '<-2<CR>gv=gv" },
   { mode = { "i", "x", "n", "s" }, lhs = "<C-s>", desc = "Save File", group = "Editing", rhs = "<cmd>w<cr><esc>" },
   { mode = "x", lhs = "<", desc = "Indent left", group = "Editing", rhs = "<gv" },
   { mode = "x", lhs = ">", desc = "Indent right", group = "Editing", rhs = ">gv" },
-  { mode = "n", lhs = "<A-d>", desc = "Duplicate line", group = "Editing", action = function() editor_module().duplicate_line_or_selection() end },
-  { mode = "i", lhs = "<A-d>", desc = "Duplicate line", group = "Editing", action = function() editor_module().duplicate_line_or_selection() end },
-  { mode = "x", lhs = "<A-d>", desc = "Duplicate selection", group = "Editing", action = function() editor_module().duplicate_line_or_selection(true) end },
-  { mode = "i", lhs = ",", group = "Editing", rhs = ",<c-g>u" },
-  { mode = "i", lhs = ".", group = "Editing", rhs = ".<c-g>u" },
-  { mode = "i", lhs = ";", group = "Editing", rhs = ";<c-g>u" },
+  { mode = "n", lhs = "<A-d>", desc = "Duplicate line", group = "Editing", action = function() text_actions().duplicate_line_or_selection() end },
+  { mode = "i", lhs = "<A-d>", desc = "Duplicate line", group = "Editing", action = function() text_actions().duplicate_line_or_selection() end },
+  { mode = "x", lhs = "<A-d>", desc = "Duplicate selection", group = "Editing", action = function() text_actions().duplicate_line_or_selection(true) end },
+  { mode = "i", lhs = ",", desc = "Undo breakpoint", group = "Editing", rhs = ",<c-g>u" },
+  { mode = "i", lhs = ".", desc = "Undo breakpoint", group = "Editing", rhs = ".<c-g>u" },
+  { mode = "i", lhs = ";", desc = "Undo breakpoint", group = "Editing", rhs = ";<c-g>u" },
   { mode = "i", lhs = "<Space>", desc = "Insert space immediately", group = "Editing", rhs = "<Space>", opts = { nowait = true } },
   { mode = "n", lhs = "gco", desc = "Add Comment Below", group = "Comment", rhs = "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>" },
   { mode = "n", lhs = "gcO", desc = "Add Comment Above", group = "Comment", rhs = "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>" },
 }
 
 local code_lsp_specs = {
-  { mode = "n", lhs = "gpc", desc = "Peek: close all", group = "Quick Preview", action = function() require("modules.editor.peek").close_all() end },
-  { mode = "n", lhs = "gpd", desc = "Peek Definition", group = "Quick Preview", action = peek("definition") },
-  { mode = "n", lhs = "gpt", desc = "Peek Type Definition", group = "Quick Preview", action = peek("typeDefinition") },
-  { mode = "n", lhs = "gpi", desc = "Peek Implementation", group = "Quick Preview", action = peek("implementation") },
-  { mode = "n", lhs = "gpD", desc = "Peek Declaration", group = "Quick Preview", action = peek("declaration") },
-  { mode = "n", lhs = "gpr", desc = "Peek References (picker)", group = "Quick Preview", action = function() require("modules.editor.peek").references() end },
   {
     mode = "n",
     lhs = "<leader>cd",
@@ -104,21 +102,14 @@ local code_lsp_specs = {
       require("modules.lsp.diagnostics").open_float({ scope = "line" })
     end,
   },
-  { mode = { "n", "x" }, lhs = "<leader>cf", desc = "Format", group = "Code", action = function() editor_module().format() end },
-  { mode = "n", lhs = "<leader>ch", desc = "Call Hierarchy", group = "Code", action = function() editor_module().call_hierarchy() end },
-  { mode = "n", lhs = "<leader>ci", desc = "Incoming Calls", group = "Code", action = function() editor_module().call_hierarchy_incoming() end },
-  { mode = "n", lhs = "<leader>co", desc = "Outgoing Calls", group = "Code", action = function() editor_module().call_hierarchy_outgoing() end },
+  { mode = { "n", "x" }, lhs = "<leader>cf", desc = "Format", group = "Code", action = function() file_actions().format() end },
   { mode = "n", lhs = "gd", desc = "Go to Definition", group = "g-prefix/LSP", action = lsp_buf_call("definition") },
   { mode = "n", lhs = "gD", desc = "Go to Declaration", group = "g-prefix/LSP", action = lsp_buf_call("declaration") },
   { mode = "n", lhs = "grt", desc = "Go to Type Definition", group = "g-prefix/LSP", action = lsp_buf_call("type_definition") },
   { mode = "n", lhs = "gri", desc = "Go to Implementation", group = "g-prefix/LSP", action = lsp_buf_call("implementation") },
   { mode = { "n", "x" }, lhs = "gra", desc = "Code Action", group = "g-prefix/LSP", action = lsp_buf_call("code_action") },
   { mode = "n", lhs = "grn", desc = "Rename Symbol", group = "g-prefix/LSP", action = lsp_buf_call("rename") },
-  { mode = "n", lhs = "grr", desc = "References", group = "g-prefix/LSP", action = function() lsp_lists_module().references() end },
-  { mode = "n", lhs = "gO", desc = "Document Symbols", group = "g-prefix/LSP", action = function() lsp_lists_module().document_symbols() end },
-  { mode = "n", lhs = "gW", desc = "Workspace Symbols", group = "g-prefix/LSP", action = function() lsp_lists_module().workspace_symbols() end },
-  { mode = "n", lhs = "<leader>ss", desc = "LSP Symbols (doc)", group = "Search", action = function() lsp_lists_module().document_symbols() end },
-  { mode = "n", lhs = "<leader>sS", desc = "LSP Symbols (workspace)", group = "Search", action = function() lsp_lists_module().workspace_symbols() end },
+
   { mode = "n", lhs = "K", desc = "Hover Documentation", group = "g-prefix/LSP", action = lsp_buf_call("hover") },
   { mode = "n", lhs = "gK", desc = "Signature Help", group = "g-prefix/LSP", action = lsp_buf_call("signature_help") },
   {
@@ -132,8 +123,8 @@ local code_lsp_specs = {
       lsp_buf_call("definition")()
     end,
   },
-  { mode = "n", lhs = "]]", desc = "Next Reference", group = "Bracket Navigation", action = function() editor_module().jump_word_reference(vim.v.count1) end },
-  { mode = "n", lhs = "[[", desc = "Prev Reference", group = "Bracket Navigation", action = function() editor_module().jump_word_reference(-vim.v.count1) end },
+  { mode = "n", lhs = "]]", desc = "Next Reference", group = "Bracket Navigation", action = function() search_words().jump_word_reference(vim.v.count1) end },
+  { mode = "n", lhs = "[[", desc = "Prev Reference", group = "Bracket Navigation", action = function() search_words().jump_word_reference(-vim.v.count1) end },
   { mode = "i", lhs = "<C-k>", desc = "Signature Help", group = "g-prefix/LSP", action = lsp_buf_call("signature_help") },
   {
     mode = "n",
@@ -141,12 +132,10 @@ local code_lsp_specs = {
     desc = "Mason",
     group = "Code",
     action = function()
-      require("modules.core.runtime").load_config("mason")
       vim.cmd("Mason")
     end,
   },
   { mode = "n", lhs = "<leader>K", desc = "Keywordprg", group = "Code", rhs = "<cmd>norm! K<cr>" },
-  { mode = "n", lhs = "<leader>rs", desc = "Refactor (all actions)", group = "Refactor", action = lsp_buf_call("code_action") },
   {
     mode = "x",
     lhs = "<leader>rx",
@@ -177,59 +166,55 @@ local code_lsp_specs = {
   },
   { mode = "n", lhs = "<leader>rr", desc = "Replace all occurrences", group = "Refactor", rhs = [[:%s/\V<C-r><C-w>/<C-r><C-w>/gI<Left><Left><Left>]] },
   { mode = "v", lhs = "<leader>rr", desc = "Replace all occurrences", group = "Refactor", rhs = [["vy:%s/\V<C-r>=escape(@v, '/\')<CR>/<C-r>v/gI<Left><Left><Left>]] },
-  { mode = "n", lhs = "<leader>cp", desc = "Copy path to clipboard", group = "Code", action = function() editor_module().copy_path() end },
-  { mode = "n", lhs = "<leader>cN", desc = "Rename file", group = "Code", action = function() editor_module().rename_file() end },
-  { mode = "n", lhs = "<leader>cB", desc = "Diff current buffer vs clipboard", group = "Code", action = function() editor_module().compare_with_clipboard() end },
+  { mode = "n", lhs = "<leader>cp", desc = "Copy path to clipboard", group = "Code", action = function() file_actions().copy_path() end },
+  { mode = "n", lhs = "<leader>cN", desc = "Rename file", group = "Code", action = function() file_actions().rename_file() end },
+  { mode = "n", lhs = "<leader>cB", desc = "Diff current buffer vs clipboard", group = "Code", action = function() require("modules.editor.clipboard_diff").compare_with_clipboard() end },
 }
 
-local search_specs = require("modules.editor.keymap_specs.search").specs()
+local search_specs = {
+    {
+      mode = "n",
+      lhs = "<leader>E",
+      desc = "File Explorer",
+      group = "Files/Terminal",
+      action = function()
+        local p = picker()
+        explorer().open(p.root(), vim.api.nvim_buf_get_name(0))
+      end,
+    },
+    {
+      mode = "n",
+      lhs = "<leader>e",
+      desc = "File Explorer (cwd)",
+      group = "Files/Terminal",
+      action = function()
+        explorer().open(nil, vim.api.nvim_buf_get_name(0))
+      end,
+    },
+    { mode = "n", lhs = "<leader>bb", desc = "Switch to Other Buffer", group = "Buffers", rhs = "<cmd>e #<cr>" },
+    { mode = "n", lhs = "<leader>bD", desc = "Delete Buffer and Window", group = "Buffers", rhs = "<cmd>bd<cr>" },
+    { mode = "n", lhs = "<leader>gC", desc = "Git Compare (contextual: file vimdiff / repo compare-load)", group = "Git", action = function() require("modules.git.compare_context").prompt() end },
+  }
 
 local global_specs = {
-  { mode = "n", lhs = "<leader>us", desc = "Toggle statusline", group = "UI", action = function() ui_module().toggle_statusline() end },
-  { mode = "n", lhs = "<leader>ut", desc = "Toggle tabline", group = "UI", action = function() ui_module().toggle_tabline() end },
-  { mode = "n", lhs = "<leader>um", desc = "Cycle tabline mode", group = "UI", action = function() ui_module().cycle_tabline_mode() end },
-  { mode = "n", lhs = "<leader>uW", desc = "Toggle winbar", group = "UI", action = function() ui_module().toggle_winbar() end },
-  { mode = "n", lhs = "<leader>uo", desc = "Toggle spelling", group = "UI", action = function() ui_module().toggle_option("spell", "Spelling") end },
-  { mode = "n", lhs = "<leader>uw", desc = "Toggle wrap", group = "UI", action = function() ui_module().toggle_option("wrap", "Wrap") end },
-  { mode = "n", lhs = "<leader>uL", desc = "Toggle relative number", group = "UI", action = function() ui_module().toggle_window_option("relativenumber", "Relative Number") end },
-  { mode = "n", lhs = "<leader>ul", desc = "Toggle line number", group = "UI", action = function() ui_module().toggle_window_option("number", "Line Number") end },
+  -- Frequent toggles (keymaps) — rare ones live only in Command Center
   { mode = "n", lhs = "<leader>ud", desc = "Toggle diagnostics", group = "UI", action = function() ui_module().toggle_diagnostics() end },
-  { mode = "n", lhs = "<leader>uT", desc = "Toggle treesitter", group = "UI", action = function() ui_module().toggle_treesitter() end },
-  { mode = "n", lhs = "<leader>uC", desc = "Select colorscheme", group = "UI", action = function() require("modules.theme.colorschemes").select() end },
-  { mode = "n", lhs = "<leader>ub", desc = "Toggle dark background", group = "UI", action = function() ui_module().toggle_dark_background() end },
-  { mode = "n", lhs = "<leader>uA", desc = "Toggle transparent background", group = "UI", action = function() ui_module().toggle_transparent_background() end },
-  { mode = "n", lhs = "<leader>uD", desc = "Toggle dim", group = "UI", action = function() ui_module().toggle_dim() end },
-  { mode = "n", lhs = "<leader>uZ", desc = "Toggle zoom", group = "UI", action = function() ui_module().toggle_zoom() end },
-  { mode = "n", lhs = "<leader>wm", desc = "Toggle zoom", group = "Windows", action = function() ui_module().toggle_zoom() end },
-  { mode = "n", lhs = "<leader>uh", desc = "Toggle inlay hints", group = "UI", action = function() ui_module().toggle_inlay_hints() end },
+  { mode = "n", lhs = "<leader>uw", desc = "Toggle wrap", group = "UI", action = function() ui_module().toggle_option("wrap", "Wrap") end },
   { mode = "n", lhs = "<leader>uf", desc = "Toggle format on save (global)", group = "UI", action = function() ui_module().toggle_format_global() end },
   { mode = "n", lhs = "<leader>uF", desc = "Toggle format on save (buffer)", group = "UI", action = function() ui_module().toggle_format_buffer() end },
-  { mode = "n", lhs = "<leader>ui", desc = "Toggle cmdline info", group = "UI", action = function() ui_module().toggle_cmdline_info() end },
-  { mode = "n", lhs = "<leader>uV", desc = "Reload Neovim config", group = "UI", action = function() ui_module().reload_config() end },
-  { mode = "n", lhs = "<leader>ug", desc = "Toggle grep layout", group = "UI", action = function() ui_module().toggle_intellij_grep() end },
-  { mode = "n", lhs = "<leader>uX", desc = "Toggle treesitter context", group = "UI", action = function() ui_module().toggle_treesitter_context() end },
-  { mode = "n", lhs = "<leader>uM", desc = "Toggle render markdown", group = "UI", action = function() ui_module().toggle_render_markdown() end },
-  { mode = "n", lhs = "<leader>uS", desc = "Toggle SonarLint", group = "UI", action = function() require("modules.lsp.sonarlint").toggle() end },
-  { mode = "n", lhs = "<leader>uP", desc = "Workflow mode", group = "UI", action = function() require("modules.ui.workflow_modes").select() end },
-  { mode = "n", lhs = "<leader>uz", desc = "Toggle Zen Mode", group = "UI", opts = { nowait = true }, action = function() editor_module().toggle_zen_mode() end },
-  { mode = "n", lhs = "<leader>uzz", desc = "Toggle Zen Mode", group = "UI", opts = { nowait = true }, action = function() editor_module().toggle_zen_mode() end },
-  { mode = "n", lhs = "<leader>uzn", desc = "Cycle Zen Width (110/120/130)", group = "UI", action = function() editor_module().cycle_zen_width() end },
-  { mode = "n", lhs = "<leader>np", desc = "No Neck Pain: toggle", group = "No Neck Pain", action = function() editor_module().toggle_zen_mode() end },
-  { mode = "n", lhs = "<leader>n=", desc = "No Neck Pain: width up", group = "No Neck Pain", action = function() zen_module().adjust_zen_width(5) end },
-  { mode = "n", lhs = "<leader>n-", desc = "No Neck Pain: width down", group = "No Neck Pain", action = function() zen_module().adjust_zen_width(-5) end },
-  { mode = "n", lhs = "<leader>nql", desc = "No Neck Pain: toggle left side", group = "No Neck Pain", action = function() zen_module().toggle_side("left") end },
-  { mode = "n", lhs = "<leader>nqr", desc = "No Neck Pain: toggle right side", group = "No Neck Pain", action = function() zen_module().toggle_side("right") end },
-  { mode = "n", lhs = "<leader>ns", desc = "No Neck Pain: scratch pad", group = "No Neck Pain", action = function() zen_module().toggle_scratch_pad() end },
-  { mode = "n", lhs = "<leader>nd", desc = "No Neck Pain: debug", group = "No Neck Pain", action = function() zen_module().toggle_debug() end },
-  { mode = "n", lhs = "<leader>uR", desc = "Toggle diff profile (review/focused)", group = "UI", action = function() editor_module().toggle_diff_profile() end },
-  { mode = "n", lhs = "<leader>uq", desc = "Toggle LSP in diff buffer", group = "UI", rhs = "<cmd>DiffLspToggle<cr>" },
+  { mode = "n", lhs = "<leader>uh", desc = "Toggle inlay hints", group = "UI", action = function() ui_module().toggle_inlay_hints() end },
+  { mode = "n", lhs = "<leader>uC", desc = "Select colorscheme", group = "UI", action = function() require("colorscheme-sync").select() end },
+  { mode = "n", lhs = "<leader>uz", desc = "Toggle Zen Mode", group = "UI", opts = { nowait = true }, action = function() require("config.ui").toggle_zen_mode() end },
+  { mode = "n", lhs = "<leader>uZ", desc = "Toggle zoom", group = "UI", action = function() ui_module().toggle_zoom() end },
+  { mode = "n", lhs = "<leader>wm", desc = "Toggle zoom", group = "Windows", action = function() ui_module().toggle_zoom() end },
+  { mode = "n", lhs = "<leader>uR", desc = "Toggle diff profile (review/focused)", group = "UI", action = function() diff_mode().toggle_diff_profile() end },
   {
     mode = "n",
     lhs = "<leader>ur",
     desc = "Redraw / Clear search highlights / Diff Update",
     group = "UI",
     action = function()
-      editor_module().clear_search_highlights()
+      search_words().clear_search_highlights()
       vim.cmd("diffupdate")
       vim.cmd("redraw!")
     end,
@@ -241,26 +226,28 @@ local global_specs = {
     group = "Search",
     opts = { expr = true, silent = true },
     action = function()
-      editor_module().clear_search_highlights()
+      search_words().clear_search_highlights()
       return "<Esc>"
     end,
   },
   { mode = "n", lhs = "<leader>qq", desc = "Quit All", group = "Quit", rhs = "<cmd>qa<cr>" },
-  { mode = "n", lhs = "<leader>pH", desc = "Open Quickfix Playbook", group = "Project/Sessions", action = function() editor_module().open_quickfix_playbook() end },
-  { mode = "n", lhs = "<leader>pT", desc = "Task Runner", group = "Project/Sessions", action = function() require("modules.editor.task_runner").select() end },
-  { mode = "n", lhs = "<leader>ue", desc = "Toggle diff mode", group = "UI", action = function() editor_module().toggle_diff_mode() end },
-  { mode = "i", lhs = "<C-]>", desc = "Line completion (close + semicolon + newline)", group = "Editing", action = function() editor_module().line_completion() end },
+  { mode = "n", lhs = "<leader>tn", desc = "Test: nearest", group = "Tests", action = function() require("config.test").run_nearest() end },
+  { mode = "n", lhs = "<leader>tf", desc = "Test: file", group = "Tests", action = function() require("config.test").run_file() end },
+  { mode = "n", lhs = "<leader>td", desc = "Test: debug", group = "Tests", action = function() require("config.test").run_debug() end },
+  { mode = "n", lhs = "<leader>tl", desc = "Test: last", group = "Tests", action = function() require("config.test").run_last() end },
+  { mode = "n", lhs = "<leader>tw", desc = "Test: watch", group = "Tests", action = function() require("config.test").toggle_watch() end },
+  { mode = "n", lhs = "<leader>pH", desc = "Open Quickfix Playbook", group = "Project/Sessions", action = function() file_actions().open_quickfix_playbook() end },
+  { mode = "n", lhs = "<leader>pT", desc = "Task Runner", group = "Project/Sessions", action = function() require("config.editor.task_runner").select() end },
+  { mode = "n", lhs = "<leader>ue", desc = "Toggle diff mode", group = "UI", action = function() diff_mode().toggle_diff_mode() end },
+  { mode = "i", lhs = "<C-]>", desc = "Line completion (close + semicolon + newline)", group = "Editing", action = function() text_actions().line_completion() end },
   { mode = "n", lhs = "<C-h>", desc = "Move to left window/tmux pane", group = "Windows", action = function() split_nav_module().move("h") end },
   { mode = "n", lhs = "<C-j>", desc = "Move to lower window/tmux pane", group = "Windows", action = function() split_nav_module().move("j") end },
   { mode = "n", lhs = "<C-k>", desc = "Move to upper window/tmux pane", group = "Windows", action = function() split_nav_module().move("k") end },
   { mode = "n", lhs = "<C-l>", desc = "Move to right window/tmux pane", group = "Windows", action = function() split_nav_module().move("l") end },
-  { mode = "n", lhs = "<leader><space>", desc = "Command Center", group = "Command Center", action = function() require("modules.editor.command_center").select() end },
-  { mode = "n", lhs = "<leader>xC", desc = "Quickfix Cockpit", group = "Lists", action = function() require("modules.editor.quickfix_cockpit").select() end },
-  { mode = "n", lhs = "<leader>?", desc = "Keymaps", group = "Search", action = function() require("modules.editor.keymap_docs").select() end },
+  { mode = "n", lhs = "<leader><space>", desc = "Command Center", group = "Command Center", action = function() require("config.editor.command_center").select() end },
 }
 
 local window_list_tab_specs = {
-  { mode = "n", lhs = "<leader>w", desc = "Windows", group = "Windows", rhs = "<C-W>", opts = { remap = true } },
   { mode = "n", lhs = "<leader>ww", desc = "Other Window", group = "Windows", rhs = "<C-W>w", opts = { remap = true } },
   { mode = "n", lhs = "<leader>wd", desc = "Delete Window", group = "Windows", rhs = "<C-W>c", opts = { remap = true } },
   { mode = "n", lhs = "<leader>ws", desc = "Split Below", group = "Windows", rhs = "<C-W>s", opts = { remap = true } },
@@ -368,20 +355,6 @@ function M.expand(specs)
     end
   end
   return expanded
-end
-
-function M.docs()
-  local docs = {}
-  for _, spec in ipairs(M.expand(M.all_specs())) do
-    docs[#docs + 1] = {
-      source = "spec",
-      mode = spec.mode,
-      keys = spec.lhs,
-      desc = spec.desc,
-      group = spec.group,
-    }
-  end
-  return docs
 end
 
 return M

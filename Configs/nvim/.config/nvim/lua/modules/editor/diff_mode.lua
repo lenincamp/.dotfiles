@@ -1,24 +1,56 @@
 local M = {}
+local registry = require("modules.bootstrap.registry")
 
-local diff_nav = require("modules.editor.diff_navigation")
-local runtime = require("modules.core.runtime")
+-- Diff navigation (merged from diff_navigation.lua)
+function M.get_diff_windows()
+  local diff_windows = {}
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.api.nvim_win_is_valid(win) and vim.wo[win].diff then
+      diff_windows[#diff_windows + 1] = win
+    end
+  end
+  return diff_windows
+end
+
+function M.is_diff_session()
+  return #M.get_diff_windows() >= 2
+end
+
+function M.with_diff_window(action)
+  return function(...)
+    if not M.is_diff_session() then return end
+    local args = { ... }
+    if vim.wo.diff then
+      action(unpack(args))
+      return
+    end
+    local diff_windows = M.get_diff_windows()
+    local target = diff_windows[1]
+    if target and vim.api.nvim_win_is_valid(target) then
+      vim.api.nvim_win_call(target, function() action(unpack(args)) end)
+    end
+  end
+end
+
+M.diff_jump_next = M.with_diff_window(function() vim.cmd("normal! ]czz") end)
+M.diff_jump_prev = M.with_diff_window(function() vim.cmd("normal! [czz") end)
 
 function M.enable_diff_mode()
   vim.cmd("diffthis")
-  runtime.setup_diff_mappings()
+  registry.setup_diff_mappings()
 end
 
 function M.disable_diff_mode()
   vim.cmd("diffoff")
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_buf_is_loaded(buf) then
-      runtime.cleanup_diff_mappings(buf)
+      registry.cleanup_diff_mappings(buf)
     end
   end
 end
 
 function M.toggle_diff_mode()
-  if diff_nav.is_diff_session() then
+  if M.is_diff_session() then
     M.disable_diff_mode()
   else
     M.enable_diff_mode()

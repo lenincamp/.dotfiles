@@ -1,5 +1,5 @@
 local M = {}
-local runtime = require("modules.core.runtime")
+local registry = require("modules.bootstrap.registry")
 
 local CLIPBOARD_BUF_MARK = "clipboard_diff_buffer"
 
@@ -63,12 +63,12 @@ function M.compare_with_clipboard()
 
   vim.api.nvim_win_call(source_win, function()
     vim.cmd("diffthis")
-    runtime.setup_diff_mappings()
+    registry.setup_diff_mappings()
   end)
 
   vim.api.nvim_win_call(clip_win, function()
     vim.cmd("diffthis")
-    runtime.setup_diff_mappings()
+    registry.setup_diff_mappings()
   end)
 
   vim.api.nvim_set_current_win(source_win)

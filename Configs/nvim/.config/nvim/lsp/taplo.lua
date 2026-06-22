@@ -1,6 +1,7 @@
 local ROOT_MARKERS = { ".taplo.toml", "taplo.toml", "Cargo.toml", "pyproject.toml" }
 
 return {
+  cmd = { "taplo", "lsp", "stdio" },
   filetypes = { "toml" },
   root_dir = function(bufnr, on_dir)
     local path = vim.api.nvim_buf_get_name(bufnr)

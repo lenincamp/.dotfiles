@@ -1,4 +1,37 @@
-local server_map = require("modules.lsp.server_map")
+local servers_by_filetype = {
+  lua = { "lua_ls" },
+  kotlin = { "kotlin_language_server" },
+  sh = { "bashls" },
+  bash = { "bashls" },
+  zsh = { "bashls" },
+  vim = { "vimls" },
+  dockerfile = { "dockerls" },
+  xml = { "lemminx" },
+  markdown = { "marksman" },
+  ["markdown.mdx"] = { "marksman" },
+  toml = { "taplo" },
+  yaml = { "yamlls" },
+  ["yaml.docker-compose"] = { "docker_compose_language_service" },
+
+  javascript = { "vtsls", "eslint", "lwc_ls" },
+  javascriptreact = { "vtsls", "eslint", "tailwindcss" },
+  typescript = { "vtsls", "eslint" },
+  typescriptreact = { "vtsls", "eslint", "tailwindcss" },
+
+  html = { "eslint", "tailwindcss", "lwc_ls" },
+  css = { "tailwindcss" },
+  scss = { "tailwindcss" },
+  less = { "tailwindcss" },
+  vue = { "tailwindcss" },
+  svelte = { "tailwindcss" },
+
+  apex = { "apex_ls" },
+  visualforce = { "visualforce_ls" },
+}
+
+local function servers_for_filetype(filetype)
+  return servers_by_filetype[filetype]
+end
 
 local M = {}
 
@@ -116,7 +149,7 @@ function M.enable_for_buffer(bufnr, opts)
   end
 
   local ft = vim.bo[bufnr].filetype
-  local servers = server_map.for_filetype(ft)
+  local servers = servers_for_filetype(ft)
   if type(servers) ~= "table" then
     return 0
   end
@@ -135,7 +168,7 @@ function M.enable_for_buffer(bufnr, opts)
 end
 
 local function should_defer_lsp(bufnr)
-  local servers = server_map.for_filetype(vim.bo[bufnr].filetype)
+  local servers = servers_for_filetype(vim.bo[bufnr].filetype)
   if type(servers) ~= "table" then
     return false
   end

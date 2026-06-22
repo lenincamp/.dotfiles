@@ -1,7 +1,7 @@
 -- LSP bootstrap (Neovim 0.12 native API).
 -- Servers are enabled on demand per FileType + server root_dir/root_markers.
 
-local runtime = require("modules.core.runtime")
+local registry = require("modules.bootstrap.registry")
 local code_actions = require("modules.lsp.code_actions")
 local diagnostics = require("modules.lsp.diagnostics")
 local start = require("modules.lsp.start")
@@ -21,7 +21,7 @@ vim.schedule(function()
   end
 end)
 
-runtime.set_lsp_api({
+registry.set_lsp_api({
   enable_for_buffer = start.enable_for_buffer,
 })
 

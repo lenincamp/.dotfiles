@@ -48,8 +48,6 @@ local group_clues = {
   { mode = "x", keys = "<Leader>s", desc = "+Search" },
   { mode = "n", keys = "<Leader>S", desc = "+Salesforce" },
   { mode = "n", keys = "<Leader>t", desc = "+Tests" },
-  { mode = "n", keys = "<Leader>tt", desc = "+Java/Maven tests" },
-  { mode = "n", keys = "<Leader>td", desc = "+Java/Maven debug" },
   { mode = "n", keys = "<Leader>u", desc = "+UI" },
   { mode = "n", keys = "<Leader>w", desc = "+Windows" },
   { mode = "n", keys = "<Leader>x", desc = "+Lists" },
@@ -79,4 +77,17 @@ clue.setup({
       border = "rounded",
     },
   },
+})
+
+vim.api.nvim_create_autocmd("User", {
+  pattern = "LazyLoad",
+  desc = "Refresh mini.clue triggers after lazy-loaded plugins",
+  callback = function()
+    vim.schedule(function()
+      local ok_clue, mini_clue = pcall(require, "mini.clue")
+      if ok_clue then
+        mini_clue.ensure_buf_triggers()
+      end
+    end)
+  end,
 })
