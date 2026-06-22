@@ -181,7 +181,11 @@ return vim.list_extend(csync_themes, {
   }),
 
   { "mfussenegger/nvim-jdtls", ft = "java" },
-  p("lenincamp/jdtls.nvim", "jdtls.nvim", { ft = "java" }),
+  p("lenincamp/jdtls.nvim", "jdtls.nvim", {
+    ft = "java",
+    dependencies = { "nvim-jdtls" },
+    config = cfg("lsp/jdtls.lua"),
+  }),
   p("lenincamp/mybatis.nvim", "mybatis.nvim", {
     ft = { "java", "xml" },
     config = function()
@@ -248,7 +252,7 @@ return vim.list_extend(csync_themes, {
     cmd = { "DapViewOpen", "DapViewClose", "DapViewToggle", "DapViewWatch", "DapViewNavigate" },
     cond = not_diff,
     dependencies = { "dap-controls.nvim" },
-    config = cfg("debug/nvim-dap-view.lua"),
+    -- Setup via dap-controls in plugins/debug/nvim-dap.lua
   },
   p("lenincamp/breakpoints.nvim", "breakpoints.nvim", {
     lazy = true,

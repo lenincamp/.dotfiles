@@ -19,5 +19,4 @@ if not vim.g._pure_java_execute_client_command_guarded then
   end
 end
 
--- JDTLS lifecycle (lazy.nvim loads jdtls.nvim via ft="java")
-require("jdtls-nvim").attach()
+-- JDTLS attach: handled by jdtls.nvim/ftplugin/java.lua (do not call attach here — double start)
