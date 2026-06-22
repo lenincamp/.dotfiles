@@ -88,7 +88,7 @@ vim.cmd.filetype("plugin indent on")
 -- ── Display ───────────────────────────────────────────────────────────────────
 
 -- Cmdline info off by default — ruler shows "Top/line,col", showcmd shows
--- partial keystrokes. Both are already visible in the winbar; toggle via <leader>ui.
+-- partial keystrokes. Both are already visible in the winbar; toggle via Command Center.
 opt.ruler = false
 opt.showcmd = false
 opt.showmode = false
