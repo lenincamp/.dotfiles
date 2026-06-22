@@ -21,7 +21,7 @@
 local ok, dv = pcall(require, "dap-view")
 if not ok then return end
 
-local helpers = require("modules.dap.helpers")
+local helpers = require("dap-controls.helpers")
 
 dv.setup({
   auto_toggle = true,
@@ -80,7 +80,7 @@ dv.setup({
 })
 
 -- ── Thread-sync patches ──────────────────────────────────────────────────────
-local thread_sync = require("modules.dap.thread_sync")
+local thread_sync = require("dap-controls.thread_sync")
 thread_sync.apply()
 thread_sync.register_diag_command()
 
@@ -90,7 +90,7 @@ thread_sync.register_diag_command()
 -- `p`, `P`, `<C-v>` open the floating eval pre-filled with clipboard contents,
 -- so user can review/edit and submit as a single joined expression.
 local function open_eval_with_clipboard()
-  local helpers_mod = require("modules.dap.helpers")
+  local helpers_mod = require("dap-controls.helpers")
   local clip = vim.fn.getreg("+")
   if clip == "" or clip == nil then clip = vim.fn.getreg("*") end
   if clip == "" or clip == nil then clip = vim.fn.getreg('"') end

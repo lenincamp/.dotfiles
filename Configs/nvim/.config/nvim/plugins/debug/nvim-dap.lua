@@ -10,13 +10,13 @@
 local ok_dap, dap = pcall(require, "dap")
 if not ok_dap then return end
 
-require("modules.dap.signs").setup()
+local controls = require("dap-controls")
+controls.setup({ thread_sync = false })  -- thread_sync applied in nvim-dap-view.lua
 
 -- ── DAP keymaps (<leader>d) ─────────────────────────────────────────────────
 
-local helpers = require("modules.dap.helpers")
-local java_profiles = require("modules.dap.java_profiles")
-local keymaps = require("modules.dap.keymaps")
+local helpers = require("dap-controls.helpers")
+local keymaps = require("dap-controls.keymaps")
 
 -- Use wrappers so patches applied later (e.g. thread-sync in nvim-dap-view)
 -- take effect; direct refs like dap.continue capture a stale function.
@@ -136,7 +136,10 @@ local function ensure_java_config(bufnr)
     return
   end
 
-  dap.configurations.java = java_profiles.java_configurations(helpers, bufnr)
+  local ok_jdtls, jdtls_nvim = pcall(require, "jdtls-nvim")
+  if ok_jdtls then
+    dap.configurations.java = jdtls_nvim.dap_configurations(bufnr)
+  end
 
   configured.java = true
   setup_java_adapter(bufnr)
@@ -279,7 +282,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 -- ── Persistent breakpoints: setup autocmds + load on startup ─────────────────
 
-local ok_bp, bp = pcall(require, "modules.dap.breakpoints")
+local ok_bp, bp = pcall(require, "breakpoints")
 if ok_bp then
-  bp.setup()  -- auto-load is handled inside setup() via vim.schedule
+  bp.setup({
+    markers = { "mvnw", "pom.xml", "build.gradle", "build.gradle.kts", "package.json" },
+    on_setup = function() require("dap-controls.signs").setup() end,
+  })
 end
