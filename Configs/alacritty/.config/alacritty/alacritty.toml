@@ -5,6 +5,10 @@ live_config_reload = true
 WINIT_X11_SCALE_FACTOR = "1.0"
 TERM = "xterm-256color"
 
+[terminal.shell]
+program = "/bin/zsh"
+args = ["-lc", "exec tmux new-session -A -s dev"]
+
 [window]
 decorations = "Buttonless"
 opacity = 0.95
@@ -16,7 +20,7 @@ padding.x = 0
 padding.y = 0
 
 [font]
-size = 16.5
+size = 15.5
 offset.y = 4
 # offset.x = -1
 offset.x = 0
@@ -45,6 +49,6 @@ history = 10000
 save_to_clipboard = true
 
 [colors.primary]
-background = "#00141a"
-foreground = "#839496"
+background = "#fdf6e3"
+foreground = "#586e75"
 

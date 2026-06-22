@@ -55,4 +55,4 @@ else
     export DOCKER_HOST='unix:///var/folders/86/mgwc95vs10q6h_6kmw33cnnw0000gp/T/podman/podman-machine-default-api.sock'
 fi
 alias docker=podman
-alias nvcs='rm -rf ~/.local/state/nvim/sessions'
+alias nvcs='rm -rf ~/.local/state/nvim/sessions && rm -rf ~/.local/share/nvim/sessions'
