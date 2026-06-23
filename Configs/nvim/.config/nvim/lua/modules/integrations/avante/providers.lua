@@ -115,6 +115,7 @@ function M.context()
     claude_api_key_name = claude_api_key_name,
     has_copilot_provider = has_avante_provider("copilot"),
     has_copilot_auth = has_copilot_auth(),
+    enable_copilot = vim.env.AVANTE_ENABLE_COPILOT == "1",
     has_claude_code = has_claude_code,
     has_gemini_cli = has_gemini_cli,
     acp_providers = acp_providers,
@@ -130,11 +131,15 @@ function M.setup_options(state)
 
     providers = {
       copilot = {
-        hide_in_model_selector = not (state.has_copilot_provider and state.has_copilot_auth),
+        hide_in_model_selector = not (state.has_copilot_provider and state.has_copilot_auth and state.enable_copilot),
       },
       claude = {
         endpoint = vim.env.ANTHROPIC_BASE_URL or "https://api.anthropic.com",
         model = "claude-sonnet-4-6",
+        model_names = {
+          "claude-sonnet-4-6",
+          "claude-opus-4-6",
+        },
         api_key_name = state.claude_api_key_name,
         timeout = 60000,
         context_window = 200000,
@@ -146,7 +151,7 @@ function M.setup_options(state)
       ["claude-opus"] = {
         __inherited_from = "claude",
         endpoint = vim.env.ANTHROPIC_BASE_URL or "https://api.anthropic.com",
-        model = "claude-opus-4-7",
+        model = "claude-opus-4-8",
         api_key_name = state.claude_api_key_name,
         timeout = 90000,
         extra_request_body = {
@@ -207,7 +212,7 @@ end
 function M.provider_items(state)
   local items = {
     { name = "claude", label = "claude         │ claude-sonnet-4-6              (proxy→bedrock)" },
-    { name = "claude-opus", label = "claude-opus    │ claude-opus-4-7                (proxy→bedrock)" },
+    { name = "claude-opus", label = "claude-opus    │ claude-opus-4-8                (proxy→bedrock)" },
     { name = "claude-haiku", label = "claude-haiku   │ claude-haiku-4-5               (proxy→bedrock)" },
     { name = "gemini", label = "gemini         │ gemini-2.5-pro-preview-05-06   (direct API)" },
   }
@@ -220,6 +225,108 @@ function M.provider_items(state)
   end
 
   return items
+end
+
+function M.model_items()
+  local ok_cfg, Config = pcall(require, "avante.config")
+  local ok_prov, Providers = pcall(require, "avante.providers")
+  if not ok_cfg or not ok_prov then
+    return {}
+  end
+
+  local items = {}
+  for provider_name in pairs(Config.providers or {}) do
+    local provider_cfg = Providers[provider_name]
+    if provider_cfg and not provider_cfg.hide_in_model_selector and provider_cfg.is_env_set() then
+      local seen = {}
+      local function add(model)
+        if not model or seen[model] then
+          return
+        end
+        seen[model] = true
+        items[#items + 1] = {
+          provider_name = provider_name,
+          model = model,
+          label = string.format("%-14s %s", provider_name, model),
+        }
+      end
+      if type(provider_cfg.model_names) == "table" then
+        for _, model in ipairs(provider_cfg.model_names) do
+          add(model)
+        end
+      end
+      add(provider_cfg.model)
+    end
+  end
+
+  table.sort(items, function(a, b)
+    return a.label < b.label
+  end)
+  return items
+end
+
+function M.apply_model_choice(choice)
+  local ok_cfg, Config = pcall(require, "avante.config")
+  local ok_prov, Providers = pcall(require, "avante.providers")
+  local ok_utils, Utils = pcall(require, "avante.utils")
+  if not ok_cfg or not ok_prov or not choice then
+    return
+  end
+
+  if choice.provider_name ~= Config.provider then
+    Providers.refresh(choice.provider_name)
+  end
+
+  Config.override({
+    providers = {
+      [choice.provider_name] = vim.tbl_deep_extend(
+        "force",
+        Config.get_provider_config(choice.provider_name),
+        { model = choice.model }
+      ),
+    },
+  })
+
+  local provider_cfg = Providers[choice.provider_name]
+  if provider_cfg then
+    provider_cfg.model = choice.model
+  end
+
+  if Config.windows.sidebar_header.include_model then
+    local sidebar = require("avante").get()
+    if sidebar and sidebar:is_open() then
+      sidebar:render_result()
+    end
+  elseif ok_utils then
+    Utils.info("Switched to model: " .. choice.label)
+  end
+
+  Config.save_last_model(choice.model, choice.provider_name)
+end
+
+function M.pick_model(_state)
+  local items = M.model_items()
+  if #items == 0 then
+    vim.notify("No Avante models available", vim.log.levels.WARN)
+    return
+  end
+
+  local ok_cfg, Config = pcall(require, "avante.config")
+  local current = ok_cfg and Config.provider or "?"
+
+  require("picker").select_items(items, {
+    prompt = "Avante model  (provider: " .. current .. ")",
+    scope = "global",
+    search_threshold = 0,
+    input_mode = true,
+    format_item = function(item)
+      return item.label
+    end,
+  }, function(choice)
+    if choice then
+      M.apply_model_choice(choice)
+    end
+  end)
 end
 
 return M

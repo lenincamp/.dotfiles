@@ -5,12 +5,6 @@ local registry = require("modules.bootstrap.registry")
 
 local DIFF_KEYMAPS = { "]c", "[c", "do", "dp", "dO", "dP" }
 
-local function disable_lsp_for_diff_buffer(bufnr)
-  lsp_buffer.detach_all(bufnr)
-  lsp_buffer.set_diagnostics(bufnr, false)
-  vim.b[bufnr].diff_lsp_disabled = true
-end
-
 local function is_merge_diff_mode()
   if not vim.wo.diff then return false end
   local labels = { LOCAL = false, REMOTE = false, BASE = false, MERGED = false }
@@ -119,7 +113,7 @@ local function setup_current_diff_window()
 
   local bufnr = vim.api.nvim_get_current_buf()
   if not vim.b[bufnr].diff_lsp_forced then
-    disable_lsp_for_diff_buffer(bufnr)
+    lsp_buffer.disable_for_buffer(bufnr)
   end
 end
 
@@ -159,7 +153,7 @@ local function register_diff_lsp_commands()
   vim.api.nvim_create_user_command("DiffLspDisable", function()
     local bufnr = vim.api.nvim_get_current_buf()
     vim.b[bufnr].diff_lsp_forced = false
-    disable_lsp_for_diff_buffer(bufnr)
+    lsp_buffer.disable_for_buffer(bufnr)
     vim.notify("Diff LSP disabled for current buffer", vim.log.levels.INFO)
   end, { desc = "Disable LSP for current diff buffer" })
 

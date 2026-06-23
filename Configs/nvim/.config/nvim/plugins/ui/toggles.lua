@@ -177,9 +177,21 @@ end
 function M.reload_config()
   local config = vim.fn.stdpath("config")
   for name in pairs(package.loaded) do
-    if name == "configs" or name == "plugins" or name == "lsp" or name == "keymaps" or name == "statusline" or name == "autocmds"
-      or name == "java" or name:match("^modules%.") or name:match("^lang%.") or name:match("^config%.")
-      or name:match("^pure%-ui") or name:match("^picker") or name:match("^colorscheme%-sync") then
+    if
+      name == "configs"
+      or name == "plugins"
+      or name == "lsp"
+      or name == "keymaps"
+      or name == "statusline"
+      or name == "autocmds"
+      or name == "java"
+      or name:match("^modules%.")
+      or name:match("^lang%.")
+      or name:match("^config%.")
+      or name:match("^pure%-ui")
+      or name:match("^picker")
+      or name:match("^colorscheme%-sync")
+    then
       package.loaded[name] = nil
     end
   end

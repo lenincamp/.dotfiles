@@ -1,16 +1,8 @@
 local M = {}
-
-local function get_avante_module()
-  local ok, mod = pcall(require, "avante")
-  if not ok or type(mod) ~= "table" then
-    return nil
-  end
-
-  return mod
-end
+local core = require("modules.integrations.avante.core")
 
 local function avante_sidebar()
-  local avante = get_avante_module()
+  local avante = core.get()
   if not avante then
     return nil
   end

@@ -1,6 +1,7 @@
 local M = {}
 local lazy_bootstrap = require("modules.bootstrap.lazy")
 local build = require("modules.integrations.avante.build")
+local core = require("modules.integrations.avante.core")
 local keymaps = require("modules.integrations.avante.keymaps")
 local providers = require("modules.integrations.avante.providers")
 local setup_done = false
@@ -9,15 +10,6 @@ local setup_done = false
 ---@field setup fun(opts: table)
 ---@field get fun(): table
 ---@field toggle fun()
-
-local function get_avante_module()
-  local ok, mod = pcall(require, "avante")
-  if not ok or type(mod) ~= "table" then
-    return nil
-  end
-
-  return mod
-end
 
 function M.setup()
   if setup_done then
@@ -38,7 +30,7 @@ function M.setup()
     return false
   end
 
-  local avante = get_avante_module()
+  local avante = core.get()
   if not avante then
     return false
   end
@@ -47,7 +39,7 @@ function M.setup()
 
   avante.setup(providers.setup_options(state))
 
-  if not state.has_copilot_provider then
+  if not (state.has_copilot_provider and state.has_copilot_auth and state.enable_copilot) then
     require("avante.config").providers.copilot = nil
   end
 

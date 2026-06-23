@@ -8,7 +8,7 @@ require("dap-controls").setup({
   thread_sync = true,
   repl_paste = true,
   breakpoints = true,
-  dap_view = { enabled = true, layout = "ide" },
+  dap_view = true,
   adapters = {
     java = true,
     kotlin = true,
