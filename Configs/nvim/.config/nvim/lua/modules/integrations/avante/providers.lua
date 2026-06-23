@@ -29,8 +29,8 @@ local function has_copilot_auth()
   local config_home = vim.env.XDG_CONFIG_HOME or vim.fn.expand("~/.config")
   local auth_dir = config_home .. "/github-copilot"
   return vim.fn.filereadable(auth_dir .. "/hosts.json") == 1
-    or vim.fn.filereadable(auth_dir .. "/apps.json") == 1
-    or vim.fn.filereadable(vim.fn.stdpath("data") .. "/avante/github-copilot.json") == 1
+      or vim.fn.filereadable(auth_dir .. "/apps.json") == 1
+      or vim.fn.filereadable(vim.fn.stdpath("data") .. "/avante/github-copilot.json") == 1
 end
 
 local function has_avante_provider(name)
@@ -136,10 +136,6 @@ function M.setup_options(state)
       claude = {
         endpoint = vim.env.ANTHROPIC_BASE_URL or "https://api.anthropic.com",
         model = "claude-sonnet-4-6",
-        model_names = {
-          "claude-sonnet-4-6",
-          "claude-opus-4-6",
-        },
         api_key_name = state.claude_api_key_name,
         timeout = 60000,
         context_window = 200000,
@@ -148,11 +144,18 @@ function M.setup_options(state)
           max_tokens = 64000,
         },
       },
+      ["claude-opus-4-6"] = {
+        __inherited_from = "claude",
+        model = "claude-opus-4-6",
+        timeout = 90000,
+        extra_request_body = {
+          temperature = 0.2,
+          max_tokens = 32000,
+        },
+      },
       ["claude-opus"] = {
         __inherited_from = "claude",
-        endpoint = vim.env.ANTHROPIC_BASE_URL or "https://api.anthropic.com",
         model = "claude-opus-4-8",
-        api_key_name = state.claude_api_key_name,
         timeout = 90000,
         extra_request_body = {
           temperature = 0.2,
@@ -161,9 +164,7 @@ function M.setup_options(state)
       },
       ["claude-haiku"] = {
         __inherited_from = "claude",
-        endpoint = vim.env.ANTHROPIC_BASE_URL or "https://api.anthropic.com",
         model = "claude-haiku-4-5-20251001",
-        api_key_name = state.claude_api_key_name,
         timeout = 30000,
         extra_request_body = {
           temperature = 0.1,
@@ -211,10 +212,11 @@ end
 
 function M.provider_items(state)
   local items = {
-    { name = "claude", label = "claude         │ claude-sonnet-4-6              (proxy→bedrock)" },
-    { name = "claude-opus", label = "claude-opus    │ claude-opus-4-8                (proxy→bedrock)" },
-    { name = "claude-haiku", label = "claude-haiku   │ claude-haiku-4-5               (proxy→bedrock)" },
-    { name = "gemini", label = "gemini         │ gemini-2.5-pro-preview-05-06   (direct API)" },
+    { name = "claude",          label = "claude          │ claude-sonnet-4-6       Sonnet 4.6 · fast & efficient" },
+    { name = "claude-opus-4-6", label = "claude-opus-4-6 │ claude-opus-4-6         Opus 4.6 · custom" },
+    { name = "claude-opus",     label = "claude-opus     │ claude-opus-4-8         Opus 4.8 · best for complex tasks" },
+    { name = "claude-haiku",    label = "claude-haiku    │ claude-haiku-4-5        Haiku 4.5 · fastest & cheapest" },
+    { name = "gemini",          label = "gemini          │ gemini-2.5-pro          direct API" },
   }
 
   if state.has_claude_code then
@@ -235,27 +237,21 @@ function M.model_items()
   end
 
   local items = {}
+  local seen = {}
+
   for provider_name in pairs(Config.providers or {}) do
     local provider_cfg = Providers[provider_name]
     if provider_cfg and not provider_cfg.hide_in_model_selector and provider_cfg.is_env_set() then
-      local seen = {}
-      local function add(model)
-        if not model or seen[model] then
-          return
-        end
-        seen[model] = true
+      local model = provider_cfg.model
+      local key = provider_name .. "|" .. (model or "")
+      if model and not seen[key] then
+        seen[key] = true
         items[#items + 1] = {
           provider_name = provider_name,
           model = model,
-          label = string.format("%-14s %s", provider_name, model),
+          label = string.format("%-18s %s", provider_name, model),
         }
       end
-      if type(provider_cfg.model_names) == "table" then
-        for _, model in ipairs(provider_cfg.model_names) do
-          add(model)
-        end
-      end
-      add(provider_cfg.model)
     end
   end
 
