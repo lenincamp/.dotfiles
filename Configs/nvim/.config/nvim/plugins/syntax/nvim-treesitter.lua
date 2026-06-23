@@ -62,15 +62,7 @@ end
 
 local function enable_highlight(buf)
   if not is_regular_treesitter_buffer(buf) then return end
-  if not pcall(vim.treesitter.start, buf) then return end
-  vim.schedule(function()
-    if not vim.api.nvim_buf_is_valid(buf) then return end
-    for _, winid in ipairs(vim.fn.win_findbuf(buf)) do
-      if vim.api.nvim_win_is_valid(winid) and vim.wo[winid].foldmethod == "expr" then
-        vim._foldupdate(winid, 0, vim.api.nvim_buf_line_count(buf))
-      end
-    end
-  end)
+  pcall(vim.treesitter.start, buf)
 end
 
 vim.api.nvim_create_autocmd("FileType", {

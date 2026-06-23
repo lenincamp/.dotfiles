@@ -43,10 +43,11 @@ opt.cmdheight = 1
 opt.grepprg = "rg --vimgrep --smart-case --hidden --glob !.git"
 opt.grepformat = "%f:%l:%c:%m"
 
--- ── Folding (treesitter-based) ──────────────────────────────────────────────
+-- ── Folding ───────────────────────────────────────────────────────────────────
+-- vim.lsp.foldexpr() falls back to treesitter when no LSP supports foldingRange.
 vim.treesitter.language.register("tsx", { "javascriptreact", "typescriptreact" })
 opt.foldmethod = "expr"
-opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldexpr = "v:lua.vim.lsp.foldexpr()"
 opt.foldlevel = 99 -- keep folds open by default
 opt.foldlevelstart = 99
 opt.foldenable = true
