@@ -27,3 +27,20 @@ registry.set_lsp_api({
 
 diagnostics.setup()
 code_actions.setup()
+
+-- LSP folding: override treesitter foldexpr per-buffer when server supports foldingRange.
+-- Sets foldlevel explicitly to avoid it resetting to 0 when creating the buffer-local context.
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("PureLspFolding", { clear = true }),
+  callback = function(ev)
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    if client and client:supports_method("textDocument/foldingRange", ev.buf) then
+      for _, winid in ipairs(vim.fn.win_findbuf(ev.buf)) do
+        if vim.api.nvim_win_is_valid(winid) then
+          vim.wo[winid][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
+          vim.wo[winid][0].foldlevel = 99
+        end
+      end
+    end
+  end,
+})
