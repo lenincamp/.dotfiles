@@ -27,3 +27,17 @@ registry.set_lsp_api({
 
 diagnostics.setup()
 code_actions.setup()
+
+-- LSP folding: use vim.lsp.foldexpr() buffer-locally when the server supports it.
+-- Applies to all filetypes (Java via jdtls, web via vtsls, etc.).
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("PureLspFolding", { clear = true }),
+  callback = function(ev)
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    if client and client:supports_method("textDocument/foldingRange", ev.buf) then
+      local win = vim.api.nvim_get_current_win()
+      vim.wo[win][0].foldmethod = "expr"
+      vim.wo[win][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
+    end
+  end,
+})
