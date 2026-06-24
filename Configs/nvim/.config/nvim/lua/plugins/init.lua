@@ -99,6 +99,7 @@ return vim.list_extend(csync_themes, {
   },
   { "rafamadriz/friendly-snippets", lazy = true },
 
+  { "tpope/vim-obsession", lazy = true, cmd = "Obsession" },
   { "tpope/vim-dadbod", lazy = true },
   { "kristijanhusak/vim-dadbod-completion", lazy = true },
   {
