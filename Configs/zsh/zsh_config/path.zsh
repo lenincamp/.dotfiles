@@ -56,6 +56,7 @@ export ANDROID_SDK_ROOT=$HOME/workspace/DevTools/Android/sdk # Ruta descrita en 
 export CORDOVA_JAVA_HOME=$JAVA_HOME
 export SKIP_FIREBASE_FIRESTORE_SWIFT=1
 export PURE_LOCAL_PLUGINS=1
+export CLAUDE_CODE_NO_FLICKER=1
 
 export PATH=$PATH:$ANDROID_HOME/platform-tools/
 export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin/ # Validar que exista la carpeta latest previamente
