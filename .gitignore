@@ -5,6 +5,7 @@ settings.local.json
 Configs/nvim/.config/nvim/.claude/
 Configs/nvim/.config/nvim/.github/
 **/nvim.log
+Configs/nvim/.config/nvim/lazy-lock.cursor.json
 Configs/nvim/.config/nvim/.vscode/settings.json
 
 # agents — project-specific / private (not tracked in dotfiles)

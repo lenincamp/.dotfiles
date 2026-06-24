@@ -27,9 +27,12 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("configs")
+local in_cursor = vim.g.vscode ~= nil
 require("lazy").setup("plugins", {
   defaults = { lazy = true },
   install = { colorscheme = { "catppuccin" } },
+  lockfile = vim.fn.stdpath("config") .. (in_cursor and "/lazy-lock.cursor.json" or "/lazy-lock.json"),
+  checker = { enabled = not in_cursor },
   performance = {
     rtp = { disabled_plugins = { "tohtml", "tutor", "zipPlugin", "tarPlugin", "gzip" } },
   },
