@@ -1,14 +1,20 @@
--- sessions.lua – powered by tpope/vim-obsession.
--- obsession auto-saves to Session.vim in the project cwd on every relevant event.
+-- UX layer over tpope/vim-obsession (lazy.nvim: cmd = "Obsession").
+-- Obsession keeps Session.vim updated on layout changes and exit.
 
 local M = {}
 
-local data_dir  = vim.fn.stdpath("data") .. "/sessions"
+local data_dir = vim.fn.stdpath("data") .. "/sessions"
 local last_file = data_dir .. "/.last"
 M._setup_done = false
 
+local function cwd_session_path()
+  return vim.fn.getcwd() .. "/Session.vim"
+end
+
 local function read_last_path()
-  if vim.fn.filereadable(last_file) == 0 then return nil end
+  if vim.fn.filereadable(last_file) == 0 then
+    return nil
+  end
   local lines = vim.fn.readfile(last_file)
   return lines and lines[1] and lines[1] ~= "" and lines[1] or nil
 end
@@ -18,23 +24,19 @@ local function write_last_path(path)
   vim.fn.writefile({ path }, last_file)
 end
 
-local function cwd_session_path()
-  return vim.fn.getcwd() .. "/Session.vim"
-end
-
+--- @param suffix string|nil e.g. " /path", "!", or ""
 local function obsession(suffix)
   local ok, err = pcall(vim.cmd, "Obsession" .. (suffix or ""))
   if not ok then
-    vim.notify("Session recording failed: " .. tostring(err), vim.log.levels.WARN)
+    vim.notify("Obsession: " .. tostring(err), vim.log.levels.WARN)
   end
   return ok
 end
 
--- Start obsession tracking for the cwd Session.vim (idempotent if already tracking).
 function M.save()
   local path = cwd_session_path()
   if vim.v.this_session ~= path then
-    if not obsession(" " .. vim.fn.fnameescape(path)) then
+    if not obsession(" " .. vim.fn.fnameescape(vim.fn.getcwd())) then
       return false
     end
   end
@@ -70,21 +72,52 @@ function M.load_cwd()
   return M.load(nil)
 end
 
-function M.load_last()
+local function try_load_silent()
   local last = read_last_path()
   if last and last ~= "" and M.load(last, { silent = true }) then
+    return "last"
+  end
+  if M.load(nil, { silent = true }) then
+    return "cwd"
+  end
+  return nil
+end
+
+function M.load_last()
+  local which = try_load_silent()
+  if which == "last" then
     vim.notify("Session loaded (last)", vim.log.levels.INFO)
     return true
   end
-  return M.load_cwd()
+  if which == "cwd" then
+    vim.notify("Session loaded", vim.log.levels.INFO)
+    return true
+  end
+  vim.notify("No session found", vim.log.levels.INFO)
+  return false
+end
+
+--- Dashboard: last session, then cwd, then session picker.
+function M.restore()
+  local which = try_load_silent()
+  if which == "last" then
+    vim.notify("Session loaded (last)", vim.log.levels.INFO)
+    return true
+  end
+  if which == "cwd" then
+    vim.notify("Session loaded", vim.log.levels.INFO)
+    return true
+  end
+  M.select()
+  return false
 end
 
 function M.select()
-  local seen  = {}
+  local seen = {}
   local items = {}
 
   for _, path in ipairs(vim.v.oldfiles or {}) do
-    local dir     = vim.fn.fnamemodify(path, ":h")
+    local dir = vim.fn.fnamemodify(path, ":h")
     local session = dir .. "/Session.vim"
     if not seen[session] and vim.fn.filereadable(session) == 1 then
       seen[session] = true
@@ -108,32 +141,50 @@ function M.select()
   end
 
   require("picker").select_items(items, {
-    prompt           = "Session: Select",
-    scope            = "project",
+    prompt = "Session: Select",
+    scope = "project",
     search_threshold = 0,
-    format_item      = function(item) return item.label end,
+    format_item = function(item)
+      return item.label
+    end,
   }, function(choice)
-    if not choice then return end
+    if not choice then
+      return
+    end
     M.load(choice.path)
   end)
 end
 
 function M.stop()
-  if not obsession("!") then return false end
+  if not obsession("!") then
+    return false
+  end
   vim.notify("Session recording stopped", vim.log.levels.INFO)
   return true
 end
 
 function M.setup()
-  if M._setup_done then return end
+  if M._setup_done then
+    return
+  end
   M._setup_done = true
 
   local map = vim.keymap.set
-  map("n", "<leader>ps", function() M.save() end,      { desc = "Session: Save" })
-  map("n", "<leader>pl", function() M.load_cwd() end,  { desc = "Session: Load (cwd)" })
-  map("n", "<leader>pL", function() M.load_last() end, { desc = "Session: Load (last)" })
-  map("n", "<leader>pS", function() M.select() end,    { desc = "Session: Select" })
-  map("n", "<leader>pd", function() M.stop() end,      { desc = "Session: Stop recording" })
+  map("n", "<leader>ps", function()
+    M.save()
+  end, { desc = "Session: Save" })
+  map("n", "<leader>pl", function()
+    M.load_cwd()
+  end, { desc = "Session: Load (cwd)" })
+  map("n", "<leader>pL", function()
+    M.load_last()
+  end, { desc = "Session: Load (last)" })
+  map("n", "<leader>pS", function()
+    M.select()
+  end, { desc = "Session: Select" })
+  map("n", "<leader>pd", function()
+    M.stop()
+  end, { desc = "Session: Stop recording" })
 end
 
 return M

@@ -109,10 +109,7 @@ require("picker").setup({
   dashboard = {
     actions = {
       session = function()
-        local ok, sessions = pcall(require, "config.editor.sessions")
-        if ok then
-          sessions.load_last()
-        end
+        require("config.editor.sessions").restore()
       end,
     },
     on_restore_window = function(win)
