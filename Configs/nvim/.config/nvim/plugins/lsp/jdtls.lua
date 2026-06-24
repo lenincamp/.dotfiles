@@ -5,6 +5,10 @@ local home = os.getenv("HOME") or ""
 local brew = "/opt/homebrew/Cellar"
 
 require("jdtls-nvim").setup({
+  -- Use JDK 21 directly to launch jdtls (bypasses Homebrew wrapper which
+  -- unconditionally picks config_mac instead of config_mac_arm on Apple Silicon)
+  jdtls_java_home = brew .. "/openjdk@21/21.0.11/libexec/openjdk.jdk/Contents/Home",
+
   -- Machine-specific JDK paths
   java_runtimes = {
     { name = "JavaSE-1.8", path = "/Library/Java/JavaVirtualMachines/jdk1.8.0_202.jdk/Contents/Home" },

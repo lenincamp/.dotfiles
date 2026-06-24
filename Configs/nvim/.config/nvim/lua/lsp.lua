@@ -29,17 +29,33 @@ diagnostics.setup()
 code_actions.setup()
 
 -- LSP folding: override treesitter foldexpr per-buffer when server supports foldingRange.
--- Sets foldlevel explicitly to avoid it resetting to 0 when creating the buffer-local context.
+-- BufWinEnter re-applies when the buffer enters a window where LspAttach already ran
+-- (e.g. opening a previously-attached buffer via picker in a different window).
+local function apply_lsp_fold(winid, bufnr)
+  if not vim.api.nvim_win_is_valid(winid) then return end
+  vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()", { win = winid })
+  vim.api.nvim_set_option_value("foldlevel", 99, { win = winid })
+end
+
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("PureLspFolding", { clear = true }),
   callback = function(ev)
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
     if client and client:supports_method("textDocument/foldingRange", ev.buf) then
       for _, winid in ipairs(vim.fn.win_findbuf(ev.buf)) do
-        if vim.api.nvim_win_is_valid(winid) then
-          vim.wo[winid][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
-          vim.wo[winid][0].foldlevel = 99
-        end
+        apply_lsp_fold(winid, ev.buf)
+      end
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  group = "PureLspFolding",
+  callback = function(ev)
+    for _, client in ipairs(vim.lsp.get_clients({ bufnr = ev.buf })) do
+      if client:supports_method("textDocument/foldingRange", ev.buf) then
+        apply_lsp_fold(vim.api.nvim_get_current_win(), ev.buf)
+        break
       end
     end
   end,
