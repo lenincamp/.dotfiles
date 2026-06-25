@@ -69,6 +69,14 @@ return vim.list_extend(csync_themes, {
     cond = not_diff,
     config = cfg("syntax/treesitter-context.lua"),
   },
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    branch = "main",
+    event = { "BufReadPost", "BufNewFile" },
+    cond = not_diff,
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = cfg("syntax/treesitter-textobjects.lua"),
+  },
 
   p("lenincamp/colorscheme-sync.nvim", "colorscheme-sync.nvim", {
     lazy = false,

@@ -3,7 +3,6 @@
 local keymap_specs = require("modules.editor.keymap_specs")
 
 require("modules.editor.todos")
-require("modules.editor.treesitter_textobjects")
 
 -- ── Spec-driven motion/search/editing ───────────────────────────────────────
 
