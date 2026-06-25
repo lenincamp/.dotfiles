@@ -95,11 +95,11 @@ opt.ruler = false
 opt.showcmd = false
 opt.showmode = false
 
-opt.pumblend = 0 -- no popup blend (crisp completion menu)
-opt.winblend = 0 -- no floating-window blend
+opt.pumblend = 0      -- no popup blend (crisp completion menu)
+opt.winblend = 0      -- no floating-window blend
 opt.splitright = true -- new vertical splits open to the right
 opt.splitbelow = true -- new horizontal splits open below
-opt.showtabline = 0 -- never show the tabline
+opt.showtabline = 0   -- never show the tabline
 
 -- Undercurl support (for diagnostic underlines in capable terminals)
 vim.cmd([[let &t_Cs = "\e[4:3m"]])
@@ -110,21 +110,21 @@ vim.cmd([[let g:loaded_python3_provider = 0]])
 
 -- Large file defaults (will be overridden per-buffer in autocmds.lua)
 opt.lazyredraw = false -- enable per-buffer when large file detected
-opt.updatetime = 100 -- default (1000ms when large file detected)
-opt.undolevels = 1000 -- default (100 when large file detected)
+opt.updatetime = 100   -- default (1000ms when large file detected)
+opt.undolevels = 1000  -- default (100 when large file detected)
 
 -- ── Diff / Merge ergonomics (Neovim 0.12-friendly) ──────────────────────────
 
 local diffopt = {
-  "internal", -- use Neovim's built-in diff
-  "filler", -- keep filler lines for context alignment
-  "closeoff", -- close diff when only one window remains
-  "foldcolumn:1", -- fold column in diff mode
-  "context:8", -- keep nearby context while collapsing distant unchanged blocks
-  "vertical", -- default to vertical split
+  "internal",            -- use Neovim's built-in diff
+  "filler",              -- keep filler lines for context alignment
+  "closeoff",            -- close diff when only one window remains
+  "foldcolumn:1",        -- fold column in diff mode
+  "context:8",           -- keep nearby context while collapsing distant unchanged blocks
+  "vertical",            -- default to vertical split
   "algorithm:histogram", -- better block matching than Myers for code
-  "indent-heuristic", -- indentation-aware diff
-  "linematch:120", -- stronger moved-line detection for large refactors
+  "indent-heuristic",    -- indentation-aware diff
+  "linematch:120",       -- stronger moved-line detection for large refactors
 }
 opt.diffopt:append(table.concat(diffopt, ","))
 
@@ -137,7 +137,7 @@ end
 
 -- ── Statusline baseline (hidden by default, winbar carries file context) ──────
 
-opt.laststatus = 0
+opt.laststatus = 2
 opt.statusline = " "
 opt.fillchars:append({ stl = "─", stlnc = "─" })
 

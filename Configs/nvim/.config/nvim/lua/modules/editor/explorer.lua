@@ -48,8 +48,13 @@ function M.open(cwd, reveal_path)
   end
 
   local width = tonumber(vim.g.netrw_winsize) or 25
-  vim.cmd("botright vertical " .. width .. "Vexplore " .. vim.fn.fnameescape(target))
-  vim.cmd("vertical resize " .. width)
+
+  -- Crear el split a la izquierda
+  vim.cmd(("topleft %dvsplit"):format(width))
+  vim.cmd(("vertical resize %d"):format(width))
+
+  -- Abrir netrw en la ventana actual
+  vim.cmd("Explore " .. vim.fn.fnameescape(target))
   vim.wo.winfixwidth = true
   vim.wo.number = false
   vim.wo.relativenumber = false
