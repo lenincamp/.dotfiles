@@ -33,22 +33,17 @@ local function notify_did_rename(changes)
 end
 
 function M.copy_path()
-  local cwd  = vim.fn.getcwd()
-  local full = vim.fn.expand("%:p")
-  local name = vim.fn.expand("%:t")
-  if full:sub(1, #cwd) ~= cwd then
-    vim.notify("File is outside the working directory.", vim.log.levels.WARN)
-    return
-  end
+  local paths = {
+    ["Absolute path"] = "%:p",
+    ["Relative path"] = "%:.",
+    ["File name only"] = "%:t",
+  }
 
-  vim.ui.select({ "Relative path", "File name only" }, { prompt = "Copy to clipboard:" }, function(choice)
-    if choice == "Relative path" then
-      local rel = full:sub(#cwd + 2)
-      vim.fn.setreg("+", rel)
-      vim.notify("Copied: " .. rel)
-    elseif choice == "File name only" then
-      vim.fn.setreg("+", name)
-      vim.notify("Copied: " .. name)
+  vim.ui.select({ "Absolute path", "Relative path", "File name only" }, { prompt = "Copy to clipboard:" }, function(choice)
+    if choice then
+      local path = vim.fn.expand(paths[choice])
+      vim.fn.setreg("+", path)
+      vim.notify("Copied: " .. path)
     end
   end)
 end

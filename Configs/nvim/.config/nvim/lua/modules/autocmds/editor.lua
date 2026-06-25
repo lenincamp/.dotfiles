@@ -17,15 +17,6 @@ local function edit_netrw_hiding_list()
 end
 
 function M.setup()
-  vim.api.nvim_create_autocmd("FileType", {
-    group = vim.api.nvim_create_augroup("avante_no_numbers", { clear = true }),
-    pattern = { "Avante", "AvanteInput" },
-    callback = function()
-      vim.wo.number = false
-      vim.wo.relativenumber = false
-    end,
-  })
-
   vim.api.nvim_create_autocmd("TextYankPost", {
     pattern = "*",
     group = vim.api.nvim_create_augroup("YankHighlight", { clear = true }),

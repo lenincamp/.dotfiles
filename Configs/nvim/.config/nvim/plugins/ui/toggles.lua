@@ -124,7 +124,7 @@ end
 
 function M.toggle_zoom()
   if vim.t.pure_ui_zoom_tab then
-    vim.cmd("tabclose")
+    vim.cmd("tabclose!")
     return
   end
 

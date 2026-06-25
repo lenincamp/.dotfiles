@@ -33,8 +33,14 @@ code_actions.setup()
 -- (e.g. opening a previously-attached buffer via picker in a different window).
 local function apply_lsp_fold(winid, bufnr)
   if not vim.api.nvim_win_is_valid(winid) then return end
-  vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.lsp.foldexpr()", { win = winid })
-  vim.api.nvim_set_option_value("foldlevel", 99, { win = winid })
+  if not vim.api.nvim_buf_is_valid(bufnr) then return end
+  if vim.api.nvim_win_get_buf(winid) ~= bufnr then return end
+  if vim.bo[bufnr].buftype ~= "" then return end
+  if vim.wo[winid].diff then return end
+
+  vim.wo[winid][0].foldmethod = "expr"
+  vim.wo[winid][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
+  vim.wo[winid][0].foldlevel = 99
 end
 
 vim.api.nvim_create_autocmd("LspAttach", {

@@ -31,7 +31,6 @@ nnp.setup({
       number = false,
       relativenumber = false,
       signcolumn = "no",
-      statuscolumn = "",
       foldcolumn = "0",
       cursorline = false,
       cursorcolumn = false,
