@@ -6,61 +6,89 @@ local M = {}
 local shell = require("modules.util.shell")
 
 -- ──────────────────────────────────────────────────────────────────────────────
--- Paths
--- ──────────────────────────────────────────────────────────────────────────────
-
-local home = os.getenv("HOME") or ""
-local default_java17_home = home .. "/Library/Java/JavaVirtualMachines/azul-17.0.11/Contents/Home"
-
-local function java17_home()
-  return vim.env.PURE_JAVA17_HOME or default_java17_home
-end
-
-local function java17_env_prefix()
-  return "JAVA_HOME=" .. java17_home() .. " "
-end
-
--- ──────────────────────────────────────────────────────────────────────────────
 -- Test runners (Maven → tmux scratch)
 -- ──────────────────────────────────────────────────────────────────────────────
 
-local function get_class_name()
+local function ts_parent(match)
+  local ok, node = pcall(vim.treesitter.get_node)
+  if not ok then return nil end
+  while node do
+    if match(node:type()) then return node end
+    node = node:parent()
+  end
+end
+
+local function ts_name(node)
+  local name = node and node:child_by_field_name("name")
+  return name and vim.treesitter.get_node_text(name, 0) or nil
+end
+
+local function get_class_name_fallback()
   local bufnr = vim.api.nvim_get_current_buf()
   local current_pos = vim.api.nvim_win_get_cursor(0)
-  local pattern = "class%s+(%w+)"
   for i = current_pos[1], 1, -1 do
     local line = vim.api.nvim_buf_get_lines(bufnr, i - 1, i, false)[1]
-    local name = line:match(pattern)
+    local name = line:match("%f[%w]class%s+(%w+)")
+        or line:match("%f[%w]record%s+(%w+)")
+        or line:match("%f[%w]interface%s+(%w+)")
+        or line:match("%f[%w]enum%s+(%w+)")
     if name then return name end
   end
-  return "UnknownClass"
+  return nil
+end
+
+local function get_method_name_fallback()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local current_pos = vim.api.nvim_win_get_cursor(0)
+  for i = current_pos[1], 1, -1 do
+    local line = vim.api.nvim_buf_get_lines(bufnr, i - 1, i, false)[1]
+    local name = line:match("[%w_<>,%[%]%s]+%s+(%w+)%s*%([^;]*%)%s*[%{%w]*")
+    if name then return name end
+  end
+  return nil
+end
+
+local function get_class_name()
+  return ts_name(ts_parent(function(t)
+    return t == "class_declaration" or t == "record_declaration"
+        or t == "interface_declaration" or t == "enum_declaration"
+  end)) or get_class_name_fallback()
 end
 
 local function get_method_name()
-  return vim.fn.expand("<cword>")
-end
-
-local function maven_base(format)
-  return java17_env_prefix()
-    .. format
-    .. " -DfailIfNoTests=false -Djacoco.skip=true"
-    .. " -Dmaven.javadoc.skip=true -Dmaven.site.skip=true"
-    .. " -Dsurefire.useFile=false -DtrimStackTrace=false"
-    .. " -Dmaven.source.skip=true -o -B -pl api -am"
+  return ts_name(ts_parent(function(t) return t == "method_declaration" end))
+      or get_method_name_fallback()
 end
 
 function M.run_test_method(is_debug)
-  local base = maven_base("mvn test -Dtest=%s#%s")
-  local command = is_debug and (base .. " -Dmaven.surefire.debug") or base
-  command = string.format(command, get_class_name(), get_method_name())
-    .. ' | grep -A 10 -B 1 "T E S T S"'
+  local class_name = get_class_name()
+  local method_name = get_method_name()
+  if not class_name or not method_name then
+    vim.notify("No Java test method found under cursor", vim.log.levels.WARN)
+    return
+  end
+
+  local command = require("jdtls-nvim").maven().test_method(class_name, method_name, {
+    bufnr = 0,
+    debug = true,
+    debug_suspend = is_debug == true,
+  })
   shell.tmux_send_keys("scratch", command)
   vim.notify("executing: " .. command, vim.log.levels.INFO)
 end
 
 function M.run_test_class()
-  local command = string.format(maven_base("mvn test -Dtest=%s"), get_class_name())
-    .. ' | grep -A 100 "T E S T S" | grep -B 100 "BUILD SUCCESS"'
+  local class_name = get_class_name()
+  if not class_name then
+    vim.notify("No Java test class found under cursor", vim.log.levels.WARN)
+    return
+  end
+
+  local command = require("jdtls-nvim").maven().test_class(class_name, {
+    bufnr = 0,
+    debug = true,
+    debug_suspend = false,
+  })
   shell.tmux_send_keys("scratch", command)
   vim.notify("executing Test Class: " .. command, vim.log.levels.INFO)
 end

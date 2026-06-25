@@ -88,7 +88,7 @@ return vim.list_extend(csync_themes, {
     "saghen/blink.cmp",
     event = "InsertEnter",
     cond = not_diff,
-    dependencies = { "saghen/blink.lib", "milanglacier/minuet-ai.nvim", "rafamadriz/friendly-snippets" },
+    dependencies = { "saghen/blink.lib", "Kaiser-Yang/blink-cmp-avante", "milanglacier/minuet-ai.nvim", "rafamadriz/friendly-snippets" },
     config = cfg("editor/blink-cmp.lua"),
   },
   {
@@ -262,6 +262,8 @@ return vim.list_extend(csync_themes, {
 
   {
     "yetone/avante.nvim",
+    build = "make",
+    version = false,
     keys = {
       { "<leader>aa", mode = { "n", "x" }, desc = "Avante: ask" },
       { "<leader>at", desc = "Avante: toggle" },

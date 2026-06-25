@@ -1,5 +1,9 @@
+local function avante_filetype(ft)
+  return ft == "Avante" or ft == "AvanteInput" or ft == "AvantePromptInput"
+end
+
 local function text_like_filetype(ft)
-  return ft == "Avante"
+  return avante_filetype(ft)
     or ft == "markdown"
     or ft == "gitcommit"
     or ft == "NeogitCommitMessage"
@@ -81,6 +85,9 @@ require("blink.cmp").setup({
     },
     menu = {
       auto_show = function()
+        if vim.bo.filetype == "AvanteInput" then
+          return true
+        end
         return not intrusive_context()
       end,
       draw = {
@@ -205,6 +212,7 @@ require("blink.cmp").setup({
   sources = {
     default = completion_sources,
     per_filetype = {
+      AvanteInput = { "avante" },
       mysql = { "snippets", "dadbod", "buffer" },
       plsql = { "snippets", "dadbod", "buffer" },
       sql = { "snippets", "dadbod", "buffer" },
@@ -216,6 +224,12 @@ require("blink.cmp").setup({
       dadbod = {
         name = "Dadbod",
         module = "vim_dadbod_completion.blink",
+      },
+      avante = {
+        name = "Avante",
+        module = "blink-cmp-avante",
+        score_offset = 1000,
+        opts = {},
       },
       minuet = {
         name         = "󰋦",
@@ -230,7 +244,7 @@ require("blink.cmp").setup({
       -- Disable path completions inside Avante buffers
       path = {
         enabled = function()
-          return vim.bo.filetype ~= "Avante"
+          return not avante_filetype(vim.bo.filetype)
         end,
       },
       snippets = {

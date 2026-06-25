@@ -37,6 +37,13 @@ local function has_avante_provider(name)
   return #vim.api.nvim_get_runtime_file("lua/avante/providers/" .. name .. ".lua", false) > 0
 end
 
+local function has_bedrock_env()
+  return vim.env.BEDROCK_KEYS ~= nil
+    or vim.env.AWS_PROFILE ~= nil
+    or vim.env.AWS_REGION ~= nil
+    or vim.env.AWS_DEFAULT_REGION ~= nil
+end
+
 function M.context()
   load_claude_settings_env()
 
@@ -113,6 +120,11 @@ function M.context()
 
   return {
     claude_api_key_name = claude_api_key_name,
+    claude_model = vim.env.AVANTE_CLAUDE_MODEL or "claude-sonnet-4-6",
+    has_bedrock = has_avante_provider("bedrock") and has_bedrock_env(),
+    bedrock_model = vim.env.AVANTE_BEDROCK_MODEL or "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+    aws_region = vim.env.AWS_REGION or vim.env.AWS_DEFAULT_REGION,
+    aws_profile = vim.env.AWS_PROFILE,
     has_copilot_provider = has_avante_provider("copilot"),
     has_copilot_auth = has_copilot_auth(),
     enable_copilot = vim.env.AVANTE_ENABLE_COPILOT == "1",
@@ -123,19 +135,14 @@ function M.context()
 end
 
 function M.setup_options(state)
-  return {
-    provider = "claude",
-    auto_suggestions_provider = nil,
-    instructions_file = "avante.md",
-    mode = "agentic",
-
+  local opts = {
     providers = {
       copilot = {
         hide_in_model_selector = not (state.has_copilot_provider and state.has_copilot_auth and state.enable_copilot),
       },
       claude = {
         endpoint = vim.env.ANTHROPIC_BASE_URL or "https://api.anthropic.com",
-        model = "claude-sonnet-4-6",
+        model = state.claude_model,
         api_key_name = state.claude_api_key_name,
         timeout = 60000,
         context_window = 200000,
@@ -144,81 +151,39 @@ function M.setup_options(state)
           max_tokens = 64000,
         },
       },
-      ["claude-opus-4-6"] = {
-        __inherited_from = "claude",
-        model = "claude-opus-4-6",
-        timeout = 90000,
-        extra_request_body = {
-          temperature = 0.2,
-          max_tokens = 32000,
-        },
-      },
-      ["claude-opus"] = {
-        __inherited_from = "claude",
-        model = "claude-opus-4-8",
-        timeout = 90000,
-        extra_request_body = {
-          temperature = 0.2,
-          max_tokens = 32000,
-        },
-      },
-      ["claude-haiku"] = {
-        __inherited_from = "claude",
-        model = "claude-haiku-4-5-20251001",
-        timeout = 30000,
-        extra_request_body = {
-          temperature = 0.1,
-          max_tokens = 8192,
-        },
-      },
-      gemini = {
-        endpoint = "https://generativelanguage.googleapis.com/v1beta/models",
-        model = "gemini-2.5-pro-preview-05-06",
-        timeout = 60000,
-        context_window = 1048576,
-        use_ReAct_prompt = true,
-        extra_request_body = {
-          generationConfig = {
-            temperature = 0.2,
-          },
-        },
-      },
     },
 
     acp_providers = state.acp_providers,
-    input = { provider = "native" },
-    selector = { provider = "native" },
 
     windows = {
-      edit = { border = "rounded", start_insert = true },
-      ask = { border = "rounded", start_insert = true, floating = true },
+      ask = { floating = true },
     },
 
     behaviour = {
-      auto_suggestions = false,
       auto_set_keymaps = false,
       auto_approve_tool_permissions = false,
-      auto_add_current_file = true,
-      confirmation_ui_style = "inline_buttons",
-      acp_follow_agent_locations = true,
-    },
-
-    suggestion = {
-      debounce = 1200,
-      throttle = 1200,
     },
   }
+
+  if state.has_bedrock then
+    opts.providers.bedrock = {
+      model = state.bedrock_model,
+      aws_region = state.aws_region,
+      aws_profile = state.aws_profile,
+    }
+  end
+
+  return opts
 end
 
 function M.provider_items(state)
   local items = {
-    { name = "claude",          label = "claude          │ claude-sonnet-4-6       Sonnet 4.6 · fast & efficient" },
-    { name = "claude-opus-4-6", label = "claude-opus-4-6 │ claude-opus-4-6         Opus 4.6 · custom" },
-    { name = "claude-opus",     label = "claude-opus     │ claude-opus-4-8         Opus 4.8 · best for complex tasks" },
-    { name = "claude-haiku",    label = "claude-haiku    │ claude-haiku-4-5        Haiku 4.5 · fastest & cheapest" },
-    { name = "gemini",          label = "gemini          │ gemini-2.5-pro          direct API" },
+    { name = "claude", label = "claude       │ API/proxy                      " .. state.claude_model },
   }
 
+  if state.has_bedrock then
+    table.insert(items, { name = "bedrock", label = "bedrock      │ AWS Bedrock                    " .. state.bedrock_model })
+  end
   if state.has_claude_code then
     table.insert(items, { name = "claude-code", label = "claude-code    │ ACP agent                      (terminal)" })
   end

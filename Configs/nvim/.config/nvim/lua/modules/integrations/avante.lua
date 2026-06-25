@@ -1,6 +1,4 @@
 local M = {}
-local lazy_bootstrap = require("modules.bootstrap.lazy")
-local build = require("modules.integrations.avante.build")
 local core = require("modules.integrations.avante.core")
 local keymaps = require("modules.integrations.avante.keymaps")
 local providers = require("modules.integrations.avante.providers")
@@ -14,20 +12,6 @@ local setup_done = false
 function M.setup()
   if setup_done then
     return true
-  end
-
-  if not build.ensure_ready(function(ok)
-    if not ok or setup_done then
-      return
-    end
-
-    if lazy_bootstrap.load("avante.nvim") then
-      return
-    end
-
-    pcall(M.setup)
-  end) then
-    return false
   end
 
   local avante = core.get()
