@@ -44,11 +44,22 @@ opt.grepprg = "rg --vimgrep --smart-case --hidden --glob !.git"
 opt.grepformat = "%f:%l:%c:%m"
 
 -- ── Folding ───────────────────────────────────────────────────────────────────
--- Global: treesitter for all buffers.
--- LSP buffers override per-buffer in lsp.lua via LspAttach (PureLspFolding).
+-- Single global foldexpr that dispatches per-buffer: LSP foldingRange when the
+-- buffer has a capable client (flag set in lsp.lua), otherwise treesitter.
+-- Deciding at eval time (not via window-local overrides) avoids the pre-attach
+-- race where an inherited lsp-foldexpr wedges the folding state on a buffer
+-- whose client has not attached yet.
 vim.treesitter.language.register("tsx", { "javascriptreact", "typescriptreact" })
+
+function _G.SmartFoldexpr()
+  if vim.b._has_lsp_folding then
+    return vim.lsp.foldexpr(vim.v.lnum)
+  end
+  return vim.treesitter.foldexpr(vim.v.lnum)
+end
+
 opt.foldmethod = "expr"
-opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldexpr = "v:lua.SmartFoldexpr()"
 opt.foldlevel = 99 -- keep folds open by default
 opt.foldlevelstart = 99
 opt.foldenable = true

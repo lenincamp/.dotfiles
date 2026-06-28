@@ -28,41 +28,52 @@ registry.set_lsp_api({
 diagnostics.setup()
 code_actions.setup()
 
--- LSP folding: override treesitter foldexpr per-buffer when server supports foldingRange.
--- BufWinEnter re-applies when the buffer enters a window where LspAttach already ran
--- (e.g. opening a previously-attached buffer via picker in a different window).
-local function apply_lsp_fold(winid, bufnr)
-  if not vim.api.nvim_win_is_valid(winid) then return end
-  if not vim.api.nvim_buf_is_valid(bufnr) then return end
-  if vim.api.nvim_win_get_buf(winid) ~= bufnr then return end
-  if vim.bo[bufnr].buftype ~= "" then return end
-  if vim.wo[winid].diff then return end
+-- LSP folding: flip a per-buffer flag that the global SmartFoldexpr (configs.lua)
+-- reads to choose LSP foldingRange over treesitter. foldexpr stays a single global
+-- setting; the flag is the only source of truth for "this buffer uses LSP folds".
+local fold_group = vim.api.nvim_create_augroup("PureLspFolding", { clear = true })
 
-  vim.wo[winid][0].foldmethod = "expr"
-  vim.wo[winid][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
-  vim.wo[winid][0].foldlevel = 99
+local function buffer_has_folding(bufnr)
+  for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
+    if client:supports_method("textDocument/foldingRange", bufnr) then
+      return true
+    end
+  end
+  return false
+end
+
+-- Recompute folds in every window showing bufnr (the flag flip alone does not
+-- invalidate already-computed treesitter folds).
+local function refresh_folds(bufnr)
+  for _, winid in ipairs(vim.fn.win_findbuf(bufnr)) do
+    vim.api.nvim_win_call(winid, function()
+      if vim.wo.foldmethod == "expr" then
+        vim.cmd("silent! normal! zx")
+      end
+    end)
+  end
 end
 
 vim.api.nvim_create_autocmd("LspAttach", {
-  group = vim.api.nvim_create_augroup("PureLspFolding", { clear = true }),
+  group = fold_group,
   callback = function(ev)
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
     if client and client:supports_method("textDocument/foldingRange", ev.buf) then
-      for _, winid in ipairs(vim.fn.win_findbuf(ev.buf)) do
-        apply_lsp_fold(winid, ev.buf)
-      end
+      vim.b[ev.buf]._has_lsp_folding = true
+      refresh_folds(ev.buf)
     end
   end,
 })
 
-vim.api.nvim_create_autocmd("BufWinEnter", {
-  group = "PureLspFolding",
+vim.api.nvim_create_autocmd("LspDetach", {
+  group = fold_group,
   callback = function(ev)
-    for _, client in ipairs(vim.lsp.get_clients({ bufnr = ev.buf })) do
-      if client:supports_method("textDocument/foldingRange", ev.buf) then
-        apply_lsp_fold(vim.api.nvim_get_current_win(), ev.buf)
-        break
+    -- The detaching client is still listed during the event; recheck next tick.
+    vim.schedule(function()
+      if vim.api.nvim_buf_is_valid(ev.buf) and not buffer_has_folding(ev.buf) then
+        vim.b[ev.buf]._has_lsp_folding = nil
+        refresh_folds(ev.buf)
       end
-    end
+    end)
   end,
 })

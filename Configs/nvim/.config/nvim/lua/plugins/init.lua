@@ -84,7 +84,10 @@ return vim.list_extend(csync_themes, {
     config = function()
       local csync = require("colorscheme-sync")
       if not csync._initialized then
-        csync.setup({ system_sync = true })
+        csync.setup({
+          system_sync = true,
+          delta_config_path = vim.fn.expand("~/.dotfiles/Configs/gitconfig/delta-generated.gitconfig"),
+        })
       end
       local target = csync.current_theme(vim.g.pure_colorscheme)
       csync.apply(target, { notify = false, sync_external = "defer" })

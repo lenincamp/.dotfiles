@@ -84,6 +84,7 @@ require("blink.cmp").setup({
       auto_brackets = { enabled = true },
     },
     menu = {
+      border = "rounded",
       auto_show = function()
         if vim.bo.filetype == "AvanteInput" then
           return true
