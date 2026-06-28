@@ -28,6 +28,7 @@ opt.cursorlineopt = "number" -- highlight only the line-number column, not the f
 opt.scrolloff = 8
 opt.sidescrolloff = 8
 opt.smoothscroll = true
+opt.jumpoptions = "clean,view" -- 0.12: restore window view on jumps and tagstack pops
 opt.fillchars = { fold = " ", foldopen = "▾", foldclose = "▸", foldsep = " ", eob = " " }
 opt.inccommand = "split"
 opt.undodir = vim.fn.expand("~/.vim/undodir")
@@ -136,6 +137,7 @@ local diffopt = {
   "algorithm:histogram", -- better block matching than Myers for code
   "indent-heuristic",    -- indentation-aware diff
   "linematch:120",       -- stronger moved-line detection for large refactors
+  "inline:word",         -- 0.12: word-level change highlighting (merges adjacent blocks)
 }
 opt.diffopt:append(table.concat(diffopt, ","))
 
@@ -146,10 +148,16 @@ if vim.fn.getenv("TERM_PROGRAM") == "ghostty" then
   opt.titlestring = "%{fnamemodify(getcwd(), ':t')}"
 end
 
--- ── Statusline baseline (hidden by default, winbar carries file context) ──────
+-- ── Statusline (native 0.12 default: file, diagnostics, busy ◐, ruler) ────────
 
 opt.laststatus = 2
-opt.statusline = " "
-opt.fillchars:append({ stl = "─", stlnc = "─" })
+
+-- ── Experimental native message/cmdline UI (Neovim 0.12 "ui2") ────────────────
+-- Removes "Press ENTER" interruptions, highlights the cmdline as you type, and
+-- exposes the pager as a real buffer/window (open full message history with g<).
+-- Guarded so it is a no-op on older Nvim or if the private module path changes.
+pcall(function()
+  require("vim._core.ui2").enable()
+end)
 
 require("config.editor")

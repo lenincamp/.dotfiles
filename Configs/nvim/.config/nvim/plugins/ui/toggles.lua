@@ -23,11 +23,6 @@ function M.toggle_tabline()
   notify("Tabline " .. bool_text(chrome.tabline_enabled()))
 end
 
-function M.cycle_tabline_mode()
-  chrome.cycle_tabline_mode()
-  notify("Tabline mode: " .. chrome.tabline_mode())
-end
-
 function M.toggle_winbar()
   chrome.toggle_winbar()
   notify("Winbar " .. bool_text(chrome.winbar_enabled()))
@@ -39,10 +34,6 @@ end
 
 function M.tabline_enabled()
   return chrome.tabline_enabled()
-end
-
-function M.tabline_mode()
-  return chrome.tabline_mode()
 end
 
 function M.winbar_enabled()
@@ -178,19 +169,19 @@ function M.reload_config()
   local config = vim.fn.stdpath("config")
   for name in pairs(package.loaded) do
     if
-      name == "configs"
-      or name == "plugins"
-      or name == "lsp"
-      or name == "keymaps"
-      or name == "statusline"
-      or name == "autocmds"
-      or name == "java"
-      or name:match("^modules%.")
-      or name:match("^lang%.")
-      or name:match("^config%.")
-      or name:match("^pure%-ui")
-      or name:match("^picker")
-      or name:match("^colorscheme%-sync")
+        name == "configs"
+        or name == "plugins"
+        or name == "lsp"
+        or name == "keymaps"
+        or name == "statusline"
+        or name == "autocmds"
+        or name == "java"
+        or name:match("^modules%.")
+        or name:match("^lang%.")
+        or name:match("^config%.")
+        or name:match("^pure%-ui")
+        or name:match("^picker")
+        or name:match("^colorscheme%-sync")
     then
       package.loaded[name] = nil
     end

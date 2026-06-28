@@ -110,7 +110,14 @@ function M.setup()
         [diagnostic.severity.HINT] = diag_icons.Hint,
       },
     },
-    virtual_text = false,
+    virtual_text = {
+      spacing = 2,
+      source = "if_many",
+      prefix = function(diag)
+        local severity_name = diagnostic.severity[diag.severity]
+        return diag_icons[severity_name] or "● "
+      end,
+    },
     virtual_lines = false,
     underline = true,
     update_in_insert = false,

@@ -56,7 +56,6 @@ function M.items()
     action("Toggle render markdown", "UI", function() ui.toggle_render_markdown() end),
     action("Toggle statusline", "UI", function() ui.toggle_statusline() end),
     action("Toggle tabline", "UI", function() ui.toggle_tabline() end),
-    action("Cycle tabline mode", "UI", function() ui.cycle_tabline_mode() end),
     action("Toggle winbar", "UI", function() ui.toggle_winbar() end),
     action("Toggle spelling", "UI", function() ui.toggle_option("spell", "Spelling") end),
     action("Toggle relative number", "UI", function() ui.toggle_window_option("relativenumber", "Relative Number") end),
