@@ -11,7 +11,7 @@ args = ["-lc", "exec tmux new-session -A -s dev"]
 
 [window]
 decorations = "Buttonless"
-opacity = 0.95
+opacity = 0.85
 # blur = true
 startup_mode = "Maximized"
 dynamic_padding = true
@@ -20,20 +20,21 @@ padding.x = 0
 padding.y = 0
 
 [font]
-size = 15.5
+size = 16
 offset.y = 4
 # offset.x = -1
 offset.x = 0
 # offset.y = 1
-normal.family = "Monoflow NF"
+# normal.family = "Monoflow NF"
 # normal.family = "Dank Mono NF"
 # normal.family = "Consola Mono NF"
 # normal.family = "Consolas NF"
 # normal.family = "FiraMono Nerd Font" #installed by brew 
 # normal.family = "0xProto Nerd Font"
 
-# normal.family = "Maple Mono NF" #installed by brew | web browser
+normal.family = "Maple Mono NF" #installed by brew | web browser
 # normal.style = "ExtraLight"
+bold.style =  "Light"
 # normal.family = "Monaspice Rn NF"
 # normal.style = "Light"
 # normal.family = "VictorMono Nerd Font"
@@ -49,6 +50,6 @@ history = 10000
 save_to_clipboard = true
 
 [colors.primary]
-background = "#fdf6e3"
-foreground = "#586e75"
+background = "#14161b"
+foreground = "#e0e2ea"
 

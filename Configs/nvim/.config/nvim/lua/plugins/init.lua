@@ -14,20 +14,9 @@ local function p(repo, name, opts)
   return ps.spec(repo, name, opts)
 end
 
-local function dap_lazy_keys()
-  local mod = ps.dofile_lua("dap-controls.nvim", "lua/dap-controls/keymaps.lua")
-  if mod and mod.lazy_keys then
-    return mod.lazy_keys()
-  end
-  return {}
-end
-
-local function picker_lazy_keys()
-  local mod = ps.dofile_lua("picker.nvim", "lua/picker/user_keymaps.lua")
-  if mod and mod.lazy_keys then
-    return mod.lazy_keys()
-  end
-  return {}
+local function lazy_keys(name, relpath)
+  local mod = ps.dofile_lua(name, relpath)
+  return (mod and mod.lazy_keys) and mod.lazy_keys() or {}
 end
 
 local diff_startup = vim.tbl_contains(vim.v.argv or {}, "-d")
@@ -41,13 +30,13 @@ return vim.list_extend(csync_themes, {
   { "nvim-lua/plenary.nvim", lazy = true },
   { "MunifTanjim/nui.nvim", lazy = true },
   p("lenincamp/picker.nvim", "picker.nvim", {
-    lazy = false,
+    lazy = true,
     dependencies = { "preview.nvim" },
-    keys = picker_lazy_keys(),
+    keys = lazy_keys("picker.nvim", "lua/picker/user_keymaps.lua"),
     config = cfg("editor/picker.lua"),
   }),
   p("lenincamp/preview.nvim", "preview.nvim", {
-    lazy = false,
+    lazy = true,
   }),
   p("lenincamp/pure-ui.nvim", "pure-ui.nvim", {
     lazy = false,
@@ -99,7 +88,12 @@ return vim.list_extend(csync_themes, {
     "saghen/blink.cmp",
     event = "InsertEnter",
     cond = not_diff,
-    dependencies = { "saghen/blink.lib", "Kaiser-Yang/blink-cmp-avante", "milanglacier/minuet-ai.nvim", "rafamadriz/friendly-snippets" },
+    dependencies = {
+      "saghen/blink.lib",
+      "Kaiser-Yang/blink-cmp-avante",
+      "milanglacier/minuet-ai.nvim",
+      "rafamadriz/friendly-snippets",
+    },
     config = cfg("editor/blink-cmp.lua"),
   },
   {
@@ -239,7 +233,7 @@ return vim.list_extend(csync_themes, {
   }),
   {
     "mfussenegger/nvim-dap",
-    keys = dap_lazy_keys(),
+    keys = lazy_keys("dap-controls.nvim", "lua/dap-controls/keymaps.lua"),
     cmd = {
       "DapContinue",
       "DapRunToCursor",
@@ -296,5 +290,10 @@ return vim.list_extend(csync_themes, {
     cmd = { "AvanteAsk", "AvanteChat", "AvanteToggle" },
     dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
     config = cfg("ai/avante.lua"),
+  },
+  {
+    "stevearc/quicker.nvim",
+    ft = "qf",
+    opts = {},
   },
 })
