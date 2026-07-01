@@ -1,68 +1,34 @@
-local core = require("modules.integrations.avante.core")
-local files = require("modules.integrations.avante.files")
-local providers = require("modules.integrations.avante.providers")
-
 local M = {}
 
-local function pick_provider(state)
-  local ok_cfg, cfg = pcall(require, "avante.config")
-  local current = (ok_cfg and cfg.provider) or "?"
-
-  require("picker").select_items(providers.provider_items(state), {
-    prompt = "Avante provider  (active: " .. current .. ")",
-    scope = "global",
-    search_threshold = 0,
-    input_mode = true,
-    format_item = function(item)
-      return item.label
-    end,
-  }, function(choice)
-    if choice then
-      require("avante.api").switch_provider(choice.name)
-    end
-  end)
-end
-
-function M.setup(state)
+function M.setup()
   local map = vim.keymap.set
+  local avante = require("avante")
+  local api    = require("avante.api")
 
-  map({ "n", "x" }, "<leader>aa", function()
-    require("avante.api").ask()
-  end, { desc = "Avante: ask" })
+  map({ "n", "v" }, "<leader>aa", api.ask,                                    { desc = "Avante: ask" })
+  map("v",          "<leader>ae", api.edit,                                   { desc = "Avante: edit" })
+  map("n",          "<leader>ar", api.refresh,                                { desc = "Avante: refresh" })
+  map("n",          "<leader>af", api.focus,                                  { desc = "Avante: focus" })
+  map("n",          "<leader>aS", api.stop,                                   { desc = "Avante: stop" })
+  map({ "n", "v" }, "<leader>az", api.zen_mode,                               { desc = "Avante: zen mode" })
+  map("n",          "<leader>a?", api.select_model,                           { desc = "Avante: select model" })
+  map("n",          "<leader>ah", api.select_history,                         { desc = "Avante: history" })
+  map("n",          "<leader>aM", api.select_acp_model,                       { desc = "Avante: select ACP model" })
+  map("n",          "<leader>ai", api.select_acp_mode,                        { desc = "Avante: select ACP mode" })
+  map("n",          "<leader>aB", api.add_buffer_files,                       { desc = "Avante: add all buffers" })
+  map("n",          "<leader>at", function() avante.toggle() end,             { desc = "Avante: toggle" })
+  map("n",          "<leader>ad", function() avante.toggle.debug() end,       { desc = "Avante: toggle debug" })
+  map("n",          "<leader>as", function() avante.toggle.suggestion() end,  { desc = "Avante: toggle suggestion" })
+  map("n",          "<leader>aR", function() require("avante.repo_map").show() end, { desc = "Avante: repo map" })
+  map("n",          "<leader>ac", function()
+    local sidebar = avante.get()
+    if sidebar then sidebar.file_selector:add_current_buffer() end
+  end, { desc = "Avante: add current buffer" })
 
-  map("n", "<leader>at", function()
-    local avante = core.get()
-    if not avante then
-      return
-    end
-
-    avante.toggle()
-  end, { desc = "Avante: toggle" })
-
-  map({ "n", "x" }, "<leader>ae", function()
-    require("avante.api").edit()
-  end, { desc = "Avante: edit" })
-
-  map("n", "<leader>an", "<cmd>AvanteChatNew<CR>", { desc = "Avante: new chat" })
-  map("n", "<leader>ah", "<cmd>AvanteHistory<CR>", { desc = "Avante: history" })
-  map("n", "<leader>aS", "<cmd>AvanteStop<CR>", { desc = "Avante: stop" })
-  map("n", "<leader>ar", "<cmd>AvanteRefresh<CR>", { desc = "Avante: refresh" })
-  map("n", "<leader>af", "<cmd>AvanteFocus<CR>", { desc = "Avante: focus" })
-  map("n", "<leader>a?", function()
-    pick_provider(state)
-  end, { desc = "Avante: pick provider/model" })
-  map("n", "<leader>aM", function()
-    providers.pick_model(state)
-  end, { desc = "Avante: pick model" })
-  map("n", "<leader>aP", "<cmd>AvanteSwitchProvider<CR>", { desc = "Avante: provider" })
-  map("n", "<leader>aC", "<cmd>AvanteClear<CR>", { desc = "Avante: clear" })
-  map("n", "<leader>aR", "<cmd>AvanteShowRepoMap<CR>", { desc = "Avante: repo map" })
-  map("n", "<leader>ac", files.add_current_buffer, { desc = "Avante: add current file" })
-  map("n", "<leader>aB", files.add_open_buffers, { desc = "Avante: add open buffers" })
-
-  map("n", "<leader>az", function()
-    require("avante.api").zen_mode()
-  end, { desc = "Avante: zen mode" })
+  -- custom
+  map("n", "<leader>an", "<cmd>AvanteChatNew<CR>",        { desc = "Avante: new chat" })
+  map("n", "<leader>aP", "<cmd>AvanteSwitchProvider<CR>", { desc = "Avante: switch provider" })
+  map("n", "<leader>aC", "<cmd>AvanteClear<CR>",          { desc = "Avante: clear" })
 end
 
 return M

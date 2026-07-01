@@ -17,6 +17,19 @@ local function eslint_settings(root_dir)
   local settings = {
     validate = "on",
     packageManager = "npm",
+    problems = {
+      shortenToSingleLine = false,
+    },
+    rulesCustomizations = {},
+    codeAction = {
+      disableRuleComment = {
+        enable = true,
+        location = "separateLine",
+      },
+      showDocumentation = {
+        enable = true,
+      },
+    },
     nodePath = vim.NIL,
     runtime = vim.NIL,
     execArgv = vim.NIL,

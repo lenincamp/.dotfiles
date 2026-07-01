@@ -93,7 +93,13 @@ return vim.list_extend(csync_themes, {
       "Kaiser-Yang/blink-cmp-avante",
       "milanglacier/minuet-ai.nvim",
       "rafamadriz/friendly-snippets",
+      "mayromr/blink-cmp-dap"
     },
+    build = function()
+      -- build the fuzzy matcher, optionally add a timeout to `pwait(timeout_ms)`
+      -- you can use `gb` in `:Lazy` to rebuild the plugin as needed
+      require("blink.cmp").build():pwait()
+    end,
     config = cfg("editor/blink-cmp.lua"),
   },
   {
@@ -273,19 +279,22 @@ return vim.list_extend(csync_themes, {
       { "<leader>aa", mode = { "n", "x" }, desc = "Avante: ask" },
       { "<leader>at", desc = "Avante: toggle" },
       { "<leader>ae", mode = { "n", "x" }, desc = "Avante: edit" },
-      { "<leader>an", desc = "Avante: new ask" },
+      { "<leader>an", desc = "Avante: new chat" },
       { "<leader>ah", desc = "Avante: history" },
       { "<leader>aS", desc = "Avante: stop" },
       { "<leader>ar", desc = "Avante: refresh" },
       { "<leader>af", desc = "Avante: focus" },
       { "<leader>a?", desc = "Avante: select model" },
       { "<leader>aM", desc = "Avante: select ACP model" },
-      { "<leader>aP", desc = "Avante: select ACP mode" },
+      { "<leader>ai", desc = "Avante: select ACP mode" },
+      { "<leader>aP", desc = "Avante: switch provider" },
       { "<leader>aC", desc = "Avante: clear" },
       { "<leader>aR", desc = "Avante: repo map" },
       { "<leader>ac", desc = "Avante: add current buffer" },
       { "<leader>aB", desc = "Avante: add all buffers" },
       { "<leader>az", desc = "Avante: zen mode" },
+      { "<leader>ad", desc = "Avante: toggle debug" },
+      { "<leader>as", desc = "Avante: toggle suggestion" },
     },
     cmd = { "AvanteAsk", "AvanteChat", "AvanteToggle" },
     dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },

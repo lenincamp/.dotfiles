@@ -19,15 +19,8 @@ function M.setup()
     return false
   end
 
-  local state = providers.context()
-
-  avante.setup(providers.setup_options(state))
-
-  if not (state.has_copilot_provider and state.has_copilot_auth and state.enable_copilot) then
-    require("avante.config").providers.copilot = nil
-  end
-
-  keymaps.setup(state)
+  avante.setup(providers.setup_options())
+  keymaps.setup()
   setup_done = true
   return true
 end
