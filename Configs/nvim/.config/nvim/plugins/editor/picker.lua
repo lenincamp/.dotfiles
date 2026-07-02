@@ -114,7 +114,7 @@ require("picker").setup({
     },
     on_restore_window = function(win)
       pcall(function()
-        require("picker.gutter").apply_window(win)
+        require("config.gutter").apply_window(win)
       end)
     end,
   },

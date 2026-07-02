@@ -1,3 +1,6 @@
 require("modules.autocmds.editor").setup()
 require("modules.autocmds.diff").setup()
 require("modules.autocmds.large_files").setup()
+vim.api.nvim_create_user_command("TD", function()
+  require("floatodo").floatodo_toggle()
+end, { desc = "Toggle Floating TODO" })

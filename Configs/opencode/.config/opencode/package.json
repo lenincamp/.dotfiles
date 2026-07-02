@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@mumme-it/opencode-caveman": "^0.2.0",
+    "@opencode-ai/plugin": "1.17.11",
+    "karpathy-guidelines": "github:Kiruno-lz/andrej-karpathy-skills"
+  }
+}

@@ -12,12 +12,11 @@ function M.use_local()
   return vim.g.pure_local_plugins == true
 end
 
---- Prepend rtp for plugins needed before lazy.setup (boot gutter/highlights).
+--- Prepend rtp for plugins needed before lazy.setup (highlights).
 function M.prepend_rtp_if_local()
   if not M.use_local() then
     return
   end
-  vim.opt.rtp:prepend(M.local_root .. "/picker.nvim")
   vim.opt.rtp:prepend(M.local_root .. "/colorscheme-sync.nvim")
 end
 

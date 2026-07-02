@@ -29,3 +29,6 @@ Configs/zsh/zsh_config/local-secrets.zsh
 
 # system-settings exports (review before committing)
 system-settings/defaults/*.plist
+node_modules/
+dist/
+output/

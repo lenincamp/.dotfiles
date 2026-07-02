@@ -173,29 +173,30 @@ require("blink.cmp").setup({
       claude = "󰚩",
     },
   },
-
   -- ── Cmdline completion ────────────────────────────────────────────────────
-
   cmdline = {
-    keymap = {
-      preset = "cmdline",
-      ["<Left>"] = false,
-      ["<Right>"] = false,
-    },
-    -- Must be set explicitly: the top-level sources.default override below
-    -- also replaces blink's built-in cmdline default ({ buffer, cmdline }),
-    -- which otherwise leaves the real `cmdline` source disabled for `:`.
-    sources = { default = { "buffer", "cmdline" } },
-    completion = {
-      list = { selection = { preselect = false } },
-      menu = {
-        auto_show = function()
-          return vim.fn.getcmdtype() == ":"
-        end,
-      },
-      ghost_text = { enabled = true },
-    },
+    enabled = false,
   },
+  -- cmdline = {
+  --   keymap = {
+  --     preset = "cmdline",
+  --     ["<Left>"] = false,
+  --     ["<Right>"] = false,
+  --   },
+  --   -- Must be set explicitly: the top-level sources.default override below
+  --   -- also replaces blink's built-in cmdline default ({ buffer, cmdline }),
+  --   -- which otherwise leaves the real `cmdline` source disabled for `:`.
+  --   sources = { default = { "buffer", "cmdline" } },
+  --   completion = {
+  --     list = { selection = { preselect = false } },
+  --     menu = {
+  --       auto_show = function()
+  --         return vim.fn.getcmdtype() == ":"
+  --       end,
+  --     },
+  --     ghost_text = { enabled = true },
+  --   },
+  -- },
   sources = {
     default = COMPLETION_SOURCES,
     per_filetype = {
@@ -243,9 +244,9 @@ require("blink.cmp").setup({
       -- Undefined otherwise, which defaults to score_offset = 0 and ties
       -- with `buffer` in cmdline mode — real command/argument completions
       -- must outrank buffer words there.
-      cmdline = {
-        score_offset = 20,
-      },
+      -- cmdline = {
+      --   score_offset = 20,
+      -- },
       avante = {
         name = "Avante",
         module = "blink-cmp-avante",

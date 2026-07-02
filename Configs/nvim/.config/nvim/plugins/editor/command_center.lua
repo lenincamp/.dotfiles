@@ -48,7 +48,6 @@ function M.items()
     action("Commands", "Search", function() p.commands() end),
     action("Help", "Search", function() p.help() end),
 
-    action("Colorscheme", "UI", function() require("colorscheme-sync").select() end),
     action("Toggle dark background", "UI", function() ui.toggle_dark_background() end),
     action("Toggle transparency", "UI", function() ui.toggle_transparent_background() end),
     action("Toggle diagnostics", "UI", function() ui.toggle_diagnostics() end),

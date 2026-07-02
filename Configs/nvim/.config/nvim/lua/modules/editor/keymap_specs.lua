@@ -488,15 +488,6 @@ local global_specs = {
   },
   {
     mode = "n",
-    lhs = "<leader>uC",
-    desc = "Select colorscheme",
-    group = "UI",
-    action = function()
-      require("colorscheme-sync").select()
-    end,
-  },
-  {
-    mode = "n",
     lhs = "<leader>uz",
     desc = "Toggle Zen Mode",
     group = "UI",
@@ -812,6 +803,15 @@ local window_list_tab_specs = {
   { mode = "n", lhs = "<leader><tab>]", desc = "Next Tab", group = "Tabs", rhs = "<cmd>tabnext<cr>" },
   { mode = "n", lhs = "<leader><tab>d", desc = "Close Tab", group = "Tabs", rhs = "<cmd>tabclose<cr>" },
   { mode = "n", lhs = "<leader><tab>[", desc = "Prev Tab", group = "Tabs", rhs = "<cmd>tabprevious<cr>" },
+  {
+    mode = "n",
+    lhs = "<leader>fo",
+    desc = "Oldfiles filtrados por CWD",
+    group = "Files",
+    action = function()
+      file_actions().quickfix_oldfiles_cwd()
+    end,
+  },
 }
 
 function M.search_specs()

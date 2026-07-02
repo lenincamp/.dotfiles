@@ -40,10 +40,6 @@ opt.incsearch = true
 opt.autoread = true
 opt.cmdheight = 1
 
--- Fast grep backend + quickfix-compatible format.
-opt.grepprg = "rg --vimgrep --smart-case --hidden --glob !.git"
-opt.grepformat = "%f:%l:%c:%m"
-
 -- ── Folding ───────────────────────────────────────────────────────────────────
 -- Single global foldexpr that dispatches per-buffer: LSP foldingRange when the
 -- buffer has a capable client (flag set in lsp.lua), otherwise treesitter.
@@ -107,11 +103,11 @@ opt.ruler = true
 opt.showcmd = false
 opt.showmode = true
 
-opt.pumblend = 0      -- no popup blend (crisp completion menu)
-opt.winblend = 0      -- no floating-window blend
+opt.pumblend = 0 -- no popup blend (crisp completion menu)
+opt.winblend = 0 -- no floating-window blend
 opt.splitright = true -- new vertical splits open to the right
 opt.splitbelow = true -- new horizontal splits open below
-opt.showtabline = 0   -- never show the tabline
+opt.showtabline = 0 -- never show the tabline
 
 -- Undercurl support (for diagnostic underlines in capable terminals)
 vim.cmd([[let &t_Cs = "\e[4:3m"]])
@@ -122,22 +118,22 @@ vim.cmd([[let g:loaded_python3_provider = 0]])
 
 -- Large file defaults (will be overridden per-buffer in autocmds.lua)
 opt.lazyredraw = false -- enable per-buffer when large file detected
-opt.updatetime = 100   -- default (1000ms when large file detected)
-opt.undolevels = 1000  -- default (100 when large file detected)
+opt.updatetime = 100 -- default (1000ms when large file detected)
+opt.undolevels = 1000 -- default (100 when large file detected)
 
 -- ── Diff / Merge ergonomics (Neovim 0.12-friendly) ──────────────────────────
 
 local diffopt = {
-  "internal",            -- use Neovim's built-in diff
-  "filler",              -- keep filler lines for context alignment
-  "closeoff",            -- close diff when only one window remains
-  "foldcolumn:1",        -- fold column in diff mode
-  "context:8",           -- keep nearby context while collapsing distant unchanged blocks
-  "vertical",            -- default to vertical split
+  "internal", -- use Neovim's built-in diff
+  "filler", -- keep filler lines for context alignment
+  "closeoff", -- close diff when only one window remains
+  "foldcolumn:1", -- fold column in diff mode
+  "context:8", -- keep nearby context while collapsing distant unchanged blocks
+  "vertical", -- default to vertical split
   "algorithm:histogram", -- better block matching than Myers for code
-  "indent-heuristic",    -- indentation-aware diff
-  "linematch:120",       -- stronger moved-line detection for large refactors
-  "inline:word",         -- 0.12: word-level change highlighting (merges adjacent blocks)
+  "indent-heuristic", -- indentation-aware diff
+  "linematch:120", -- stronger moved-line detection for large refactors
+  "inline:word", -- 0.12: word-level change highlighting (merges adjacent blocks)
 }
 opt.diffopt:append(table.concat(diffopt, ","))
 
@@ -157,7 +153,7 @@ opt.laststatus = 2
 -- exposes the pager as a real buffer/window (open full message history with g<).
 -- Guarded so it is a no-op on older Nvim or if the private module path changes.
 pcall(function()
-  require("vim._core.ui2").enable()
+  require("vim._core.ui2").enable({ enable = true })
 end)
 
 require("config.editor")

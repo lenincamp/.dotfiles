@@ -1,6 +1,10 @@
 local M = {}
 
-local todo_core = require("picker.todos.core")
+local DEFAULT_KEYWORDS = { "TODO", "FIX", "FIXME", "HACK", "WARN", "PERF", "NOTE", "TEST" }
+
+local function highlight_pattern()
+  return [[\v<(]] .. table.concat(DEFAULT_KEYWORDS, "|") .. [[)>]]
+end
 
 local function clear_matches(win)
   local ids = vim.w[win].pure_todo_match_ids
@@ -25,7 +29,7 @@ local function add_matches(win)
 
   clear_matches(win)
   vim.w[win].pure_todo_match_ids = {
-    vim.fn.matchadd("Todo", todo_core.highlight_pattern(), 10, -1, { window = win }),
+    vim.fn.matchadd("Todo", highlight_pattern(), 10, -1, { window = win }),
   }
 end
 
@@ -34,7 +38,7 @@ local function refresh_current_window()
 end
 
 local function jump(direction)
-  local pattern = todo_core.highlight_pattern()
+  local pattern = highlight_pattern()
   local flags = direction < 0 and "bW" or "W"
   if vim.fn.search(pattern, flags) == 0 then
     vim.cmd(direction < 0 and "normal! G$" or "normal! gg0")

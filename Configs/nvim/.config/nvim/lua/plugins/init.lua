@@ -93,7 +93,7 @@ return vim.list_extend(csync_themes, {
       "Kaiser-Yang/blink-cmp-avante",
       "milanglacier/minuet-ai.nvim",
       "rafamadriz/friendly-snippets",
-      "mayromr/blink-cmp-dap"
+      "mayromr/blink-cmp-dap",
     },
     build = function()
       -- build the fuzzy matcher, optionally add a timeout to `pwait(timeout_ms)`
@@ -186,6 +186,7 @@ return vim.list_extend(csync_themes, {
     config = cfg("lsp/mason.lua"),
   },
   p("lenincamp/lsp-nav.nvim", "lsp-nav.nvim", {
+    lazy=true,
     event = "LspAttach",
     config = function()
       require("lsp-nav").setup({})
@@ -304,5 +305,17 @@ return vim.list_extend(csync_themes, {
     "stevearc/quicker.nvim",
     ft = "qf",
     opts = {},
+  },
+  {
+    "debsishu/floatodo.nvim",
+    lazy = true,
+    config = function()
+      require("floatodo").setup({
+        path = "~/todo.md",
+        width_percent = 0.8,
+        height_percent = 0.8,
+        insert_on_open = false,
+      })
+    end,
   },
 })

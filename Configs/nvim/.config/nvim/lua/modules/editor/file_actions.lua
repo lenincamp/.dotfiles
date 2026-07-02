@@ -39,13 +39,17 @@ function M.copy_path()
     ["File name only"] = "%:t",
   }
 
-  vim.ui.select({ "Absolute path", "Relative path", "File name only" }, { prompt = "Copy to clipboard:" }, function(choice)
-    if choice then
-      local path = vim.fn.expand(paths[choice])
-      vim.fn.setreg("+", path)
-      vim.notify("Copied: " .. path)
+  vim.ui.select(
+    { "Absolute path", "Relative path", "File name only" },
+    { prompt = "Copy to clipboard:" },
+    function(choice)
+      if choice then
+        local path = vim.fn.expand(paths[choice])
+        vim.fn.setreg("+", path)
+        vim.notify("Copied: " .. path)
+      end
     end
-  end)
+  )
 end
 
 function M.rename_file()
@@ -98,5 +102,20 @@ function M.open_quickfix_playbook()
 
   vim.cmd("edit " .. vim.fn.fnameescape(path))
 end
+function M.quickfix_oldfiles_cwd()
+  local cwd = vim.fn.getcwd()
+  local oldfiles = vim.v.oldfiles
+  local items = {}
+
+  for _, file in ipairs(oldfiles) do
+    if file:find(cwd, 1, true) and vim.fn.filereadable(file) == 1 then
+      table.insert(items, { filename = file, lnum=1, col=1, text="" })
+    end
+  end
+
+  vim.fn.setqflist({}, "r", { title = "Recent Files (CWD)", items = items })
+  vim.cmd("copen")
+end
+
 
 return M

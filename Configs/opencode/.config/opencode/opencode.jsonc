@@ -1,0 +1,26 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "karpathy-guidelines",
+    "@mumme-it/opencode-caveman"
+  ],
+  "agent": {
+    "default": {
+      "instructions": [
+        "karpathy-guidelines",
+        "caveman-full"
+      ]
+    }
+  },
+  "mcp": {
+    "codebase-memory": {
+      "type": "local",
+      "command": ["/Users/lcampoverde/.local/bin/codebase-memory-mcp"],
+      "enabled": true
+    },
+     "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    }
+  }
+}
