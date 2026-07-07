@@ -18,7 +18,11 @@ local WATCH_FILETYPES = {
 }
 
 local function project_root()
-  return require("picker").root()
+  local out = vim.fn.systemlist({ "git", "rev-parse", "--show-toplevel" })
+  if vim.v.shell_error == 0 and out[1] then
+    return out[1]
+  end
+  return vim.fn.getcwd()
 end
 
 local function ensure_neotest()

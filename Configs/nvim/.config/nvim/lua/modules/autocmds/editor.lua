@@ -13,27 +13,9 @@ local function get_files()
     return cache.files
   end
 
+  local fd = require("modules.editor.fd")
   local output = vim
-    .system({
-      "fd",
-      "--type",
-      "f",
-      "--hidden",
-      "--exclude",
-      ".git",
-      "--exclude",
-      "node_modules",
-      "--exclude",
-      "target",
-      "--exclude",
-      "dist",
-      "--exclude",
-      "build",
-      "--exclude",
-      "coverage",
-      "--exclude",
-      "out",
-    }, { text = true })
+    .system(vim.list_extend({ "fd", "--type", "f" }, fd.basic()), { text = true })
     :wait()
 
   local files = vim.split(output.stdout or "", "\n", { trimempty = true })
@@ -94,13 +76,16 @@ function M.setup()
   })
 
   vim.api.nvim_create_user_command("Rg", function(opts)
-    local lines = vim.fn.systemlist({ "rg", "--vimgrep", "-F", opts.args })
+    local cmd = { "rg", "--vimgrep", "-F" }
+    vim.list_extend(cmd, opts.fargs)
+    -- print("Comando ejecutado: " .. vim.inspect(cmd))
+    local lines = vim.fn.systemlist(cmd)
     vim.fn.setqflist({}, "r", {
-      title = "Search: " .. opts.args,
+      title = "Search: " .. table.concat(opts.fargs, " "),
       lines = lines,
     })
     vim.cmd.copen(10)
-  end, { nargs = 1 })
+  end, { nargs = "+" })
 
   vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("pure_netrw_split_navigation", { clear = true }),

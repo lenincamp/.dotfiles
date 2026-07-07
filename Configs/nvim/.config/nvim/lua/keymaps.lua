@@ -20,6 +20,6 @@ keymap_specs.apply(keymap_specs.window_list_tab_specs())
 
 keymap_specs.apply(keymap_specs.global_specs())
 
--- ── Explorer / personal git / buffer shortcuts (picker keymaps in picker.setup) ──
+-- ── Explorer / search / git / buffer shortcuts ──
 
 keymap_specs.apply(keymap_specs.search_specs())

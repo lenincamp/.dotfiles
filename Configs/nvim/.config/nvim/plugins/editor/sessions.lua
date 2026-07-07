@@ -140,10 +140,8 @@ function M.select()
     return
   end
 
-  require("picker").select_items(items, {
+  vim.ui.select(items, {
     prompt = "Session: Select",
-    scope = "project",
-    search_threshold = 0,
     format_item = function(item)
       return item.label
     end,

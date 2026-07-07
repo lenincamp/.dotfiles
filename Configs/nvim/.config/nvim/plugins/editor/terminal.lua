@@ -2,13 +2,26 @@ local M = {}
 
 M._setup_done = false
 
+local function git_root()
+  local out = vim.fn.systemlist({ "git", "rev-parse", "--show-toplevel" })
+  if vim.v.shell_error == 0 and out[1] then
+    return out[1]
+  end
+  return vim.fn.getcwd()
+end
+
+local function open_terminal(cwd)
+  vim.cmd("botright 15split")
+  vim.fn.termopen({ vim.o.shell }, { cwd = cwd })
+  vim.cmd("startinsert")
+end
+
 function M.open_cwd()
-  require("picker").open_terminal(vim.fn.getcwd())
+  open_terminal(vim.fn.getcwd())
 end
 
 function M.open_root()
-  local picker = require("picker")
-  picker.open_terminal(picker.root())
+  open_terminal(git_root())
 end
 
 function M.setup()

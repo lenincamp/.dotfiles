@@ -1,19 +1,19 @@
 # Quickfix Refactor Playbook
 
-Guía rápida para refactors en proyectos grandes con herramientas **nativas de Neovim** + picker/quickfix de esta config.
+Guía rápida para refactors con herramientas **nativas de Neovim** + quickfix.
 
-Abrir: `<leader>pH` · Command Center → *Open quickfix* / picker lists
+Abrir: `<leader>pH` · Command Center (`<leader><space>`)
 
 ---
 
 ## Flujo recomendado
 
-1. **Buscar** — grep o picker → lista de matches
+1. **Buscar** — `:Rg` o grep → quickfix
 2. **Revisar** — quickfix / location list, saltar match a match
 3. **Cambiar** — `:s`, LSP rename, o `:cdo`/`:cfdo` en lote
-4. **Validar** — tests (`<leader>tn` / `tf`), `:make`, `:grep` de nuevo
+4. **Validar** — tests (`<leader>tn` / `tf`), `:make`, `:Rg` de nuevo
 
-Regla: prefiere **cambios pequeños y revisables** antes que un `:cdo` masivo sin preview.
+Regla: prefiere **cambios pequeños y revisables** antes que un `:cdo` masivo.
 
 ---
 
@@ -24,54 +24,45 @@ Regla: prefiere **cambios pequeños y revisables** antes que un `:cdo` masivo si
 | `:s/old/new/` | Primera ocurrencia en la línea |
 | `:s/old/new/g` | Todas en la línea |
 | `:%s/old/new/g` | Todo el buffer |
-| `:%s/old/new/gc` | Con confirmación (recomendado en refactors) |
+| `:%s/old/new/gc` | Con confirmación (recomendado) |
 | `:5,20s/old/new/g` | Rango de líneas |
 | `:s/\vfoo(bar)/\1/g` | Regex very magic (`\v`) |
 
-Atajos de esta config:
+Atajos:
 
 | Key | Acción |
 |-----|--------|
-| `<leader>rr` (normal) | Sustituir palabra bajo cursor en todo el archivo |
-| `<leader>rr` (visual) | Sustituir selección en todo el archivo |
+| `<leader>rr` (normal) | Sustituir palabra bajo cursor |
+| `<leader>rr` (visual) | Sustituir selección |
 
 Tips:
-
-- `\V` en patterns = literal (sin regex): `:%s/\Vold.name/new.name/gc`
-- Escapar `/` en paths: `:s#com/old#com/new#g`
-- Deshacer por buffer: `u` · revisar con `:undolist`
+- `\V` = literal: `:%s/\Vold.name/new.name/gc`
+- Escapar `/`: `:s#com/old#com/new#g`
+- Deshacer: `u` · `:undolist`
 
 ---
 
-## 2. Grep de proyecto → quickfix
-
-### Picker (rg, cwd/root)
+## 2. Grep → quickfix
 
 | Key | Acción |
 |-----|--------|
-| `<leader>sg` | Grep regex (cwd) |
-| `<leader>sG` | Grep regex (root) |
-| `<leader>s/` | Grep regex root (alias) |
+| `<leader>sg` | Grep (cwd) — input |
+| `<leader>sG` | Grep (root) — input |
+| `<leader>s/` | Grep literal (root) — input |
 | `<leader>sw` | Palabra bajo cursor (cwd) |
 | `<leader>sW` | Palabra bajo cursor (root) |
-| `<leader>si` / `sI` | Grep ignored literal |
-| `<leader>/` | Buscar en buffer actual (rg) |
-| `<leader>sr` | Reanudar última búsqueda picker |
+| `<leader>si` / `sI` | Grep ignored (cwd/root) |
+| `<leader>/` | Buscar en buffer actual |
+| `<leader>sr` | Reanudar última búsqueda |
 
-### Vim nativo (cuando no quieres picker)
+También disponible: `:Rg` (input → quickfix, ya existía)
+
+### Vim nativo adicional
 
 ```vim
-" Desde el root del repo (ajusta path)
-:grep -R --line-number --fixed-strings 'OldClassName' src/
-
-" Solo ciertos tipos
-:grep -R --include='*.java' 'import com.old' .
-
-" Regex multilínea (vimgrep + very magic)
 :vimgrep /\vclass\s+\zsOldName/ %:p:h/**
+:grep -R --include='*.java' 'import com.old' .
 ```
-
-`grepprg` usa ripgrep si está instalado. Los resultados van al **quickfix**.
 
 ---
 
@@ -79,32 +70,29 @@ Tips:
 
 | Key / cmd | Acción |
 |-----------|--------|
+| `]q` / `[q` | Siguiente / anterior quickfix |
 | `<leader>xq` | Toggle quickfix window |
 | `<leader>xl` | Toggle location list |
-| `<leader>sq` | Picker: quickfix list |
-| `<leader>sl` | Picker: location list |
+| `<leader>sq` | Buscar en quickfix (vim.ui.select) |
+| `<leader>sl` | Buscar en location list |
 | `:copen` / `:cclose` | Abrir/cerrar quickfix |
 | `:cnext` / `:cprev` | Siguiente / anterior |
-| `]q` / `[q` | Siguiente / anterior (si mapeado) |
 | `<Enter>` en qf | Ir al match |
 | `:cdo cmd` | Ejecutar `cmd` en **cada** entrada qf |
-| `:cfdo cmd` | Como `:cdo` pero solo en archivos únicos |
+| `:cfdo cmd` | Como `:cdo` pero solo archivos únicos |
 | `:cfdo update` | Guardar todos los buffers tocados |
 
 Ejemplos `:cfdo`:
 
 ```vim
-" Abrir cada match en split y pausar (manual)
-:cfdo tab split
-
-" Sustituir en cada archivo del quickfix (¡revisar antes!)
+" Sustituir en cada archivo del quickfix
 :cfdo %s/\VOldApi/NewApi/ge | update
 
-" Solo ver cuántos archivos
+" Solo ver archivos
 :cfdo echo expand('%:p')
 ```
 
-**Seguro:** usa `:cfdo` con `:s/.../gc` archivo por archivo, o un script, no `:cdo` a ciegas en 200 archivos.
+**Seguro:** usa `:cfdo` con `:s/.../gc` archivo por archivo.
 
 ---
 
@@ -114,19 +102,18 @@ Ejemplos `:cfdo`:
 |-----|--------|
 | `*` / `#` | Buscar palabra (con highlight) |
 | `n` / `N` | Siguiente / anterior match |
-| `]]` / `[[` | Siguiente / anterior referencia de palabra |
+| `]]` / `[[` | Siguiente / anterior referencia |
 | `<Esc>` / `<leader>ur` | Limpiar highlights |
 
-LSP (nativo + lsp-nav):
+LSP:
 
 | Key | Acción |
 |-----|--------|
 | `gd` | Definition |
-| `grr` | References → picker |
-| `gO` | Document symbols |
-| `gW` | Workspace symbols |
-| `<leader>ss` / `sS` | Symbols doc / workspace (picker) |
-| `grn` | Rename symbol (preferir en refactors semánticos) |
+| `gra` | Code action |
+| `grn` | Rename symbol |
+| `<leader>sd` / `sD` | Diagnostics (buffer/workspace) |
+| `<leader>sk` | Keymaps |
 
 ---
 
@@ -134,19 +121,18 @@ LSP (nativo + lsp-nav):
 
 | Key | Acción |
 |-----|--------|
-| `gra` | LSP code action (menú) |
+| `gra` | LSP code action |
 | `<leader>rx` | Extract variable (visual) |
 | `<leader>rf` | Extract function (visual) |
 | `<leader>ri` | Inline variable |
 | `<leader>ro` | Organize imports |
 | `<leader>cf` | Format buffer |
-| `<leader>cN` | Rename file (+ LSP willRename si aplica) |
+| `<leader>cN` | Rename file (+ LSP willRename) |
 
 Cuándo usar qué:
-
-- **Rename simbolo** (`grn`) → mismo identificador, mismo tipo, LSP-aware
-- **`:s` / `<leader>rr`** → strings, logs, configs, nombres que LSP no ve
-- **grep + cfdo** → migraciones masivas de API/texto
+- **Rename símbolo** (`grn`) → mismo identificador, LSP-aware
+- **`:s` / `<leader>rr`** → strings, logs, configs
+- **grep + cfdo** → migraciones masivas
 
 ---
 
@@ -158,54 +144,57 @@ Cuándo usar qué:
 | `<leader>uR` | Toggle diff profile |
 | `<leader>gC` | Git compare contextual |
 | `<leader>cB` | Buffer vs clipboard diff |
-| `]c` / `[c` | Siguiente / anterior cambio (en diff) |
-| `do` / `dp` | Obtener / poner cambio diff |
-
-Antes de commit grande: `:vert diffsplit` con rama base o `git difftool` vía compare.
+| `]c` / `[c` | Siguiente / anterior cambio |
+| `do` / `dp` | Obtener / poner cambio |
 
 ---
 
-## 7. Listas y buffers durante refactor
+## 7. Git integrations
 
 | Key | Acción |
 |-----|--------|
-| `<leader>ff` / `fF` | Find files cwd/root |
-| `<leader>fg` | Git files |
-| `<leader>fR` | Recent files |
-| `<leader>bd` | Delete buffer (picker) |
-| `<leader>bo` | Delete other buffers |
-| `<leader>bb` | Alternate buffer |
-| `:bufdo` | Comando en todos los buffers cargados |
-
-```vim
-" Guardar solo buffers modificados del quickfix
-:cfdo update
-
-" Cerrar buffers sin cambios después del refactor
-:bufdo silent! bd
-```
+| `<leader>gl` | Git log (cwd) → quickfix |
+| `<leader>gL` | Git log (root) → quickfix |
+| `<leader>gf` | Git file history → quickfix |
+| `<leader>gb` | Git blame line (notification) |
+| `<leader>gB` | Git browse (open in browser) |
+| `<leader>gY` | Git browse (copy URL) |
+| `<leader>gg` / `gG` | Lazygit (cwd/root) |
 
 ---
 
-## 8. Recetas frecuentes
+## 8. Files & Buffers
+
+| Key | Acción |
+|-----|--------|
+| `<leader>ff` / `fF` | Find files (cwd/root) → quickfix |
+| `<leader>fg` | Git tracked files → quickfix |
+| `<leader>fR` | Recent files → quickfix |
+| `<leader>bd` | Delete buffer |
+| `<leader>bo` | Delete other buffers |
+| `<leader>bb` | Alternate buffer |
+
+---
+
+## 9. Recetas frecuentes
 
 ### Renombrar string literal en muchos archivos
 
 1. `<leader>sG` → pattern literal
-2. Revisar lista en quickfix (`<leader>xq`)
+2. Revisar quickfix (`]q`/`[q`)
 3. `:cfdo %s/\VoldValue/newValue/ge | update`
-4. `:grep` de nuevo para verificar cero matches
+4. `:Rg` de nuevo para verificar
 
 ### Migrar import / package (Java)
 
 1. `<leader>sW` sobre el import viejo
-2. Editar manualmente o `grn` si es tipo
-3. `<leader>ro` organize imports por archivo
-4. `<leader>tf` / Maven test en módulo
+2. Editar o `grn`
+3. `<leader>ro` organize imports
+4. `<leader>tf` / Maven test
 
 ### Buscar TODO/FIXME antes de release
 
-1. `<leader>st` o `<leader>sT` (picker todos)
+1. `:Rg TODO` o `:Rg FIXME`
 2. Quickfix → resolver uno a uno
 
 ### Refactor solo en archivos abiertos
@@ -216,21 +205,22 @@ Antes de commit grande: `:vert diffsplit` con rama base o `git difftool` vía co
 
 ---
 
-## 9. Checklist post-refactor
+## 10. Checklist post-refactor
 
-- [ ] `:grep` o picker confirma cero ocurrencias del pattern viejo
-- [ ] Tests: `<leader>tn` / `tf` / `tw` (watch)
-- [ ] LSP sin diagnostics nuevos (`<leader>ud` si las ocultaste)
-- [ ] `:cfdo update` guardó todo lo esperado
+- [ ] `:Rg` confirma cero ocurrencias del pattern viejo
+- [ ] Tests: `<leader>tn` / `tf` / `tw`
+- [ ] LSP sin diagnostics nuevos (`<leader>ud`)
+- [ ] `:cfdo update` guardó todo
 - [ ] `git diff --stat` tamaño razonable
 
 ---
 
-## Referencia rápida de keys (esta config)
+## Referencia rápida
 
 ```
-Search:  sg sG sw sW s/ si sr    Lists: xq xl sq sl
-Replace: rr (n/v)                  LSP:   gra grn gd grr
-Files:   ff fF fg fR               Diff:  ue uR gC cB
-Open:    pH (este doc)             UI:    <space> (Command Center)
+Search:  sg sG sw sW s/ si / sr     Git:     gl gL gf gb gB gY gg gG
+Replace: rr (n/v)                    Lists:   xq xl sq sl
+Files:   ff fF fg fR fn fc           Diff:    ue uR gC cB
+Buffers: bd bo bb                    UI:      <space> (Command Center)
+Open:    pH (este doc)               Nav:     ]q [q
 ```

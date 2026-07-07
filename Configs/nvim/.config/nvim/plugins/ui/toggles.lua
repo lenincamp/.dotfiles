@@ -191,12 +191,7 @@ function M.reload_config()
 end
 
 function M.toggle_intellij_grep()
-  local ok, picker = pcall(require, "picker")
-  if not ok then
-    return
-  end
-  local enabled = picker.toggle_intellij_grep()
-  notify("Grep IntelliJ Layout " .. bool_text(enabled))
+  notify("Grep layout toggle (picker removed)")
 end
 
 function M.toggle_treesitter_context()

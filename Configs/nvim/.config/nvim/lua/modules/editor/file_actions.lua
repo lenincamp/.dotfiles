@@ -117,5 +117,27 @@ function M.quickfix_oldfiles_cwd()
   vim.cmd("copen")
 end
 
+function M.find_oldfiles()
+  local cwd = vim.fn.getcwd()
+
+  local candidates = vim
+    .iter(vim.v.oldfiles)
+    :filter(function(file)
+      return file:find(cwd, 1, true)
+        and vim.uv.fs_stat(file)
+    end)
+    :totable()
+
+  vim.ui.select(candidates, {
+    prompt = "Oldfiles",
+    format_item = function(item)
+      return vim.fn.fnamemodify(item, ":~:.")
+    end,
+  }, function(choice)
+    if choice then
+      vim.cmd.edit(vim.fn.fnameescape(choice))
+    end
+  end)
+end
 
 return M

@@ -28,16 +28,8 @@ local csync_themes = ps.dofile_lua("colorscheme-sync.nvim", "lua/colorscheme-syn
 
 return vim.list_extend(csync_themes, {
   { "nvim-lua/plenary.nvim", lazy = true },
+  { "tpope/vim-sleuth", lazy = false },
   { "MunifTanjim/nui.nvim", lazy = true },
-  p("lenincamp/picker.nvim", "picker.nvim", {
-    lazy = true,
-    dependencies = { "preview.nvim" },
-    keys = lazy_keys("picker.nvim", "lua/picker/user_keymaps.lua"),
-    config = cfg("editor/picker.lua"),
-  }),
-  p("lenincamp/preview.nvim", "preview.nvim", {
-    lazy = true,
-  }),
   p("lenincamp/pure-ui.nvim", "pure-ui.nvim", {
     lazy = false,
     dependencies = { "colorscheme-sync.nvim" },
@@ -236,7 +228,7 @@ return vim.list_extend(csync_themes, {
   p("lenincamp/dap-controls.nvim", "dap-controls.nvim", {
     lazy = true,
     cond = not_diff,
-    dependencies = { "breakpoints.nvim", "picker.nvim" },
+    dependencies = { "breakpoints.nvim" },
   }),
   {
     "mfussenegger/nvim-dap",
@@ -304,6 +296,9 @@ return vim.list_extend(csync_themes, {
   {
     "stevearc/quicker.nvim",
     ft = "qf",
+    keys = {
+      { "<leader>q", function() require("quicker").toggle() end, desc = "Toggle Quickfix" },
+    },
     opts = {},
   },
   {

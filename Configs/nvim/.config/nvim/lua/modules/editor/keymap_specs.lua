@@ -24,8 +24,19 @@ local function ui_module()
   return require("config.ui")
 end
 
-local function split_nav_module()
-  return require("pure-ui.split_nav")
+local function split_nav_move(dir)
+  if vim.fn.win_gettype() == "command" then
+    return
+  end
+  require("pure-ui.split_nav").move(dir)
+end
+
+local function search_qf()
+  return require("modules.editor.search_qf")
+end
+
+local function git_native()
+  return require("modules.git.native")
 end
 
 local function lsp_buf_call(method, ...)
@@ -428,6 +439,15 @@ local search_specs = {
   },
   { mode = "n", lhs = "<leader>bb", desc = "Switch to Other Buffer", group = "Buffers", rhs = "<cmd>e #<cr>" },
   { mode = "n", lhs = "<leader>bD", desc = "Delete Buffer and Window", group = "Buffers", rhs = "<cmd>bd<cr>" },
+  { mode = "n", lhs = "<leader>bd", desc = "Delete Buffer", group = "Buffers", rhs = "<cmd>bd<cr>" },
+  { mode = "n", lhs = "<leader>bo", desc = "Delete Other Buffers", group = "Buffers", rhs = "<cmd>%bd|e#|bd#<cr>" },
+  { mode = "n", lhs = "<leader>ff", desc = "Find Files (cwd)", group = "Files", action = function() vim.fn.feedkeys(":find ", "n") end },
+  { mode = "n", lhs = "<leader>fF", desc = "Find Files (root)", group = "Files", action = function() search_qf().find_files_root() end },
+  { mode = "n", lhs = "<leader>fG", desc = "Find Ignored Files", group = "Files", action = function() search_qf().find_files_ignored() end },
+  { mode = "n", lhs = "<leader>fg", desc = "Find Git Files", group = "Files", action = function() search_qf().git_files() end },
+  { mode = "n", lhs = "<leader>fR", desc = "Recent Files", group = "Files", action = function() file_actions().quickfix_oldfiles_cwd() end },
+  { mode = "n", lhs = "<leader>fn", desc = "New File", group = "Files", rhs = "<cmd>enew<cr>" },
+  { mode = "n", lhs = "<leader>fc", desc = "Config Files", group = "Files", action = function() vim.cmd("edit " .. vim.fn.stdpath("config")) end },
   {
     mode = "n",
     lhs = "<leader>gC",
@@ -437,6 +457,36 @@ local search_specs = {
       require("modules.git.compare_context").prompt()
     end,
   },
+  { mode = "n", lhs = "<leader>gl", desc = "Git Log (cwd)", group = "Git", action = function() git_native().git_log_cwd() end },
+  { mode = "n", lhs = "<leader>gL", desc = "Git Log (root)", group = "Git", action = function() git_native().git_log_root() end },
+  { mode = "n", lhs = "<leader>gf", desc = "Git File History", group = "Git", action = function() git_native().git_file_history() end },
+  { mode = "n", lhs = "<leader>gb", desc = "Git Blame Line", group = "Git", action = function() git_native().git_blame_line() end },
+  { mode = { "n", "x" }, lhs = "<leader>gB", desc = "Git Browse (open)", group = "Git", action = function() git_native().git_browse(false) end },
+  { mode = { "n", "x" }, lhs = "<leader>gY", desc = "Git Browse (copy URL)", group = "Git", action = function() git_native().git_browse(true) end },
+  { mode = "n", lhs = "<leader>gg", desc = "Lazygit (cwd)", group = "Git", condition = function() return vim.fn.executable("lazygit") == 1 end, action = function() git_native().lazygit(vim.fn.getcwd()) end },
+  { mode = "n", lhs = "<leader>gG", desc = "Lazygit (root)", group = "Git", condition = function() return vim.fn.executable("lazygit") == 1 end, action = function() git_native().lazygit(git_native().root) end },
+
+  { mode = "n", lhs = "<leader>sg", desc = "Grep (cwd)", group = "Search", action = function() search_qf().grep_cwd() end },
+  { mode = "n", lhs = "<leader>sG", desc = "Grep (root)", group = "Search", action = function() search_qf().grep_root() end },
+  { mode = { "n", "x" }, lhs = "<leader>sw", desc = "Search Word (cwd)", group = "Search", action = function() search_qf().grep_word_cwd() end },
+  { mode = { "n", "x" }, lhs = "<leader>sW", desc = "Search Word (root)", group = "Search", action = function() search_qf().grep_word_root() end },
+  { mode = "n", lhs = "<leader>s/", desc = "Grep Literal (root)", group = "Search", action = function() search_qf().grep_root_literal() end },
+  { mode = "n", lhs = "<leader>si", desc = "Grep Ignored (cwd)", group = "Search", action = function() search_qf().grep_ignored_cwd() end },
+  { mode = "n", lhs = "<leader>sI", desc = "Grep Ignored (root)", group = "Search", action = function() search_qf().grep_ignored_root() end },
+  { mode = "n", lhs = "<leader>/", desc = "Search Buffer", group = "Search", action = function() search_qf().grep_buffer() end },
+  { mode = "n", lhs = "<leader>sq", desc = "Quickfix List", group = "Search", action = function() search_qf().qflist() end },
+  { mode = "n", lhs = "<leader>sl", desc = "Location List", group = "Search", action = function() search_qf().open_loclist() end },
+  { mode = "n", lhs = "<leader>sb", desc = "Search Buffers", group = "Search", action = function() search_qf().search_buffers() end },
+  { mode = { "n", "i", "x" }, lhs = "<leader>sy", desc = "Registers", group = "Search", action = function() search_qf().search_registers() end },
+  { mode = "n", lhs = "<leader>sc", desc = "Command History", group = "Search", action = function() search_qf().command_history() end },
+  { mode = "n", lhs = "<leader>sC", desc = "Commands", group = "Search", action = function() search_qf().commands() end },
+  { mode = "n", lhs = "<leader>sd", desc = "Document Diagnostics", group = "Search", action = function() search_qf().diagnostics_buf() end },
+  { mode = "n", lhs = "<leader>sD", desc = "Workspace Diagnostics", group = "Search", action = function() search_qf().diagnostics_all() end },
+  { mode = "n", lhs = "<leader>sh", desc = "Help", group = "Search", action = function() search_qf().help() end },
+  { mode = "n", lhs = "<leader>sk", desc = "Keymaps", group = "Search", action = function() search_qf().keymaps() end },
+  { mode = "n", lhs = "<leader>sm", desc = "Marks", group = "Search", action = function() search_qf().marks() end },
+  { mode = "n", lhs = "<leader>sn", desc = "Notifications", group = "Search", action = function() search_qf().notifications() end },
+  { mode = "n", lhs = "<leader>su", desc = "Undo History", group = "Search", action = function() search_qf().undo_history() end },
 }
 
 local global_specs = {
@@ -546,6 +596,22 @@ local global_specs = {
     end,
   },
   { mode = "n", lhs = "<leader>qq", desc = "Quit All", group = "Quit", rhs = "<cmd>qa<cr>" },
+  { mode = "n", lhs = "]q", desc = "Next Quickfix", group = "Quickfix", rhs = "<cmd>cnext<cr>zz" },
+  { mode = "n", lhs = "[q", desc = "Prev Quickfix", group = "Quickfix", rhs = "<cmd>cprev<cr>zz" },
+  {
+    mode = "n",
+    lhs = "<leader>sr",
+    desc = "Resume Last Search",
+    group = "Search",
+    action = function()
+      local qf = vim.fn.getqflist({ title = 0 })
+      if qf.title and qf.title ~= "" then
+        vim.cmd("copen")
+      else
+        vim.notify("No previous search to resume", vim.log.levels.INFO)
+      end
+    end,
+  },
   {
     mode = "n",
     lhs = "<leader>tn",
@@ -633,7 +699,7 @@ local global_specs = {
     desc = "Move to left window/tmux pane",
     group = "Windows",
     action = function()
-      split_nav_module().move("h")
+      split_nav_move("h")
     end,
   },
   {
@@ -642,7 +708,7 @@ local global_specs = {
     desc = "Move to lower window/tmux pane",
     group = "Windows",
     action = function()
-      split_nav_module().move("j")
+      split_nav_move("j")
     end,
   },
   {
@@ -651,7 +717,7 @@ local global_specs = {
     desc = "Move to upper window/tmux pane",
     group = "Windows",
     action = function()
-      split_nav_module().move("k")
+      split_nav_move("k")
     end,
   },
   {
@@ -660,7 +726,7 @@ local global_specs = {
     desc = "Move to right window/tmux pane",
     group = "Windows",
     action = function()
-      split_nav_module().move("l")
+      split_nav_move("l")
     end,
   },
   {
@@ -806,11 +872,9 @@ local window_list_tab_specs = {
   {
     mode = "n",
     lhs = "<leader>fo",
-    desc = "Oldfiles filtrados por CWD",
+    desc = "Oldfiles (cwd)",
     group = "Files",
-    action = function()
-      file_actions().quickfix_oldfiles_cwd()
-    end,
+    action = function() file_actions().find_oldfiles() end,
   },
 }
 

@@ -4,7 +4,11 @@ local last_task = nil
 local state_file = vim.fn.stdpath("data") .. "/task_runner_last.json"
 
 local function root()
-  return require("picker").root()
+  local out = vim.fn.systemlist({ "git", "rev-parse", "--show-toplevel" })
+  if vim.v.shell_error == 0 and out[1] then
+    return out[1]
+  end
+  return vim.fn.getcwd()
 end
 
 local function has_file(name)
@@ -112,10 +116,8 @@ function M.select()
     vim.notify("No project tasks detected", vim.log.levels.INFO)
     return
   end
-  require("picker").select_items(tasks, {
+  vim.ui.select(tasks, {
     prompt = "Task Runner",
-    scope = "project",
-    search_threshold = 0,
     format_item = function(item) return item.label end,
   }, function(task)
     if task then run_task(task) end

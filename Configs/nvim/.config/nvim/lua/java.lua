@@ -156,9 +156,8 @@ function M.select_decompiled_buffer()
     return
   end
 
-  require("picker").select_items(items, {
+  vim.ui.select(items, {
     prompt = "Decompiled JDTLS Buffers",
-    search_threshold = 0,
     format_item = function(item)
       return item.label
     end,
