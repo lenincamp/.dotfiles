@@ -2,6 +2,7 @@
 export ZSH="$HOME/.oh-my-zsh"
 export ZSH_CONFIG_DIR="$HOME/zsh_config"
 export ZSH_FUNCTIONS_DIR="$HOME/zsh_functions"
+fpath+=~/.zfunc
 
 # Configurar fpath ANTES de cargar oh-my-zsh (compinit se ejecuta ahí)
 if [ -d "$ZSH_FUNCTIONS_DIR" ]; then
@@ -94,7 +95,6 @@ fi
 
 
 # Added by SoFi Claude Code installer
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="/Users/lcampoverde/.bun/bin:$PATH"
+export PATH="$HOME/.bun/bin:$HOME/.local/bin:$HOME/.local/share/bob/nvim-bin:$PATH"
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"

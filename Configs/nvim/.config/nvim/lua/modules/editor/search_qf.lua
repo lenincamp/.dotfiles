@@ -11,6 +11,15 @@ end
 
 local fd = require("modules.editor.fd")
 
+function M.set_to_qflist(title, items, lines, context)
+  vim.fn.setqflist(
+    {},
+    "r",
+    { title = title or "Files", items = items, lines = lines, context = context or { type = "file" } }
+  )
+  M.open_qflist()
+end
+
 --- fd files → quickfix (with excludes)
 local function fd_to_qf(args, title, opts)
   opts = opts or {}
@@ -27,17 +36,23 @@ local function fd_to_qf(args, title, opts)
   for _, f in ipairs(lines) do
     items[#items + 1] = { filename = f, lnum = 1, text = "" }
   end
-  vim.fn.setqflist({}, "r", { title = title or "Files", items = items })
-  vim.cmd.copen(10)
+  M.set_to_qflist(title or "Files", items)
 end
 
---- <leader>fF: find files root (fd → quickfix)
+--- <leader>fF: find files root (:find with root in path)
 function M.find_files_root()
   local root = git_root()
-  local old_cwd = vim.fn.getcwd()
-  vim.fn.chdir(root)
-  fd_to_qf({ "." }, "Find Files (root)")
-  vim.fn.chdir(old_cwd)
+  local old_path = vim.o.path
+  if not old_path:find(root, 1, true) then
+    vim.o.path = old_path .. "," .. root .. "/**"
+  end
+  vim.fn.feedkeys(":find ", "n")
+  vim.api.nvim_create_autocmd("BufWinEnter", {
+    once = true,
+    callback = function()
+      vim.o.path = old_path
+    end,
+  })
 end
 
 --- <leader>fG: find git-ignored files → quickfix
@@ -56,8 +71,7 @@ function M.git_files()
   for _, f in ipairs(lines) do
     items[#items + 1] = { filename = f, lnum = 1, text = "" }
   end
-  vim.fn.setqflist({}, "r", { title = "Git Files", items = items })
-  vim.cmd.copen(10)
+  M.set_to_qflist("Git Files", items)
 end
 
 --- Run rg with args → quickfix
@@ -69,11 +83,7 @@ local function rg_to_qf(args, title)
     vim.notify("No matches found", vim.log.levels.INFO)
     return
   end
-  vim.fn.setqflist({}, "r", {
-    title = title or "Search",
-    lines = lines,
-  })
-  vim.cmd.copen(10)
+  M.set_to_qflist(title or "Search", nil, lines, { type = "search" })
 end
 
 --- <leader>sg: grep cwd (input)
@@ -92,9 +102,7 @@ function M.grep_root()
     if not input or input == "" then
       return
     end
-    local root = git_root()
-    vim.fn.chdir(root)
-    rg_to_qf({ input }, "Grep (root): " .. input)
+    rg_to_qf({ input, git_root() }, "Grep (root): " .. input)
   end)
 end
 
@@ -113,11 +121,7 @@ function M.grep_word_root()
   if word == "" then
     return
   end
-  local root = git_root()
-  local old_cwd = vim.fn.getcwd()
-  vim.fn.chdir(root)
-  rg_to_qf({ word }, "Word (root): " .. word)
-  vim.fn.chdir(old_cwd)
+  rg_to_qf({ word, git_root() }, "Word (root): " .. word)
 end
 
 --- <leader>si: grep ignored cwd (no-ignore)
@@ -136,11 +140,7 @@ function M.grep_ignored_root()
     if not input or input == "" then
       return
     end
-    local root = git_root()
-    local old_cwd = vim.fn.getcwd()
-    vim.fn.chdir(root)
-    rg_to_qf({ "--no-ignore", input }, "Grep ignored (root): " .. input)
-    vim.fn.chdir(old_cwd)
+    rg_to_qf({ "--no-ignore", input, git_root() }, "Grep ignored (root): " .. input)
   end)
 end
 
@@ -167,11 +167,7 @@ function M.grep_buffer()
       vim.notify("No matches in buffer", vim.log.levels.INFO)
       return
     end
-    vim.fn.setqflist({}, "r", {
-      title = "Buffer search: " .. input,
-      items = matches,
-    })
-    vim.cmd.copen(10)
+    M.set_to_qflist("Buffer search: " .. input, matches)
   end)
 end
 
@@ -181,11 +177,7 @@ function M.grep_root_literal()
     if not input or input == "" then
       return
     end
-    local root = git_root()
-    local old_cwd = vim.fn.getcwd()
-    vim.fn.chdir(root)
-    rg_to_qf({ input }, "Grep literal (root): " .. input)
-    vim.fn.chdir(old_cwd)
+    rg_to_qf({ input, git_root() }, "Grep literal (root): " .. input)
   end)
 end
 
@@ -267,22 +259,21 @@ end
 
 --- <leader>sC: commands
 function M.commands()
-  local cmds = vim.api.nvim_get_commands({ builtin = true })
-  local list = {}
+  local cmds = vim.api.nvim_get_commands({})
+  local items = {}
   for _, cmd in pairs(cmds) do
-    list[#list + 1] = { name = cmd.name, definition = cmd.definition or "" }
+    items[#items + 1] = { text = cmd.name, name = cmd.name }
   end
-  table.sort(list, function(a, b) return a.name < b.name end)
-  vim.ui.select(list, {
-    prompt = "Commands",
-    format_item = function(item)
-      return item.name
-    end,
-  }, function(choice)
-    if choice then
-      vim.cmd(choice.name)
-    end
+  table.sort(items, function(a, b)
+    return a.text < b.text
   end)
+  M.set_to_qflist("Commands", items, nil, { type = "commands" })
+
+  vim.keymap.set("n", "<CR>", function()
+    local idx = vim.fn.line(".")
+    vim.cmd.cclose()
+    vim.cmd(items[idx].name)
+  end, { buffer = 0 })
 end
 
 --- <leader>sd: document diagnostics
@@ -304,8 +295,7 @@ function M.diagnostics_buf()
         or "I",
     }
   end
-  vim.fn.setqflist({}, "r", { title = "Buffer Diagnostics", items = items })
-  vim.cmd.copen(10)
+  M.set_to_qflist("Buffer Diagnostics", items, nil, { type = "diagnostic" })
 end
 
 --- <leader>sD: workspace diagnostics
@@ -327,8 +317,7 @@ function M.diagnostics_all()
         or "I",
     }
   end
-  vim.fn.setqflist({}, "r", { title = "Workspace Diagnostics", items = items })
-  vim.cmd.copen(10)
+  M.set_to_qflist("Workspace Diagnostics", items, nil, { type = "diagnostic" })
 end
 
 --- <leader>sh: help
@@ -346,24 +335,25 @@ function M.keymaps()
   local items = {}
   for _, m in ipairs(maps) do
     if m.lhs then
+      local lhs = m.lhs:gsub("\xff", "")
+      local desc = m.desc or ""
+      local rhs = type(m.rhs) == "string" and m.rhs or ""
       items[#items + 1] = {
-        lhs = m.lhs:gsub("\xff", ""),
-        desc = m.desc or "",
-        rhs = type(m.rhs) == "string" and m.rhs or "",
+        lhs = lhs,
+        desc = desc,
+        rhs = rhs,
+        text = lhs .. "  " .. (desc ~= "" and desc or rhs),
       }
     end
   end
-  vim.ui.select(items, {
-    prompt = "Keymaps",
-    format_item = function(item)
-      return item.lhs .. "  " .. (item.desc or item.rhs)
-    end,
-  }, function(choice)
-    if choice then
-      local keys = vim.api.nvim_replace_termcodes(choice.lhs, true, false, true)
-      vim.api.nvim_feedkeys(keys, "m", false)
-    end
-  end)
+  M.set_to_qflist("Keymaps", items, nil, { type = "keymaps" })
+
+  vim.keymap.set("n", "<CR>", function()
+    local idx = vim.fn.line(".")
+    vim.cmd.cclose()
+    local keys = vim.api.nvim_replace_termcodes(items[idx].lhs, true, false, true)
+    vim.api.nvim_feedkeys(keys, "m", false)
+  end, { buffer = 0 })
 end
 
 --- <leader>sm: marks
@@ -392,9 +382,21 @@ function M.marks()
   end)
 end
 
---- <leader>sn: notifications (stub)
+--- <leader>sn: notifications
 function M.notifications()
-  vim.notify("No notifications to show", vim.log.levels.INFO)
+  local hist = _G.notify_history or {}
+  if #hist == 0 then
+    vim.notify("No notifications", vim.log.levels.INFO)
+    return
+  end
+  local items = {}
+  for _, n in ipairs(hist) do
+    items[#items + 1] = {
+      text = n.time .. "  " .. n.msg,
+      level = n.level,
+    }
+  end
+  M.set_to_qflist("Notifications", items, nil, { type = "notifications" })
 end
 
 --- <leader>sq: quickfix list as picker

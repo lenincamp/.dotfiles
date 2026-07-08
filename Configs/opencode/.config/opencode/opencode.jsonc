@@ -1,26 +1,70 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "model": "opencode/mimo-v2.5-free",
+  "small_model": "opencode/mimo-v2.5-free",
+  "instructions": ["skills/karpathy-guidelines/SKILL.md", "instructions/mcp-rules.md", ".cursor/rules/*.md"],
   "plugin": [
-    "karpathy-guidelines",
-    "@mumme-it/opencode-caveman"
+    "@mumme-it/opencode-caveman",
+    "caveman"
   ],
-  "agent": {
-    "default": {
-      "instructions": [
-        "karpathy-guidelines",
-        "caveman-full"
-      ]
-    }
-  },
   "mcp": {
     "codebase-memory": {
       "type": "local",
       "command": ["/Users/lcampoverde/.local/bin/codebase-memory-mcp"],
       "enabled": true
     },
-     "context7": {
+    "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp"
     }
+  },
+  "lsp": true,
+  "formatter": true,
+  "permission": {
+    "read": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "websearch": "ask",
+    "webfetch": "ask",
+    "todowrite": "allow",
+    "todoread": "allow",
+    "codesearch": "allow",
+    "question": "allow",
+    "edit": "ask",
+    "bash": "ask",
+    "task": "ask",
+    "lsp": "ask",
+    "skill": "ask",
+    "external_directory": "deny"
+  },
+  "watcher": {
+    "ignore": [
+      "node_modules",
+      "*.lock",
+      "dist",
+      "build",
+      ".next",
+      ".nuxt",
+      "target",
+      "__pycache__",
+      ".venv",
+      ".git",
+      "*.min.js",
+      "*.min.css"
+    ]
+  },
+  "shell": "/bin/zsh",
+  // ── Snapshot (undo support) ────────────────────────────────────────────────
+  "snapshot": true,
+  "share": "manual",
+  "autoupdate": true,
+  "compaction": {
+    "auto": true,
+    "tail_turns": 2
+  },
+  "tool_output": {
+    "max_lines": 2000,
+    "max_bytes": 51200
   }
 }

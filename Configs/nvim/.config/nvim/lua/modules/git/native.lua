@@ -1,5 +1,51 @@
 local M = {}
 
+local function set_to_qflist(title, items)
+  require("modules.editor.search_qf").set_to_qflist(title, items, nil, { type = "git" })
+end
+
+local git_show_buf = nil
+function M.git_show(hash)
+  if not git_show_buf or not vim.api.nvim_buf_is_valid(git_show_buf) then
+    git_show_buf = vim.api.nvim_create_buf(false, true) -- scratch buffer
+    vim.bo[git_show_buf].bufhidden = "wipe"
+    vim.bo[git_show_buf].filetype = "git"
+  end
+
+  vim.cmd("tabnew")
+  local current_win = vim.api.nvim_get_current_win()
+  vim.api.nvim_win_set_buf(current_win, git_show_buf)
+  vim.wo[current_win].number = false
+  vim.wo[current_win].relativenumber = false
+  vim.wo[current_win].signcolumn = "no"
+
+  vim.fn.termopen({ "git", "-c", "core.pager=delta", "show", hash }, {
+    on_exit = function()
+      vim.schedule(function()
+        if vim.api.nvim_win_is_valid(current_win) then
+          pcall(vim.api.nvim_win_close, current_win, true)
+        end
+        git_show_buf = nil
+      end)
+    end,
+  })
+  vim.cmd("startinsert")
+end
+
+function M.git_open()
+  local line = vim.api.nvim_win_get_cursor(0)[1]
+  local qf = vim.fn.getqflist()
+  local item = qf[line]
+  if not item then
+    return
+  end
+  if item.module then
+    M.git_show(item.module)
+  else
+    vim.notify("No commit hash", vim.log.levels.WARN)
+  end
+end
+
 local function git_root()
   local out = vim.fn.systemlist({ "git", "rev-parse", "--show-toplevel" })
   if vim.v.shell_error == 0 and out[1] then
@@ -52,8 +98,7 @@ function M.git_log_cwd()
       }
     end
   end
-  vim.fn.setqflist({}, "r", { title = "Git Log (cwd)", items = items })
-  vim.cmd.copen(10)
+  set_to_qflist("Git Log (cwd)", items)
 end
 
 --- <leader>gL: git log root → quickfix
@@ -76,8 +121,7 @@ function M.git_log_root()
       }
     end
   end
-  vim.fn.setqflist({}, "r", { title = "Git Log (root)", items = items })
-  vim.cmd.copen(10)
+  set_to_qflist("Git Log (root)", items)
 end
 
 --- <leader>gf: git file history
@@ -106,8 +150,7 @@ function M.git_file_history()
       }
     end
   end
-  vim.fn.setqflist({}, "r", { title = "Git History: " .. relpath, items = items })
-  vim.cmd.copen(10)
+  set_to_qflist("Git History: ", items)
 end
 
 --- <leader>gb: git blame line (notification)
@@ -120,7 +163,8 @@ function M.git_blame_line()
   local relpath = git_relative_path(file)
   local root = git_root()
   local line_num = vim.api.nvim_win_get_cursor(0)[1]
-  local output = vim.fn.systemlist({ "git", "-C", root, "blame", "-L", line_num .. "," .. line_num, "--porcelain", relpath })
+  local output =
+    vim.fn.systemlist({ "git", "-C", root, "blame", "-L", line_num .. "," .. line_num, "--porcelain", relpath })
   if vim.v.shell_error ~= 0 or #output == 0 then
     vim.notify("Blame failed", vim.log.levels.WARN)
     return
@@ -173,9 +217,24 @@ function M.lazygit(cwd)
     vim.notify("lazygit not found", vim.log.levels.WARN)
     return
   end
-  vim.cmd("botright 15split")
-  vim.fn.termopen({ "lazygit" }, { cwd = cwd or git_root() })
+  local dir = cwd or git_root()
+  vim.cmd("tabnew | terminal cd " .. vim.fn.shellescape(dir) .. " && lazygit")
   vim.cmd("startinsert")
+  local buf = vim.api.nvim_get_current_buf()
+  vim.api.nvim_create_autocmd("TermClose", {
+    buffer = buf,
+    once = true,
+    callback = function()
+      vim.schedule(function()
+        if vim.api.nvim_buf_is_valid(buf) then
+          vim.api.nvim_buf_delete(buf, { force = true })
+        end
+        if #vim.api.nvim_list_tabpages() > 1 then
+          vim.cmd("tabclose")
+        end
+      end)
+    end,
+  })
 end
 
 return M

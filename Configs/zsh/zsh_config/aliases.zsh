@@ -56,3 +56,4 @@ else
 fi
 alias docker=podman
 alias nvcs='rm -rf ~/.local/state/nvim/sessions && rm -rf ~/.local/share/nvim/sessions'
+alias opencode=ocv

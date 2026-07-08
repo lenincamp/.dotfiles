@@ -13,9 +13,9 @@ opt.swapfile = false
 opt.autoindent = true
 opt.smartindent = true -- auto-indent on new lines for C-like syntax
 opt.expandtab = true
-opt.tabstop = 4
-opt.softtabstop = 4
-opt.shiftwidth = 4
+opt.tabstop = 2
+opt.softtabstop = 2
+opt.shiftwidth = 2
 opt.shiftround = true
 opt.list = true
 opt.listchars = { tab = "  ", trail = "·", nbsp = "␣" }
@@ -47,6 +47,7 @@ opt.cmdheight = 1
 -- race where an inherited lsp-foldexpr wedges the folding state on a buffer
 -- whose client has not attached yet.
 vim.treesitter.language.register("tsx", { "javascriptreact", "typescriptreact" })
+vim.treesitter.language.register("sh", "zsh")
 
 function _G.SmartFoldexpr()
   if vim.b._has_lsp_folding then
@@ -107,7 +108,7 @@ opt.pumblend = 0 -- no popup blend (crisp completion menu)
 opt.winblend = 0 -- no floating-window blend
 opt.splitright = true -- new vertical splits open to the right
 opt.splitbelow = true -- new horizontal splits open below
-opt.showtabline = 0 -- never show the tabline
+-- opt.showtabline = 0 -- never show the tabline
 
 -- Undercurl support (for diagnostic underlines in capable terminals)
 vim.cmd([[let &t_Cs = "\e[4:3m"]])

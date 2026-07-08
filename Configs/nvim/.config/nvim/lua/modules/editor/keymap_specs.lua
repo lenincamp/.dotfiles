@@ -28,7 +28,7 @@ local function split_nav_move(dir)
   if vim.fn.win_gettype() == "command" then
     return
   end
-  require("pure-ui.split_nav").move(dir)
+  require("modules.editor.split_nav").move(dir)
 end
 
 local function search_qf()
@@ -460,7 +460,7 @@ local search_specs = {
   { mode = "n", lhs = "<leader>gl", desc = "Git Log (cwd)", group = "Git", action = function() git_native().git_log_cwd() end },
   { mode = "n", lhs = "<leader>gL", desc = "Git Log (root)", group = "Git", action = function() git_native().git_log_root() end },
   { mode = "n", lhs = "<leader>gf", desc = "Git File History", group = "Git", action = function() git_native().git_file_history() end },
-  { mode = "n", lhs = "<leader>gb", desc = "Git Blame Line", group = "Git", action = function() git_native().git_blame_line() end },
+  -- <leader>gb is set in gitsigns on_attach
   { mode = { "n", "x" }, lhs = "<leader>gB", desc = "Git Browse (open)", group = "Git", action = function() git_native().git_browse(false) end },
   { mode = { "n", "x" }, lhs = "<leader>gY", desc = "Git Browse (copy URL)", group = "Git", action = function() git_native().git_browse(true) end },
   { mode = "n", lhs = "<leader>gg", desc = "Lazygit (cwd)", group = "Git", condition = function() return vim.fn.executable("lazygit") == 1 end, action = function() git_native().lazygit(vim.fn.getcwd()) end },
@@ -800,6 +800,8 @@ local window_list_tab_specs = {
     rhs = "<C-W>=",
     opts = { remap = true },
   },
+  { mode = "n", lhs = "<leader>w|", desc = "Maximize Width", group = "Windows", rhs = "<cmd>wincmd |<cr>" },
+  { mode = "n", lhs = "<leader>w_", desc = "Maximize Height", group = "Windows", rhs = "<cmd>wincmd _<cr>" },
   {
     mode = "n",
     lhs = "<leader>wT",

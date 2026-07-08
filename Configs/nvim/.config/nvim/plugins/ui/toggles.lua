@@ -1,9 +1,7 @@
--- Editor toggles: delegates to pure-ui, colorscheme-sync, picker, and config modules.
+-- Editor toggles: delegates to colorscheme-sync, picker, and config modules.
 
 local M = {}
 local lazy_bootstrap = require("modules.bootstrap.lazy")
-local chrome = require("pure-ui.chrome")
-local dim = require("pure-ui.dim")
 
 local function notify(message)
   vim.notify(message, vim.log.levels.INFO, { title = "UI" })
@@ -11,37 +9,6 @@ end
 
 local function bool_text(enabled)
   return enabled and "ON" or "OFF"
-end
-
-function M.toggle_statusline()
-  chrome.toggle_statusline()
-  notify("Statusline " .. bool_text(chrome.statusline_enabled()))
-end
-
-function M.toggle_tabline()
-  chrome.toggle_tabline()
-  notify("Tabline " .. bool_text(chrome.tabline_enabled()))
-end
-
-function M.toggle_winbar()
-  chrome.toggle_winbar()
-  notify("Winbar " .. bool_text(chrome.winbar_enabled()))
-end
-
-function M.statusline_enabled()
-  return chrome.statusline_enabled()
-end
-
-function M.tabline_enabled()
-  return chrome.tabline_enabled()
-end
-
-function M.winbar_enabled()
-  return chrome.winbar_enabled()
-end
-
-function M.apply_bars_state()
-  chrome.apply_bars_state()
 end
 
 function M.toggle_option(option, label)
@@ -106,11 +73,6 @@ function M.toggle_transparent_background()
   end
   local transparent = csync.toggle_transparent_background()
   notify("Transparent Background " .. bool_text(transparent))
-end
-
-function M.toggle_dim()
-  local enabled = dim.toggle()
-  notify("Dim Inactive Windows " .. bool_text(enabled))
 end
 
 function M.toggle_zoom()

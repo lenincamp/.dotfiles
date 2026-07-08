@@ -35,6 +35,20 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+_G.notify_history = {}
+local orig_notify = vim.notify
+vim.notify = function(msg, level, opts)
+  _G.notify_history[#_G.notify_history + 1] = {
+    msg = msg,
+    level = level or vim.log.levels.INFO,
+    time = os.date("%H:%M:%S"),
+  }
+  if #_G.notify_history > 200 then
+    table.remove(_G.notify_history, 1)
+  end
+  orig_notify(msg, level, opts)
+end
+
 require("configs")
 require("lazy").setup("plugins", {
   defaults = { lazy = true },

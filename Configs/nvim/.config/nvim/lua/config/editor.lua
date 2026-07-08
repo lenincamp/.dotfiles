@@ -27,4 +27,7 @@ package.preload["config.ui"] = function()
   return dofile(config .. "/plugins/ui/toggles.lua")
 end
 
+require("config.editor.sessions").setup()
+require("config.editor.terminal").setup()
+
 return M

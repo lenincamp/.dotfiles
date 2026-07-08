@@ -30,14 +30,6 @@ return vim.list_extend(csync_themes, {
   { "nvim-lua/plenary.nvim", lazy = true },
   { "tpope/vim-sleuth", lazy = false },
   { "MunifTanjim/nui.nvim", lazy = true },
-  p("lenincamp/pure-ui.nvim", "pure-ui.nvim", {
-    lazy = false,
-    dependencies = { "colorscheme-sync.nvim" },
-    config = function()
-      require("pure-ui").setup()
-    end,
-  }),
-
   {
     "nvim-treesitter/nvim-treesitter",
     event = { "BufReadPost", "BufNewFile" },
@@ -102,7 +94,7 @@ return vim.list_extend(csync_themes, {
   },
   { "rafamadriz/friendly-snippets", lazy = true },
 
-  { "tpope/vim-obsession", lazy = true, cmd = "Obsession" },
+  { "tpope/vim-obsession" },
   { "tpope/vim-dadbod", lazy = true },
   { "kristijanhusak/vim-dadbod-completion", lazy = true },
   {

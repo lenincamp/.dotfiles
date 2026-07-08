@@ -71,6 +71,7 @@ gs.setup({
     map("<leader>gS", with_treesitter_paused(gs.stage_buffer),         "Git: stage buffer")
     map("<leader>gR", with_treesitter_paused(gs.reset_buffer),         "Git: reset buffer")
     map("<leader>gp", with_treesitter_paused(gs.preview_hunk),         "Git: preview hunk")
+    map("<leader>gb", function() gs.blame_line({ full = true }) end,     "Git: blame line")
     map("<leader>gt", function() gs.toggle_current_line_blame() end,    "Git: toggle line blame")
     map("<leader>gd", with_treesitter_paused(function()
       gs.diffthis()

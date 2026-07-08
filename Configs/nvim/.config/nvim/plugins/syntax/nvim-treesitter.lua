@@ -3,29 +3,8 @@
 
 -- ── Parser install directory ────────────────────────────────────────────────
 require("nvim-treesitter").setup({
-  ensure_installed = {
-    -- Shell / config
-    "bash", "zsh", "ssh_config", "tmux",
-    -- Git
-    "diff", "git_config", "git_rebase", "gitattributes", "gitcommit", "gitignore",
-    -- Web
-    "css", "html", "http", "javascript", "jsdoc", "json", "scss", "tsx", "typescript",
-    -- Lua
-    "lua", "luadoc", "luap", "query",
-    -- JVM
-    "java", "javadoc", "kotlin",
-    -- Python
-    "python",
-    -- Data / markup
-    "csv", "graphql", "jq", "markdown", "markdown_inline", "nginx",
-    "properties", "regex", "sql", "toml", "xml", "yaml",
-    -- Misc
-    "comment", "dockerfile", "latex",
-    -- Salesforce
-    "apex", "soql", "sosl",
-    -- Vim
-    "vim", "vimdoc",
-  },
+  auto_install = true,
+  ensure_installed = {},
 })
 
 -- The new main-branch nvim-treesitter stores highlight/indent/fold queries
@@ -61,12 +40,23 @@ end
 -- replacing regex-based syntax.  pcall guards against missing parsers.
 
 local function enable_highlight(buf)
-  if not is_regular_treesitter_buffer(buf) then return end
+  if not is_regular_treesitter_buffer(buf) then
+    return
+  end
+  local ft = vim.bo[buf].filetype
+  local lang = vim.treesitter.language.get_lang(ft)
+  if not lang then
+    return
+  end
+  local ok = pcall(vim.treesitter.language.inspect, lang)
+  if not ok then
+    return
+  end
   pcall(vim.treesitter.start, buf)
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-  group    = vim.api.nvim_create_augroup("ts_highlight", { clear = true }),
+  group = vim.api.nvim_create_augroup("ts_highlight", { clear = true }),
   callback = function(args)
     enable_highlight(args.buf)
   end,
@@ -85,26 +75,34 @@ vim.api.nvim_create_autocmd("FileType", {
 -- or Vim's built-in Java indent from $VIMRUNTIME/indent/java.vim).
 
 local function enable_indent(buf)
-  if not is_regular_treesitter_buffer(buf) then return end
+  if not is_regular_treesitter_buffer(buf) then
+    return
+  end
 
-  local ft   = vim.bo[buf].filetype
+  local ft = vim.bo[buf].filetype
   local lang = vim.treesitter.language.get_lang(ft)
-  if not lang then return end
+  if not lang then
+    return
+  end
 
   -- Verify parser is loadable
   local ok_parser = pcall(vim.treesitter.language.inspect, lang)
-  if not ok_parser then return end
+  if not ok_parser then
+    return
+  end
 
   -- Verify indents query exists (same check LazyVim does via have_query)
   local has_indents = vim.treesitter.query.get(lang, "indents") ~= nil
-  if not has_indents then return end
+  if not has_indents then
+    return
+  end
 
   -- Use nvim-treesitter's indent, not the native vim.treesitter one
   vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-  group    = vim.api.nvim_create_augroup("ts_indent", { clear = true }),
+  group = vim.api.nvim_create_augroup("ts_indent", { clear = true }),
   callback = function(args)
     enable_indent(args.buf)
   end,
@@ -119,6 +117,12 @@ end)
 
 -- ── Incremental selection ───────────────────────────────────────────────────
 
-vim.keymap.set("n", "gnn", function() vim.treesitter.select("parent") end, { desc = "TS: init selection" })
-vim.keymap.set("x", "grn", function() vim.treesitter.select("parent") end, { desc = "TS: grow selection" })
-vim.keymap.set("x", "grm", function() vim.treesitter.select("child") end, { desc = "TS: shrink selection" })
+vim.keymap.set("n", "gnn", function()
+  vim.treesitter.select("parent")
+end, { desc = "TS: init selection" })
+vim.keymap.set("x", "grn", function()
+  vim.treesitter.select("parent")
+end, { desc = "TS: grow selection" })
+vim.keymap.set("x", "grm", function()
+  vim.treesitter.select("child")
+end, { desc = "TS: shrink selection" })

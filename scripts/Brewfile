@@ -1,204 +1,198 @@
-tap "danielbayley/alfred"
-tap "danvergara/tools"
-tap "davidbudnick/tap"
-tap "felixkratz/formulae"
-tap "go-task/tap"
-tap "homebrew/services"
-tap "instantclienttap/instantclient"
-tap "krtirtho/apps"
-tap "ngrok/ngrok"
+tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
 tap "nikitabobko/tap"
-tap "pedh/monaco-nerd-fonts"
-tap "slp/krunkit"
 tap "spring-io/tap"
+# General-purpose data compression with high compression ratio
 brew "xz"
-brew "openssl@3"
-brew "atuin"
-brew "axel"
-brew "readline"
-brew "azure-cli"
-brew "bash"
-brew "bat"
-brew "bob"
-brew "btop"
-brew "docker"
-brew "docker-compose"
-brew "exercism"
-brew "eza"
-brew "fd"
-brew "ffmpegthumbnailer"
-brew "fnm"
-brew "fzf"
-brew "gh"
-brew "git"
-brew "git-delta"
-brew "unbound"
-brew "gnutls"
+# OpenType text shaping engine
 brew "harfbuzz"
-brew "gradle"
-brew "grc"
+# Improved shell history for zsh, bash, fish and nushell
+brew "atuin"
+# Light UNIX download accelerator
+brew "axel"
+# Cryptography and SSL/TLS Toolkit
+brew "openssl@3"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Version manager for neovim
+brew "bob"
+# Resource monitor. C++ version and continuation of bashtop and bpytop
+brew "btop"
+# Play, record, convert, and stream select audio and video codecs
+brew "ffmpeg"
+# Duplicate file utility
+brew "czkawka"
+# Command-line tool to interact with exercism.io
+brew "exercism"
+# Modern, maintained replacement for ls
+brew "eza"
+# Like neofetch, but much faster because written mostly in C
+brew "fastfetch"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
+# GNU Transport Layer Security (TLS) Library
+brew "gnutls"
+# Validating, recursive, caching DNS resolver
+brew "unbound"
+# Create thumbnails for your video files
+brew "ffmpegthumbnailer"
+# Fast and simple Node.js version manager
+brew "fnm"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# Syntax-highlighting pager for git and diff output
+brew "git-delta"
+# Library for command-line editing
+brew "readline"
+# Improved top (interactive process viewer)
 brew "htop"
+# User-friendly cURL replacement (command-line HTTP client)
+brew "httpie"
+# Tools and libraries to manipulate images in select formats
 brew "imagemagick"
-brew "ios-deploy"
+# Dex to Java decompiler
 brew "jadx"
+# Java language specific implementation of the Language Server Protocol
 brew "jdtls"
+# Manage your Java environment
 brew "jenv"
+# Lightweight and flexible command-line JSON processor
 brew "jq"
+# Cross-platform software keyboard remapper for Linux, macOS and Windows
 brew "kanata"
-brew "kubernetes-cli"
-brew "kubectx"
+# Network authentication protocol
+brew "krb5"
+# Lazier way to manage everything docker
 brew "lazydocker"
+# Simple terminal UI for git commands
 brew "lazygit"
-brew "lima"
+# Curses-based tool for viewing and analyzing log files
 brew "lnav"
+# Just-In-Time Compiler (JIT) for the Lua programming language
 brew "luajit"
+# Package manager for the Lua programming language
 brew "luarocks"
-brew "mas"
+# Java-based project management
 brew "maven"
+# NCurses Disk Usage
 brew "ncdu"
-brew "neofetch"
-brew "openjdk@11"
-brew "openjdk@21"
-brew "openssl@1.1"
-brew "php"
+# Tool for managing OCI containers and pods
 brew "podman"
-brew "podman-compose"
+# PDF rendering library (based on the xpdf-3.0 code base)
 brew "poppler"
+# Python version management
 brew "pyenv"
-brew "qemu"
+# Search tool like grep and The Silver Searcher
 brew "ripgrep"
+# Safe, concurrent, practical language
 brew "rust"
+# 7-Zip is a file archiver with a high compression ratio
 brew "sevenzip"
-brew "showkey"
-brew "socat"
+# Command-line interface for https://speedtest.net bandwidth tests
 brew "speedtest-cli"
+# Spoof your MAC address in macOS
+brew "spoof-mac"
+# Cross-shell prompt for astronauts
 brew "starship"
+# Very fast implementation of tldr in Rust
 brew "tealdeer"
+# Programmatically correct mistyped console commands
 brew "thefuck"
+# Terminal multiplexer
 brew "tmux"
+# Manage complex tmux sessions easily
 brew "tmuxinator"
-brew "w3m"
+# Internet file retriever
 brew "wget"
+# Blazing fast terminal file manager written in Rust, based on async I/O
 brew "yazi"
-brew "zlib"
+# Shell extension to navigate your filesystem faster
 brew "zoxide"
-brew "danvergara/tools/dblab"
-brew "felixkratz/formulae/borders"
-brew "felixkratz/formulae/sketchybar"
-brew "go-task/tap/go-task"
-brew "slp/krunkit/krunkit"
-brew "spring-io/tap/spring-boot"
+brew "spring-io/tap/spring-boot", trusted: true
+# AeroSpace is an i3-like tiling window manager for macOS
 cask "nikitabobko/tap/aerospace"
+# GPU-accelerated terminal emulator
+cask "alacritty"
+# Enable Windows-like alt-tab
 cask "alt-tab"
-cask "android-file-transfer"
-cask "beekeeper-studio"
-cask "blurred"
-cask "brave-browser"
-cask "copilot-cli"
+# Allows connection to a computer remotely
+cask "anydesk"
+# Log analysis tool
+cask "chipmunk"
+# Server and cloud storage browser
 cask "cyberduck"
-cask "devtoys"
-cask "diffmerge"
-cask "fig"
-cask "firefox@developer-edition"
-cask "font-0xproto-nerd-font"
-cask "font-caskaydia-cove-nerd-font"
-cask "font-fira-code"
-cask "font-fira-code-nerd-font"
-cask "font-hack-nerd-font"
-cask "font-inconsolata-nerd-font"
-cask "font-iosevka-nerd-font"
-cask "font-jetbrains-mono-nerd-font"
-cask "font-lekton-nerd-font"
-cask "font-maple-mono"
-cask "font-maple-mono-nf"
-cask "pedh/monaco-nerd-fonts/font-monaco-nerd-font"
-cask "font-plemol-jp"
-cask "font-plemol-jp-nf"
-cask "font-sf-pro"
-cask "font-symbols-only-nerd-font"
+# Disk space visualiser
+cask "daisydisk"
+# Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
-cask "hiddenbar"
+# Terminal emulator as alternative to Apple's Terminal app
 cask "iterm2"
-cask "karabiner-elements"
-cask "keepingyouawake"
-cask "klogg"
-cask "meld"
-cask "microsoft-teams"
-cask "notion"
+# Utility to uninstall apps and remove leftover files from old/uninstalled apps
 cask "pearcleaner"
-cask "podman-desktop"
-cask "postman"
-cask "rar"
+# Move and resize windows using keyboard shortcuts or snap areas
 cask "rectangle"
-cask "spotify"
-cask "krtirtho/apps/spotube"
+# Text editor for code, markup and prose
 cask "sublime-text"
-cask "temurin@17"
+# Open-source code editor
 cask "visual-studio-code"
-cask "visual-studio-code@insiders"
+# GPU-accelerated cross-platform terminal emulator and multiplexer
 cask "wezterm"
-cask "zen"
-mas "Apple Configurator", id: 1037126344
-mas "GarageBand", id: 682658836
-mas "iMovie", id: 408981434
-mas "Keynote", id: 409183694
-mas "Numbers", id: 409203825
-mas "Okta Verify", id: 490179405
-mas "Pages", id: 409201541
-mas "Slack", id: 803453959
-mas "Xcode", id: 497799835
-vscode "aaron-bond.better-comments"
-vscode "bierner.markdown-preview-github-styles"
+# OpenJDK distribution from Azul
+cask "zulu@17"
+# OpenJDK distribution from Azul
+cask "zulu@21"
+# OpenJDK distribution from Azul
+cask "zulu@8"
+vscode "asvetliakov.vscode-neovim"
+vscode "chuckjonas.apex-pmd"
+vscode "chuckjonas.salesforce-diff"
+vscode "codediagram.codediagram"
+vscode "codescansf.codescan-vscode"
 vscode "continue.continue"
 vscode "dbaeumer.vscode-eslint"
-vscode "dsznajder.es7-react-js-snippets"
+vscode "drcika.apc-extension"
+vscode "eamodio.gitlens"
 vscode "editorconfig.editorconfig"
 vscode "esbenp.prettier-vscode"
-vscode "loginspector.loginspector"
+vscode "financialforce.lana"
+vscode "github.copilot"
+vscode "github.copilot-chat"
+vscode "gruntfuggly.todo-tree"
+vscode "hugoom.sfdx-autoheader"
+vscode "johnpapa.winteriscoming"
+vscode "johnschlesinger.neosolarized-theme"
+vscode "kisstkondoros.vscode-codemetrics"
+vscode "mhutchie.git-graph"
+vscode "miguelsolorio.fluent-icons"
+vscode "miguelsolorio.symbols"
+vscode "modicatech.apex-code-coverage-visualizer"
 vscode "redhat.java"
-vscode "salesforce.agent-script-language-client"
 vscode "salesforce.apex-language-server-extension"
 vscode "salesforce.salesforce-vscode-slds"
 vscode "salesforce.salesforcedx-einstein-gpt"
 vscode "salesforce.salesforcedx-vscode"
-vscode "salesforce.salesforcedx-vscode-agents"
 vscode "salesforce.salesforcedx-vscode-apex"
-vscode "salesforce.salesforcedx-vscode-apex-debugger"
-vscode "salesforce.salesforcedx-vscode-apex-log"
 vscode "salesforce.salesforcedx-vscode-apex-oas"
 vscode "salesforce.salesforcedx-vscode-apex-replay-debugger"
 vscode "salesforce.salesforcedx-vscode-core"
 vscode "salesforce.salesforcedx-vscode-lightning"
 vscode "salesforce.salesforcedx-vscode-lwc"
-vscode "salesforce.salesforcedx-vscode-metadata"
 vscode "salesforce.salesforcedx-vscode-org"
-vscode "salesforce.salesforcedx-vscode-org-browser"
-vscode "salesforce.salesforcedx-vscode-services"
 vscode "salesforce.salesforcedx-vscode-soql"
 vscode "salesforce.salesforcedx-vscode-visualforce"
 vscode "salesforce.sfdx-code-analyzer-vscode"
-vscode "tomrijndorp.find-it-faster"
-vscode "usernamehw.errorlens"
-vscode "vmware.vscode-spring-boot"
-vscode "vscjava.migrate-java-to-azure"
 vscode "vscjava.vscode-gradle"
 vscode "vscjava.vscode-java-debug"
 vscode "vscjava.vscode-java-dependency"
 vscode "vscjava.vscode-java-pack"
 vscode "vscjava.vscode-java-test"
-vscode "vscjava.vscode-java-upgrade"
 vscode "vscjava.vscode-maven"
-vscode "vscjava.vscode-spring-boot-dashboard"
-cargo "dedoc"
-cargo "tredis"
 cargo "ttyper"
 cargo "tuckr"
 cargo "zellij"
 npm "@google/gemini-cli"
 npm "@salesforce/cli"
-npm "cordova"
+npm "@salesforce/lwc-language-server"
 npm "corepack"
 npm "neovim"
 npm "pnpm"
-npm "vscode-langservers-extracted"
 npm "yarn"

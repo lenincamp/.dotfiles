@@ -28,13 +28,19 @@ end
 --------------------------------------------------------------------------------
 -- Completion sources
 --------------------------------------------------------------------------------
-local COMPLETION_SOURCES = {
-  "lsp",
-  "minuet",
-  "snippets",
-  "path",
-  "buffer",
-}
+local has_minuet = (function()
+  local ok, cp = pcall(require, "modules.ai.claude_proxy")
+  if ok and cp.has_proxy() then
+    return true
+  end
+  return vim.env.OPENCODE_GO_API_KEY ~= nil and vim.env.OPENCODE_GO_API_KEY ~= ""
+end)()
+
+local COMPLETION_SOURCES = { "lsp" }
+if has_minuet then
+  COMPLETION_SOURCES[#COMPLETION_SOURCES + 1] = "minuet"
+end
+vim.list_extend(COMPLETION_SOURCES, { "snippets", "path", "buffer" })
 
 require("blink.cmp").setup({
   -- Force the Rust fuzzy matcher: the dylib is built locally in
@@ -214,14 +220,14 @@ require("blink.cmp").setup({
       lsp = {
         score_offset = 100,
       },
-      minuet = {
+      minuet = has_minuet and {
         name = "󰋦",
         module = "minuet.blink",
         score_offset = 80,
         async = true,
         timeout_ms = 2400,
         enabled = completion_enabled,
-      },
+      } or nil,
       snippets = {
         score_offset = 60,
         min_keyword_length = 1,

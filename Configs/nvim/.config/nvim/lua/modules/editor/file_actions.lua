@@ -102,31 +102,52 @@ function M.open_quickfix_playbook()
 
   vim.cmd("edit " .. vim.fn.fnameescape(path))
 end
-function M.quickfix_oldfiles_cwd()
-  local cwd = vim.fn.getcwd()
-  local oldfiles = vim.v.oldfiles
-  local items = {}
 
-  for _, file in ipairs(oldfiles) do
-    if file:find(cwd, 1, true) and vim.fn.filereadable(file) == 1 then
-      table.insert(items, { filename = file, lnum=1, col=1, text="" })
-    end
+local function filter_oldfiles_cwd()
+  local cwd = vim.fn.getcwd()
+  return vim
+    .iter(vim.v.oldfiles)
+    :filter(function(file)
+      return file:find(cwd, 1, true) and vim.uv.fs_stat(file)
+    end)
+    :totable()
+end
+
+function M.quickfix_oldfiles_cwd()
+  local candidates = filter_oldfiles_cwd()
+  if #candidates == 0 then
+    vim.notify("No recent files in CWD", vim.log.levels.INFO)
+    return
   end
 
-  vim.fn.setqflist({}, "r", { title = "Recent Files (CWD)", items = items })
-  vim.cmd("copen")
+  vim.ui.select(candidates, {
+    prompt = "Oldfiles → Quickfix",
+    format_item = function(item)
+      return vim.fn.fnamemodify(item, ":~:.")
+    end,
+  }, function(choice)
+    if not choice then
+      return
+    end
+    local items = {}
+    local target_idx = 1
+    for i, file in ipairs(candidates) do
+      if file == choice then
+        target_idx = i
+      end
+      items[#items + 1] = { filename = file, lnum = 1, col = 1, text = "" }
+    end
+    require("modules.editor.search_qf").set_to_qflist("Recent Files (CWD)", items)
+    vim.cmd(tostring(target_idx) .. "cc")
+  end)
 end
 
 function M.find_oldfiles()
-  local cwd = vim.fn.getcwd()
-
-  local candidates = vim
-    .iter(vim.v.oldfiles)
-    :filter(function(file)
-      return file:find(cwd, 1, true)
-        and vim.uv.fs_stat(file)
-    end)
-    :totable()
+  local candidates = filter_oldfiles_cwd()
+  if #candidates == 0 then
+    vim.notify("No recent files in CWD", vim.log.levels.INFO)
+    return
+  end
 
   vim.ui.select(candidates, {
     prompt = "Oldfiles",

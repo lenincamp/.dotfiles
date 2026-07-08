@@ -196,7 +196,6 @@ cd ~/.dotfiles
 
 3. **Instalar Tuckr:**
    ```bash
-   # Instalar tuckr según sus instrucciones
    cargo install tuckr
    # O via Homebrew si está disponible
    ```
@@ -208,35 +207,39 @@ cd ~/.dotfiles
 
 5. **Deploy dotfiles con Tuckr:**
    ```bash
-   # Opción 1: Deploy con hooks automáticos (RECOMENDADO)
+   # Deploy con hooks automáticos (recomendado)
    tuckr set Configs/*
-   
-7. **Configuración manual (si es necesario):**
-   
-   La mayoría ya se hizo con los hooks, pero verifica:
-   ```bash
-   # Ver estado de skip-worktree
-   git ls-files -v | grep '^S'
-   
-   # Verificar iTerm2
-   ./scripts/export-iterm2-settings.sh
-   ```
 
-8. **(Opcional) ✅ Configurar iTerm2 para guardar en dotfiles
-   - ✅ Instalar TPM y plugins de Tmux
-   - ✅ Instalar plugins de Zsh
-   - ✅ Y más... (ver `Hooks/README.md`)
+   # O sin hooks (solo symlinks)
+   tuckr add Configs/*
+   ```
 
 6. **Verificar deployment:**
    ```bash
    tuckr status
    ```
+
+7. **Configurar iTerm2 sync:**
    ```bash
    ./scripts/setup-iterm2-sync.sh
    # Luego reiniciar iTerm2
    ```
 
-7. **Aplicar configuraciones del sistema:**
+8. **Aplicar configuraciones del sistema:**
+   ```bash
+   ./scripts/export-system-settings.sh
+   ```
+
+9. **Configurar skip-worktree:**
+   ```bash
+   ./scripts/theme-tools/skip-theme-tracking.sh
+   ```
+
+10. **(Opcional) Hooks adicionales:**
+    - Verificar hooks disponibles: `cat Hooks/README.md`
+    - Instalar TPM y plugins de Tmux
+    - Instalar plugins de Zsh
+
 ## 🎯 Workflow Diario
 
 ### Deploy nuevo programa
@@ -256,6 +259,7 @@ tuckr add <programa>
 # O individualmente
 brew bundle dump --force
 ./scripts/export-system-settings.sh
+./scripts/export-iterm2-settings.sh
 ```
 
 ### Ver hooks disponibles
@@ -263,11 +267,6 @@ brew bundle dump --force
 cat Hooks/README.md
 ls -la Hooks/*/
 ```
-
-8. **Configurar skip-worktree:**
-   ```bash
-   ./scripts/theme-tools/skip-theme-tracking.sh
-   ```
 
 ## 📚 Referencias
 

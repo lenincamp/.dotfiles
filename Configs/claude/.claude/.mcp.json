@@ -1,0 +1,7 @@
+{
+    "mcpServers": {
+        "codebase-memory-mcp": {
+            "command": "/Users/lcampoverde/.local/bin/codebase-memory-mcp"
+        }
+    }
+}

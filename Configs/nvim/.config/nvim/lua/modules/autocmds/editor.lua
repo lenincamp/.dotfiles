@@ -7,22 +7,14 @@ local cache = {
 
 local function get_files()
   local cwd = vim.loop.cwd()
-
-  -- simple cache por directorio
   if cache.cwd == cwd and cache.files then
     return cache.files
   end
-
   local fd = require("modules.editor.fd")
-  local output = vim
-    .system(vim.list_extend({ "fd", "--type", "f" }, fd.basic()), { text = true })
-    :wait()
-
+  local output = vim.system(vim.list_extend({ "fd", "--type", "f" }, fd.basic()), { text = true }):wait()
   local files = vim.split(output.stdout or "", "\n", { trimempty = true })
-
   cache.cwd = cwd
   cache.files = files
-
   return files
 end
 
@@ -78,13 +70,13 @@ function M.setup()
   vim.api.nvim_create_user_command("Rg", function(opts)
     local cmd = { "rg", "--vimgrep", "-F" }
     vim.list_extend(cmd, opts.fargs)
-    -- print("Comando ejecutado: " .. vim.inspect(cmd))
     local lines = vim.fn.systemlist(cmd)
-    vim.fn.setqflist({}, "r", {
-      title = "Search: " .. table.concat(opts.fargs, " "),
-      lines = lines,
-    })
-    vim.cmd.copen(10)
+    local text = table.concat(opts.fargs, " ")
+    if not lines or #lines == 0 then
+      vim.notify("There aren't results for " .. text, vim.log.levels.WARN)
+      return
+    end
+    require("modules.editor.search_qf").set_to_qflist("Search: " .. text, nil, lines, { type = "search" })
   end, { nargs = "+" })
 
   vim.api.nvim_create_autocmd("FileType", {
@@ -103,8 +95,39 @@ function M.setup()
         desc = "Netrw: edit file hiding list",
       })
       vim.keymap.set("n", "<C-l>", function()
-        require("pure-ui.split_nav").move("l")
+        require("modules.editor.split_nav").move("l")
       end, { buffer = args.buf, silent = true, nowait = true, desc = "Move to right window" })
+    end,
+  })
+
+  vim.api.nvim_create_user_command("Td", function()
+    require("floatodo").floatodo_toggle()
+  end, { desc = "Toggle Floating TODO" })
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "qf",
+    callback = function(args)
+      local ctx = vim.fn.getqflist({ context = 1 }).context
+      if ctx and ctx.type == "git" then
+        vim.keymap.set("n", "<CR>", require("modules.git.native").git_open, {
+          buffer = args.buf,
+          silent = true,
+        })
+        return
+      end
+      pcall(vim.keymap.del, "n", "<CR>", { buffer = args.buf })
+    end,
+  })
+  local default_showtabline = vim.o.showtabline
+  vim.api.nvim_create_autocmd("TermOpen", {
+    callback = function()
+      vim.t.has_terminal = true
+      vim.o.showtabline = 0
+    end,
+  })
+  vim.api.nvim_create_autocmd("TabEnter", {
+    callback = function()
+      vim.o.showtabline = vim.t.has_terminal and 0 or default_showtabline
     end,
   })
 end
