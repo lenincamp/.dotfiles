@@ -21,11 +21,7 @@ Configs/iterm2/generated/*.itermcolors
 Configs/gitconfig/delta-generated.gitconfig
 Configs/gemini/.gemini/settings.json
 Configs/lazygit/Library/Application Support/lazygit/config-generated-*.yml
-Configs/starship/.config/starship.toml
 Configs/nvim/.config/github-copilot/versions.json
-Configs/alacritty/.config/alacritty/alacritty.toml
-Configs/eza/.config/eza/theme.yml
-Configs/btop/.config/btop/btop.conf
 
 # local shell secrets
 Configs/zsh/zsh_config/local-secrets.zsh
