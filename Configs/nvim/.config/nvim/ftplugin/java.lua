@@ -3,7 +3,12 @@
 vim.bo.tabstop = 4
 vim.bo.shiftwidth = 4
 vim.bo.softtabstop = 4
+vim.bo.expandtab = true
 vim.b.autoformat = false
+vim.b.did_ftplugin = 1
+
+-- Disable vim-sleuth: ftplugin already defines indent explicitly
+vim.b.sleuth_automatic = 0
 
 -- Guard: prevent executeClientCommand crash on invalid buffers (once globally)
 if not vim.g._pure_java_execute_client_command_guarded then

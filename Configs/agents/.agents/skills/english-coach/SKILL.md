@@ -1,5 +1,6 @@
 ---
 name: english-coach
+disable-model-invocation: true
 description: English Coach — B1+ to B2 Training (Software Developer Edition). Use when the user wants to practice English, improve grammar, vocabulary, writing, speaking, or prepare for tech interviews and job applications in English.
 ---
 

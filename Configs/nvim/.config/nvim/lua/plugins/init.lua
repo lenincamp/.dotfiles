@@ -70,6 +70,7 @@ return vim.list_extend(csync_themes, {
   { "saghen/blink.lib", lazy = true },
   {
     "saghen/blink.cmp",
+    version = "*",
     event = "InsertEnter",
     cond = not_diff,
     dependencies = {
@@ -79,11 +80,7 @@ return vim.list_extend(csync_themes, {
       "rafamadriz/friendly-snippets",
       "mayromr/blink-cmp-dap",
     },
-    build = function()
-      -- build the fuzzy matcher, optionally add a timeout to `pwait(timeout_ms)`
-      -- you can use `gb` in `:Lazy` to rebuild the plugin as needed
-      require("blink.cmp").build():pwait()
-    end,
+    build = "cargo build --release",
     config = cfg("editor/blink-cmp.lua"),
   },
   {
@@ -170,7 +167,7 @@ return vim.list_extend(csync_themes, {
     config = cfg("lsp/mason.lua"),
   },
   p("lenincamp/lsp-nav.nvim", "lsp-nav.nvim", {
-    lazy=true,
+    lazy = true,
     event = "LspAttach",
     config = function()
       require("lsp-nav").setup({})
@@ -289,7 +286,13 @@ return vim.list_extend(csync_themes, {
     "stevearc/quicker.nvim",
     ft = "qf",
     keys = {
-      { "<leader>q", function() require("quicker").toggle() end, desc = "Toggle Quickfix" },
+      {
+        "<leader>q",
+        function()
+          require("quicker").toggle()
+        end,
+        desc = "Toggle Quickfix",
+      },
     },
     opts = {},
   },
@@ -305,4 +308,7 @@ return vim.list_extend(csync_themes, {
       })
     end,
   },
+  { "craftzdog/solarized-osaka.nvim", lazy = false, opts = {} },
+  { "catppuccin/nvim", lazy = false, name = "catppuccin" },
+  { "wtfox/luna.nvim", lazy = false, opts = {} },
 })

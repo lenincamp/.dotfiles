@@ -64,22 +64,29 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 " go to the right split
 nnoremap <C-l> <C-w>l
-"move visual block
-xnoremap J :action MoveLineDown<CR>
-xnoremap K :action MoveLineUp<CR>
+" move line down/up (parity nvim <A-j>/<A-k>)
+nnoremap <A-j> :action MoveLineDown<CR>
+nnoremap <A-k> :action MoveLineUp<CR>
+inoremap <A-j> :action MoveLineDown<CR>
+inoremap <A-k> :action MoveLineUp<CR>
+xnoremap <A-j> :action MoveLineDown<CR>
+xnoremap <A-k> :action MoveLineUp<CR>
 " go to start of line
 nnoremap H ^
 " go to end of line
-nnoremap L g_
+nnoremap L $
 " select next occurrence
 vnoremap <C-n> :action SelectNextOccurrence<CR>
 " select all occurrences
 vnoremap <C-S-n> :action SelectAllOccurrences<CR>
 " select all text
 nnoremap <c-a> gg<S-v>G
-"Put search results in the middle of screen
-nnoremap n nzz
-nnoremap N Nzz
+" search result navigation (parity nvim: plain n/N, no centering)
+nnoremap n n
+nnoremap N N
+" center after half-page scroll (parity nvim)
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
 "Some search and replace shorcouts
 nnoremap <leader>rr :%s//g<Left><Left>
 xnoremap <leader>rr :s//g<Left><Left>
@@ -92,6 +99,7 @@ nnoremap <leader><leader>m :action ManageRecentProjects<CR>
 "NERDTree
 "nnoremap <leader>e :NERDTreeToggle<CR>
 nnoremap <leader>e :action SelectInProjectView<CR>
+nnoremap <leader>E :action SelectInProjectView<CR>
 nnoremap <leader>_ :NERDTreeFocus<CR>
 " reload vimrc
 nnoremap \e :e ~/.ideavimrc<CR>
@@ -105,12 +113,27 @@ nnoremap <leader>\| :action SplitVertically<CR>
 nnoremap <leader>- :action SplitHorizontally<CR>
 nnoremap <leader>mw :action Unsplit<CR>
 nnoremap <leader>ma :action UnsplitAll<CR>
+" window parity with nvim (<leader>w-prefix)
+nnoremap <leader>ww :action JumpToLastWindow<CR>
+nnoremap <leader>wd :action Unsplit<CR>
+nnoremap <leader>ws :action SplitHorizontally<CR>
+nnoremap <leader>wv :action SplitVertically<CR>
+nnoremap <leader>wh <C-w>h
+nnoremap <leader>wj <C-w>j
+nnoremap <leader>wk <C-w>k
+nnoremap <leader>wl <C-w>l
+nnoremap <leader>wo :action UnsplitAll<CR>
+" tabs parity with nvim (<leader><tab>-prefix)
+nnoremap <leader><tab>] :action NextTab<CR>
+nnoremap <leader><tab>[ :action PreviousTab<CR>
 "-------- Source code navigation --------
 nnoremap <leader>fC :action GotoClass<CR>
 nnoremap <leader>fF :action GotoFile<CR>
 nnoremap <leader>sS :action GotoSymbol<CR>
 nnoremap <leader>sA :action GotoAction<CR>
-nnoremap <leader>gl :action GotoLine<CR>
+" git parity with nvim (gl = git log, <leader>gb = blame)
+nnoremap <leader>gl :action Git.Log<CR>
+nnoremap <leader>gb :action Annotate<CR>
 
 nnoremap gD :action GotoDeclaration<CR>
 nnoremap gy :action GotoTypeDeclaration<CR>
@@ -119,9 +142,15 @@ nnoremap gt :action GotoTest<CR>
 nnoremap gm :action GotoSuperMethod<CR>
 nnoremap gpd :action QuickImplementations<CR>
 nnoremap K :action QuickJavaDoc<CR>
+" LSP parity with nvim (g-prefix)
+nnoremap grt :action GotoTypeDeclaration<CR>
+nnoremap gri :action GotoImplementation<CR>
+nnoremap gra :action ShowIntentionActions<CR>
+nnoremap grn :action RenameElement<CR>
+nnoremap gK :action ParameterInfo<CR>
+inoremap <C-k> :action ParameterInfo<CR>
 " find references
 nnoremap <leader>gr :action FindUsages<CR>
-nnoremap gr :action ShowUsages<CR>
 nnoremap <leader>sh :action ShowHoverInfo<CR>
 nnoremap <leader>ss :action FileStructurePopup<CR>
 nnoremap <leader>ch :action CallHierarchy<CR>
@@ -159,6 +188,11 @@ nnoremap <leader>ry :action CopyElement<CR>
 "-------- Editing ---------
 "code actions
 nnoremap <leader>ca :action ShowIntentionActions<CR>
+" command center parity with nvim (<leader><space>)
+nnoremap <leader><space> :action GotoAction<CR>
+nnoremap <A-d> :action DuplicateLines<CR>
+inoremap <A-d> :action DuplicateLines<CR>
+xnoremap <A-d> :action DuplicateLines<CR>
 vnoremap gsA :action SurroundWith<CR>
 nnoremap <S-space> :action Generate<CR>
 inoremap <C-]> :action EditorCompleteStatement<CR>
@@ -172,6 +206,8 @@ nnoremap ]v :action VcsShowNextChangeMarker<CR>
 nnoremap [v :action VcsShowPrevChangeMarker<CR>
 nnoremap [c :action JumpToLastChange<CR>
 nnoremap ]c :action JumpToNextChange<CR>
+nnoremap ]h :action VcsShowNextChangeMarker<CR>
+nnoremap [h :action VcsShowPrevChangeMarker<CR>
 nnoremap <leader>ll :action RecentLocations<CR>
 "nnoremap <leader>fR :action RecentFiles<CR>
 nnoremap <C-i> :action Forward<CR>
@@ -187,6 +223,7 @@ nnoremap ]F :action MethodUp<CR>
 nmap <leader>cf <Action>(ReformatCode)\|<Action>(RearrangeCode)
 vmap <leader>cf <Action>(ReformatCode)\|<Action>(RearrangeCode)
 nnoremap <leader>Jo :action OptimizeImports<CR>
+nnoremap <leader>ro :action OptimizeImports<CR>
 "nnoremap <leader>cF :action RearrangeCode<CR>" Organice Code
 
 "-------- Moving Code ---------
@@ -197,6 +234,11 @@ nmap <leader>cn <Action>(CopyFileName)
 nmap <leader>cp <Action>(CopyContentRootPath)
 
 "-------- File Management ---------
+" buffer parity with nvim (<leader>b-prefix)
+nnoremap <leader>bb :action JumpToLastWindow<CR>
+nnoremap <leader>bd :action CloseContent<CR>
+nnoremap <leader>bD :action CloseContent<CR>
+nnoremap <leader>bo :action CloseAllEditors<CR>
 nmap <leader>fn <Action>(NewScratchFile)
 nmap <leader>wq <Action>(CloseContent)
 "map <leader>-
@@ -204,6 +246,7 @@ nmap <leader>wo <Action>(CloseAllEditors)
 nmap <leader>nf <Action>(NewFile)
 nmap <leader>nd <Action>(NewDir)
 nmap <leader>cR <Action>(RenameFile)
+nmap <leader>cN <Action>(RenameFile)
 nmap <leader>of <Action>(OpenFile)
 nmap <leader>rs <Action>(RestartIde)
 nmap <C-S-h> <Action>(MoveEditorToOppositeTabGroup)
@@ -217,6 +260,8 @@ nmap <leader>b <Action>(ShowNavBar)
 "-------- easymotion ---------
 nmap <leader>j <Plug>(easymotion-s2)
 nmap <leader>k <Plug>(easymotion-F2)
+" flash parity with nvim (ss = jump)
+nmap ss <Plug>(easymotion-s2)
 
 " Use 'm' instead - functiontextobj
 "nmap im <Plug>InnerFunction
@@ -224,11 +269,13 @@ nmap <leader>k <Plug>(easymotion-F2)
 
 nnoremap <leader>wn :action EditSourceInNewWindow<CR>
 nnoremap <leader>n :action NextWindow<CR>
-nnoremap <leader>bd :q!<CR>
+nnoremap <leader>qq :action Exit<CR>
 inoremap jj <Esc>
 nnoremap <leader>uz :action ToggleDistractionFreeMode<CR>
 nnoremap <C-/> :action ActivateTerminalToolWindow<CR>
 nnoremap <leader>t :action Terminal.OpenInTerminal<CR>
+nnoremap <leader>ft :action Terminal.OpenInTerminal<CR>
+nnoremap <leader>fT :action ActivateTerminalToolWindow<CR>
 
 
 vnoremap < <gv
@@ -245,6 +292,11 @@ nnoremap <c-x> :action HideAllWindows<CR>
 
 " Debugging
 nnoremap ,r :action ContextRun<CR>
+" tests parity with nvim (tn/tf/td/tl)
+nnoremap <leader>tn :action ContextRun<CR>
+nnoremap <leader>tf :action RunClass<CR>
+nnoremap <leader>td :action DebugClass<CR>
+nnoremap <leader>tl :action Rerun<CR>
 nnoremap <leader>Jc :action RunClass<CR>
 nnoremap <leader>dC :action ChooseRunConfiguration<CR>
 nnoremap ,t :action ActivateRunToolWindow<CR>
@@ -269,9 +321,14 @@ imap <C-y> <Action>(EditorChooseLookupItem)
 nmap gsr <Plug>CSurround
 nmap gsd <Plug>DSurround
 xmap gsa <Plug>VSurround
+" Surround parity mini-surround (nvim sa/sd/sr)
+nmap sa ys
+nmap sd ds
+nmap sr cs
 
-nmap <leader>ff <Action>(com.fuzzyfilesearch.SearchInProjectPath)
-nmap <leader>fR <Action>(com.fuzzyfilesearch.SearchInRecentFiles)
+nmap <leader>ff <Action>(GotoFile)
+nmap <leader>fR <Action>(RecentFiles)
+nmap <leader>fo <Action>(RecentFiles)
 nmap <leader>fb <Action>(com.fuzzyfilesearch.BufSearch)
 "nmap <Leader>ff <action>(com.mituuz.fuzzier.Fuzzier)
 nmap <Leader>fm <action>(com.mituuz.fuzzier.FuzzyMover)

@@ -37,7 +37,7 @@ function M.setup_options()
         extra_request_body = { temperature = 0.2, max_tokens = 64000 },
       }
     end
-    default_provider = claude_proxy.MODELS[claude_proxy.MODEL_ORDER[2]].id
+    default_provider = claude_proxy.MODELS[claude_proxy.MODEL_ORDER[4]].id
   elseif has_opencode then
     default_provider = "opencode"
   elseif has_claude_code then
@@ -59,9 +59,7 @@ function M.setup_options()
         ACP_PATH_TO_CLAUDE_CODE_EXECUTABLE = vim.fn.exepath("claude"),
       }),
     }
-  end
-
-  if has_opencode then
+  elseif has_opencode then
     local opencode_env = { HOME = vim.env.HOME }
     if has_proxy then
       opencode_env.ANTHROPIC_API_KEY = claude_proxy.api_key()
