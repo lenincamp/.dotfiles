@@ -1,3 +1,14 @@
+# Context and Token Discipline
+- Use the smallest amount of context necessary to complete the task correctly.
+- Inspect only files, symbols, and documentation relevant to the requested change.
+- Prefer targeted searches over broad repository exploration.
+- Do not load or invoke specialized skills unless they are necessary for the task.
+- Do not perform speculative analysis or investigate unrelated hypothetical issues.
+- Do not refactor code unrelated to the requested change.
+- Prefer incremental, focused changes over large autonomous workflows.
+- Verify relevant assumptions against the codebase before acting; do not guess repository conventions.
+- Ask for clarification when the requested scope, behavior, or acceptance criteria are ambiguous.
+
 # Engineering Principles
 
 ## Security
@@ -24,8 +35,10 @@
 
 ## Execution Style
 - Responses: code + minimal explanation
-- Use AskUserQuestion when clarification needed
-- Read unknown files with `limit: 150`; Grep first for patterns
+- For unknown files, search for relevant symbols or patterns first; read only the necessary surrounding context
+- Each changed line traces to the request; remove only orphans your change created
+- Non-trivial tasks: define verifiable goal (test/cmd) first; stop once met
+- Background work: never `sleep >4m`; use `sleep 220` + cheap status poll to preserve prompt cache
 
 ## Git
 - Format: `feat|fix|chore(scope): [TICKET] description`

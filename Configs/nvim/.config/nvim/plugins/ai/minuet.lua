@@ -39,7 +39,7 @@ if has_proxy then
   provider_options = {
     claude = {
       name = "Claude",
-      model = claude_proxy.MODELS.HAIKU_4_5.id,
+      model = claude_proxy.MODELS.HAIKU_5_5.id,
       api_key = claude_proxy.api_key,
       end_point = claude_proxy.endpoint("messages"),
       system = system,
@@ -78,12 +78,18 @@ if has_proxy then
     request_timeout = 20,
     provider_options = {
       claude = {
-        model = claude_proxy.MODELS.SONNET_4_6.id,
+        model = claude_proxy.MODELS.SONNET_5_5.id,
         api_key = claude_proxy.api_key,
         end_point = claude_proxy.endpoint("messages"),
         max_tokens = 8192,
         optional = {
           temperature = 0.1,
+          output_config = {
+            effort = "low",
+          },
+          thinking = {
+            type = "between_tools",
+          },
         },
       },
     },

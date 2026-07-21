@@ -129,6 +129,78 @@ function M.escape_characters()
 end
 
 -- ──────────────────────────────────────────────────────────────────────────────
+-- Decompiled search (filesystem)
+-- ──────────────────────────────────────────────────────────────────────────────
+
+local decompiled_path = os.getenv("HOME") .. "/.cache/java-decompiled/latest-by-artifact"
+
+function M.grep_decompiled()
+  vim.ui.input({ prompt = "Grep decompiled: " }, function(input)
+    if not input or input == "" then return end
+    local cmd = { "rg", "--vimgrep", "-F", input, decompiled_path }
+    local lines = vim.fn.systemlist(cmd)
+    if vim.v.shell_error ~= 0 or #lines == 0 then
+      vim.notify("No matches in decompiled", vim.log.levels.INFO)
+      return
+    end
+    local items = {}
+    for _, line in ipairs(lines) do
+      local file, lnum, col, text = line:match("^(.-):(.-):(.-):(.*)$")
+      if file then
+        items[#items + 1] = { filename = file, lnum = tonumber(lnum), col = tonumber(col), text = text }
+      end
+    end
+    vim.fn.setqflist({}, "r", { title = "Grep decompiled: " .. input, items = items })
+    vim.cmd.copen(10)
+  end)
+end
+
+function M.find_decompiled_files()
+  local ok, picker = pcall(require, "picker")
+  if ok and picker.find_files then
+    picker.find_files({ cwd = decompiled_path, prompt = "Decompiled files" })
+    return
+  end
+  vim.fn.feedkeys(":find " .. decompiled_path .. "/**/*", "n")
+end
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- Decompiled search (filesystem)
+-- ──────────────────────────────────────────────────────────────────────────────
+
+local decompiled_path = os.getenv("HOME") .. "/.cache/java-decompiled/latest-by-artifact"
+
+function M.grep_decompiled()
+  vim.ui.input({ prompt = "Grep decompiled: " }, function(input)
+    if not input or input == "" then return end
+    local cmd = { "rg", "--vimgrep", "-F", input, decompiled_path }
+    local lines = vim.fn.systemlist(cmd)
+    if vim.v.shell_error ~= 0 or #lines == 0 then
+      vim.notify("No matches in decompiled", vim.log.levels.INFO)
+      return
+    end
+    local items = {}
+    for _, line in ipairs(lines) do
+      local file, lnum, col, text = line:match("^(.-):(.-):(.-):(.*)$")
+      if file then
+        items[#items + 1] = { filename = file, lnum = tonumber(lnum), col = tonumber(col), text = text }
+      end
+    end
+    vim.fn.setqflist({}, "r", { title = "Grep decompiled: " .. input, items = items })
+    vim.cmd.copen(10)
+  end)
+end
+
+function M.find_decompiled_files()
+  local ok, picker = pcall(require, "picker")
+  if ok and picker.find_files then
+    picker.find_files({ cwd = decompiled_path, prompt = "Decompiled files" })
+    return
+  end
+  vim.fn.feedkeys(":find " .. decompiled_path .. "/**/*", "n")
+end
+
+-- ──────────────────────────────────────────────────────────────────────────────
 -- Decompiled buffer navigation
 -- ──────────────────────────────────────────────────────────────────────────────
 
@@ -335,6 +407,10 @@ function M.java_keymaps(bufnr)
     "[J]ava [D]ecompiled buffers")
   map("n", "<leader>Jdy", M.copy_decompiled_uri,
     "[J]ava [D]ecompiled copy URI")
+  map("n", "<leader>Jds", M.grep_decompiled,
+    "[J]ava [D]ecompiled [S]earch text")
+  map("n", "<leader>Jdf", M.find_decompiled_files,
+    "[J]ava [D]ecompiled [F]ind files")
 
   -- Scaffolding
   map("n", "<leader>Jtc", M.create_class, "Spring: Create class")

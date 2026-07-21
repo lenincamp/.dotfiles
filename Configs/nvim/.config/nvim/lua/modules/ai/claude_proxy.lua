@@ -9,16 +9,16 @@ M.API_KEY_CMD = "cmd:llm-proxy-keys -q -n"
 M.MODELS = {
   OPUS_4_6     = { id = "anthropic.claude-opus-4-6",   label = "opus 4.6" },
   SONNET_4_6   = { id = "anthropic.claude-sonnet-4-6", label = "sonnet 4.6" },
-  OPUS_4_8     = { id = "anthropic.claude-opus-4-8",   label = "opus 4.8" },
-  SONNET_5     = { id = "anthropic.claude-sonnet-5",   label = "sonnet 5" },
-  HAIKU_4_5    = { id = "anthropic.claude-haiku-4-5",  label = "haiku 4.5" },
+  OPUS_5_5     = { id = "anthropic.claude-opus-5-5",   label = "opus 5.5" },
+  SONNET_5_5   = { id = "anthropic.claude-sonnet-5-5",   label = "sonnet 5.5" },
+  HAIKU_5_5    = { id = "anthropic.claude-haiku-5-5",  label = "haiku 5.5" },
   GPT_OSS_120B = { id = "openai.gpt-oss-120b",         label = "gpt-oss-120b" },
   GPT_5        = { id = "gpt-5",                       label = "gpt-5" },
   GPT_5_MINI   = { id = "gpt-5-mini",                  label = "gpt-5-mini" },
 }
 
 M.MODEL_ORDER = {
-  "OPUS_4_6", "SONNET_4_6", "OPUS_4_8", "SONNET_5", "HAIKU_4_5",
+  "OPUS_4_6", "SONNET_4_6", "OPUS_5_5", "SONNET_5_5", "HAIKU_5_5",
   "GPT_OSS_120B", "GPT_5", "GPT_5_MINI",
 }
 

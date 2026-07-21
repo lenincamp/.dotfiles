@@ -52,7 +52,7 @@ end
 require("configs")
 require("lazy").setup("plugins", {
   defaults = { lazy = true },
-  install = { colorscheme = { "catppuccin" } },
+  -- install = { colorscheme = { "catppuccin" } },
   lockfile = vim.fn.stdpath("config") .. "/lazy-lock.json",
   checker = { enabled = true },
   performance = {
